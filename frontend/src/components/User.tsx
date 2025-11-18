@@ -2,7 +2,7 @@ import { useNavigate, Link } from "react-router-dom";
 import { useContext } from "react";
 import AuthContext from "../context/AuthProvider";
 
-const Home = () => {
+const User = () => {
     const { setAuth } = useContext(AuthContext);
     const navigate = useNavigate();
 
@@ -33,4 +33,4 @@ const Home = () => {
     )
 }
 
-export default Home
+export default User;

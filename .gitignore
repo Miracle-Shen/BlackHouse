@@ -1,0 +1,18 @@
+# 依赖目录
+node_modules/
+# 环境变量文件
+.env
+.env.local
+.env.development.local
+.env.production.local
+# 构建产物
+dist/
+# 日志
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+# IDE 配置（可选，根据自己的编辑器添加）
+.idea/
+.vscode/
+*.swp
+*.swo
