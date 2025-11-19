@@ -14,7 +14,7 @@ const handleLogin = async (req, res) => {
     console.log(user,pwd);
     if (!user || !pwd) return res.status(400).json({ 'message': 'Username and password are required.' });
     const foundUser = usersDB.users.find(person => person.username === user);
-    if (!foundUser) return res.sendStatus(401); //Unauthorized 未授权
+    if (!foundUser) return res.status(401).json({ 'message': '未注册用户' }); //Unauthorized 未授权
 
     //密码验证
     const match = await bcrypt.compare(pwd, foundUser.password);

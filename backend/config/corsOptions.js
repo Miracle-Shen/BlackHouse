@@ -1,7 +1,8 @@
 const whitelist = [
     'https://www.yoursite.com',
     'http://127.0.0.1:5500',
-    'http://localhost:3500'
+    'http://localhost:3500',
+    'http://localhost:5173'
 ];
 
 const corsOptions = {
@@ -12,7 +13,8 @@ const corsOptions = {
             callback(new Error('Not allowed by CORS'));
         }
     },
-    optionsSuccessStatus: 200
+    optionsSuccessStatus: 200,
+    credentials: true 
 }
 
 module.exports = corsOptions;

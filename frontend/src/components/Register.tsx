@@ -1,8 +1,13 @@
 import { useRef, useState, useEffect } from "react";
 import axios from '../api/axios';
 
-const USER_REGEX = /^[A-z][A-z0-9-_]{3,23}$/;
-const PWD_REGEX = /^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[!@#$%]).{8,24}$/;
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faCheck, faTimes, faInfoCircle } from "@fortawesome/free-solid-svg-icons";
+import { Link } from "react-router-dom";
+// 正则表达式验证用户名和密码
+const USER_REGEX = /^[A-z][A-z0-9-_]{3,23}$/; // 4到24位，必须以字母开头，允许字母、数字、下划线、连字符
+//const PWD_REGEX = /^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[!@#$%]).{8,24}$/; // 8到24位，至少包含一个小写字母、一个大写字母、一个数字和一个特殊字符
+const PWD_REGEX = /^\S{8,24}$/; // 8到24位的非空字符
 const REGISTER_URL = '/register';
 
 const Register = () => {
@@ -24,6 +29,7 @@ const Register = () => {
     const [errMsg, setErrMsg] = useState('');
     const [success, setSuccess] = useState(false);
 
+    // 设置输入框初始焦点
     useEffect(() => {
         userRef.current?.focus();
     }, [])
@@ -43,6 +49,7 @@ const Register = () => {
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
+        // 防止通过修改前端代码绕过验证
         const v1 = USER_REGEX.test(user);
         const v2 = PWD_REGEX.test(pwd);
         if (!v1 || !v2) {
@@ -51,7 +58,7 @@ const Register = () => {
         }
         try {
             const response = await axios.post(REGISTER_URL,
-                JSON.stringify({ user, pwd }),
+                JSON.stringify({ user:user, pwd:pwd }),
                 {
                     headers: { 'Content-Type': 'application/json' },
                     withCredentials: true
@@ -59,22 +66,17 @@ const Register = () => {
             );
             console.log(JSON.stringify(response?.data));
             setSuccess(true);
+            //清空输入框
             setUser('');
             setPwd('');
             setMatchPwd('');
         } catch (err: unknown) {
-            interface ErrorResponse {
-                response?: {
-                    status?: number;
-                };
-            }
-            const error = err as ErrorResponse;
-            if (!error?.response) {
+            if (!err?.response) {
                 setErrMsg('No Server Response');
-            } else if (error.response?.status === 409) {
-                setErrMsg('Username Taken');
+            } else if (err.response?.status === 409) {
+                setErrMsg('用户名已被占用');
             } else {
-                setErrMsg('Registration Failed')
+                setErrMsg('注册失败')
             }
             errRef.current?.focus();
         }
@@ -82,102 +84,108 @@ const Register = () => {
 
     return (
         <>
-            {success ? (
-                <div className="p-4">
-                    <div className="max-w-sm mx-auto text-center">
-                        <h1 className="text-xl font-bold mb-2">Success!</h1>
-                        <p>Account created successfully.</p>
-                    </div>
-                </div>
-            ) : (
-                <div className="p-4">
-                    <div className="max-w-sm mx-auto">
-                        {errMsg && (
-                            <p ref={errRef} className="text-red-600 text-sm mb-4" aria-live="assertive">
-                                {errMsg}
-                            </p>
-                        )}
-                        <h1 className="text-xl font-bold mb-4">Register</h1>
-                        <form onSubmit={handleSubmit} className="space-y-4">
-                            <div>
-                                <label htmlFor="username" className="block text-sm mb-1">
-                                    Username {validName && <span className="text-green-600">✓</span>}
-                                    {!validName && user && <span className="text-red-600">✗</span>}
-                                </label>
-                                <input
-                                    type="text"
-                                    id="username"
-                                    ref={userRef}
-                                    autoComplete="off"
-                                    onChange={(e) => setUser(e.target.value)}
-                                    value={user}
-                                    required
-                                    onFocus={() => setUserFocus(true)}
-                                    onBlur={() => setUserFocus(false)}
-                                    className="w-full p-2 border border-gray-300 rounded"
-                                />
-                                {userFocus && user && !validName && (
-                                    <p className="text-xs text-gray-600 mt-1">
-                                        4 to 24 characters. Must begin with a letter. Letters, numbers, underscores, hyphens allowed.
-                                    </p>
-                                )}
-                            </div>
+        {success ? 
+        (<>
+        <h2>注册成功！</h2>
+        <Link to="/login">点击这里登录</Link>
+        </>)
+           :
+        (<section>
+            <p ref={errRef} className={errMsg ? "errmsg" : "offscreen"} aria-live="assertive">{errMsg}</p>
 
-                            <div>
-                                <label htmlFor="password" className="block text-sm mb-1">
-                                    Password {validPwd && <span className="text-green-600">✓</span>}
-                                    {!validPwd && pwd && <span className="text-red-600">✗</span>}
-                                </label>
-                                <input
-                                    type="password"
-                                    id="password"
-                                    onChange={(e) => setPwd(e.target.value)}
-                                    value={pwd}
-                                    required
-                                    onFocus={() => setPwdFocus(true)}
-                                    onBlur={() => setPwdFocus(false)}
-                                    className="w-full p-2 border border-gray-300 rounded"
-                                />
-                                {pwdFocus && !validPwd && (
-                                    <p className="text-xs text-gray-600 mt-1">
-                                        8 to 24 characters. Must include uppercase and lowercase letters, a number and a special character (!@#$%).
-                                    </p>
-                                )}
-                            </div>
+            <h1>欢迎注册</h1>
+            <form onSubmit={handleSubmit}>
+                {/* 属性值 username 与 <input> 的 id="username" 绑定， */}
+                <label htmlFor="username">
+                    用户名称:
+                    <span className={validName ? "valid" : "hide"}>
+                       <FontAwesomeIcon icon={faCheck} />
+                    </span>
+                    <span className={validName || !user ? "hide" : "invalid"}>
+                        <FontAwesomeIcon icon={faTimes} />
+                    </span>
+                </label>
+                <input
+                    type="text"
+                    id="username"
+                    ref = {userRef}
+                    autoComplete="off"
+                    onChange={(e) => setUser(e.target.value)}
+                    value={user}
+                    required
+                    aria-invalid={validName ? "false" : "true"}
+                    aria-describedby="uidnote"
+                    onFocus={()=>setUserFocus(true)}
+                    onBlur={()=>setUserFocus(false)}
+                />
+                <p id="uidnote" className={userFocus && user && !validName ? "instructions" : "offscreen"}>
+                    <FontAwesomeIcon icon="info-circle" />
+                    4-24位<br />
+                    必须以字母开头，允许字母、数字、下划线、连字符<br />
+                </p>
 
-                            <div>
-                                <label htmlFor="confirm_pwd" className="block text-sm mb-1">
-                                    Confirm Password {validMatch && matchPwd && <span className="text-green-600">✓</span>}
-                                    {!validMatch && matchPwd && <span className="text-red-600">✗</span>}
-                                </label>
-                                <input
-                                    type="password"
-                                    id="confirm_pwd"
-                                    onChange={(e) => setMatchPwd(e.target.value)}
-                                    value={matchPwd}
-                                    required
-                                    onFocus={() => setMatchFocus(true)}
-                                    onBlur={() => setMatchFocus(false)}
-                                    className="w-full p-2 border border-gray-300 rounded"
-                                />
-                                {matchFocus && !validMatch && (
-                                    <p className="text-xs text-gray-600 mt-1">
-                                        Must match the first password input field.
-                                    </p>
-                                )}
-                            </div>
+                <label htmlFor="password">
+                    Password:
+                    <span className={validPwd ? "valid" : "hide"}>
+                        <FontAwesomeIcon icon={faCheck} />        
+                    </span>
+                    <span className={validPwd || !pwd ? "hide" : "invalid"}>
+                        <FontAwesomeIcon icon={faTimes} />
+                    </span> 
+                </label>
+                <input
+                    type="password" 
+                    id="password"
+                    onChange={(e) => setPwd(e.target.value)}
+                    value={pwd}
+                    required
+                    aria-invalid={validPwd ? "false" : "true"}
+                    aria-describedby="pwdnote"
+                    onFocus={()=>setPwdFocus(true)}
+                    onBlur={()=>setPwdFocus(false)}
+                />
+                <p id="pwdnote" className={pwdFocus && !validPwd ? "instructions" : "offscreen"}>
+                    <FontAwesomeIcon icon={faInfoCircle} />
+                    8- 24 非空字符.<br />
+                    允许字母，数字，符合等可见字符
+                </p>
 
-                            <button 
-                                disabled={!validName || !validPwd || !validMatch}
-                                className="w-full bg-blue-600 hover:bg-blue-700 disabled:bg-gray-400 text-white py-2 px-4 rounded"
-                            >
-                                Sign Up
-                            </button>
-                        </form>
-                    </div>
-                </div>
-            )}
-        </>
+                <label htmlFor="confirm_pwd">
+                    Confirm Password:
+                    <span className={validMatch && matchPwd ? "valid" : "hide"}>    
+                        <FontAwesomeIcon icon={faCheck} />
+                    </span>
+                    <span className={validMatch || !matchPwd ? "hide" : "invalid"}>
+                        <FontAwesomeIcon icon={faTimes} />    
+                    </span>
+                </label>
+                <input
+                    type="password"
+                    id="confirm_pwd"
+                    onChange={(e) => setMatchPwd(e.target.value)}
+                    value={matchPwd}
+                    required
+                    aria-invalid={validMatch ? "false" : "true"}
+                    aria-describedby="confirmnote"
+                    onFocus={()=>setMatchFocus(true)}
+                    onBlur={()=>setMatchFocus(false)}
+                />
+                <p id="confirmnote" className={matchFocus && !validMatch ? "instructions" : "offscreen"}>
+                    <FontAwesomeIcon icon="info-circle" />
+                    必须和上面输入的密码一致
+                </p>
+
+                <button disabled={ !validName || !validPwd || !validMatch ? true : false } onClick={handleSubmit}>注册</button>  
+            </form>
+
+            <p>
+                已有账号？<br />
+                <span className="line">
+                    <Link to="/login">登录</Link>
+                </span>
+            </p>
+        </section>)}
+    </>
     )
 }
 
