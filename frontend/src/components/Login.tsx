@@ -5,7 +5,7 @@ import { Link, useNavigate, useLocation } from 'react-router-dom';
 import axios from '../api/axios';
 const LOGIN_URL = '/auth';
 
-export const Login = () => {
+const Login = () => {
     const { setAuth } = useAuth();
 
     const navigate = useNavigate();
@@ -97,3 +97,4 @@ export const Login = () => {
     )
 }
 
+export default Login;

@@ -1,4 +1,4 @@
-import { Login } from './components/Login';
+import Login from './components/Login';
 import Register from './components/Register';
 import User from './components/User';
 import { feedStream as FeedStream } from './components/Feed';
