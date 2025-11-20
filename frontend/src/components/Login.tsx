@@ -37,8 +37,8 @@ const Login = () => {
             );
             console.log("Login Response: " + JSON.stringify(response?.data)); 
             const accessToken = response?.data?.accessToken; 
-            const roles = response?.data?.roles;
-            setAuth({ user, pwd, roles, accessToken });
+            // const roles = response?.data?.roles;
+            setAuth({ user, pwd, accessToken });
             setUser(''); 
             setPwd(''); 
             setSuccess(true);
@@ -59,11 +59,18 @@ const Login = () => {
 
     return (
         <>
-        {success ? ( <>登录成功!!</>) : 
+        {success ? ( 
+            <>
+                <p>登录成功!</p>
+                <section>
+                <Link to="/User" >返回</Link>
+                </section>
+            </>
+        ) : 
         (<section>
             <p ref={errRef} className={errMsg ? "errmsg" : "offscreen"} aria-live="assertive">{errMsg}</p>
 
-            <h1>登录</h1>
+            <h1>请登录</h1>
 
             <form onSubmit={handleSubmit}>
                 <label htmlFor="username">用户名:</label>

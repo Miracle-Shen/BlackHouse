@@ -6,10 +6,10 @@ const usersDB = {
 
 const fsPromises = require('fs').promises;
 const path = require('path');
-
+const { v4: uuidv4 } = require('uuid');
 //hash password
 const bcrypt = require('bcrypt');
-
+const { createUser } = require('../lib/userAPI.js');
 const  handleNewUser = async (req, res) => {
     const { user, pwd } = req.body;
     if(!user || !pwd) return res.status(400).json({ 'message': 'Username and password are required.' }); //400 Bad Request 语法有有误格式不对
@@ -20,13 +20,17 @@ const  handleNewUser = async (req, res) => {
     try{
         //密码加密
         const hashedPwd = await bcrypt.hash(pwd, 10); //这个数字 10 是 成本因子 或 salt的轮数。
-        const newUser = {"username": user, "password": hashedPwd};
+        const userId = uuidv4();
+        const newUser = {"username": user,"userId": userId, "password": hashedPwd};
         usersDB.setUsers([...usersDB.users, newUser]);
         await fsPromises.writeFile(
             path.join(__dirname, '..', 'model', 'users.json'), 
             JSON.stringify(usersDB.users)
         );
         console.log(usersDB.users);
+      
+        await createUser(userId, user);
+        console.log(`User ${user} created in Appwrite DB`);
         res.status(201).json({ 'success': `New user ${user} created!` }); //201 Created 成功创建
     }catch(err){
         console.error(err);

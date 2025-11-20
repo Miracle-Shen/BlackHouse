@@ -1,19 +1,28 @@
 
-const usersDB = {
-    users:require('../model/users.json'),
-    setUsers: function (data) { this.users = data; }
-}
+const fs = require('fs');
+const path = require('path');
 const bcrypt = require('bcrypt');
 const JWT = require('jsonwebtoken');
 require('dotenv').config();
 const fsPromises = require('fs').promises;
-const path = require('path');
 
+const usersDB = {
+    get users() {
+        // 每次访问时实时读取文件，避免缓存问题
+        const data = fs.readFileSync(path.join(__dirname, '../model/users.json'), 'utf-8');
+        return JSON.parse(data);
+    },
+    setUsers: function (data) { 
+        fs.writeFileSync(path.join(__dirname, '../model/users.json'), JSON.stringify(data, null, 2));
+    }
+};
 const handleLogin = async (req, res) => {
     const { user, pwd } = req.body;
     console.log(user,pwd);
     if (!user || !pwd) return res.status(400).json({ 'message': 'Username and password are required.' });
     const foundUser = usersDB.users.find(person => person.username === user);
+
+        console.log("foundUser:", foundUser);
     if (!foundUser) return res.status(401).json({ 'message': '未注册用户' }); //Unauthorized 未授权
 
     //密码验证

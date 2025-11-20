@@ -10,7 +10,6 @@ const useAxiosPrivate = () => {
     const { auth } = useAuth();
 
     useEffect(() => {
-
         const requestIntercept = axiosPrivate.interceptors.request.use(
             config => {
                 if (!config.headers['authorization']) {
@@ -20,19 +19,23 @@ const useAxiosPrivate = () => {
             }
         );
         const responseIntercept = axiosPrivate.interceptors.response.use(
+            // 情况1：请求成功 → 直接返回响应数据
             response => response,
+            
+            // 情况2：请求失败 → 进入这里处理 
             async(error) => {
                 const prevRequest = error?.config;
                 if(error?.response?.status === 403 && !prevRequest?.sent){
                     prevRequest.sent = true;//只重试一次
-                    const refresh = await refresh();
-                    prevRequest.header['authorization'] = `Bearer ${refresh}`;
+                    const refreshToken = await refresh();
+                    prevRequest.headers['authorization'] = `Bearer ${refreshToken}`;
                     return axiosPrivate(prevRequest);
                 }
             }
         );
         return () => {
             axiosPrivate.interceptors.response.eject(responseIntercept);
+            axiosPrivate.interceptors.request.eject(requestIntercept);
         }
     }, [auth, refresh])
 

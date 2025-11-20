@@ -8,6 +8,7 @@ const path = require('path');
 
 const handleLogout = async (req, res) => {
     const cookie = req.cookies;
+    console.log("cookie:", cookie);
     if(!cookie?.jwt) {
         return res.sendStatus(204); //No Content 无内容
     }
@@ -16,6 +17,8 @@ const handleLogout = async (req, res) => {
         res.clearCookie('jwt',{ httpOnly:true, maxAge:24*60*60*1000 });
         return res.sendStatus(204);
     }
+
+    //清除刷新令牌 db
     foundUser.refreshToken = '';
 
     const otherUsers = usersDB.users.filter(person => person.username !== foundUser.username);

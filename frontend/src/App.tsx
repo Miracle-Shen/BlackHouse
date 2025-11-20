@@ -4,7 +4,7 @@ import User from './components/User';
 import { feedStream as FeedStream } from './components/Feed';
 import Layout from './components/Layout-simple';
 import { Routes, Route } from 'react-router-dom';
-
+import PostEditor from './components/publish';
 function App() {
 
   return (
@@ -12,7 +12,7 @@ function App() {
       {/* 登录和注册页面不使用布局 */}
       <Route path="/login" element={<Login />} />
       <Route path="/register" element={<Register />} />
-      
+      <Route path="/publish" element={<PostEditor />} />
       {/* 其他页面使用布局 */}
       <Route path="/" element={<Layout />}>
         <Route index element={<FeedStream />} />

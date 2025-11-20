@@ -68,9 +68,10 @@ textarea {
 button {
   font-family: 'Nunito', sans-serif;
   font-size: 22px;
-  background-color:RGB(0, 188, 212) ;
+  background-color:white;
   padding: 0.5rem;
   border-radius: 0.5rem;
+  border-color:RGB(0, 188, 212)  ;
   margin-top: 1rem; 
 }
 
