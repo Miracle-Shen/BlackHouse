@@ -1,10 +1,10 @@
 import Login from './components/Login';
 import Register from './components/Register';
-import User from './components/User';
-import { feedStream as FeedStream } from './components/Feed';
+import FeedPage from './pages/FeedPage';
 import Layout from './components/Layout-simple';
 import { Routes, Route } from 'react-router-dom';
 import PostEditor from './components/publish';
+import Mine from './pages/Mine';
 function App() {
 
   return (
@@ -15,8 +15,8 @@ function App() {
       <Route path="/publish" element={<PostEditor />} />
       {/* 其他页面使用布局 */}
       <Route path="/" element={<Layout />}>
-        <Route index element={<FeedStream />} />
-        <Route path="user" element={<User />} />
+        <Route index element={<FeedPage />} />
+        <Route path="mine" element={<Mine />} />
       </Route>
     </Routes>
   );

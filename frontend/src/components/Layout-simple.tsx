@@ -22,7 +22,7 @@ const Layout = () => {
                         onClick={() => handleTabClick('home', '/')}
                         className={`p-2 text-sm ${activeTab === 'home' ? 'text-blue-600' : 'text-gray-500'}`}
                     >
-                        Home
+                        首页
                     </button>
                     
                     <button
@@ -33,10 +33,10 @@ const Layout = () => {
                     </button>
                     
                     <button
-                        onClick={() => handleTabClick('profile', '/user')}
-                        className={`p-2 text-sm ${activeTab === 'profile' ? 'text-blue-600' : 'text-gray-500'}`}
+                        onClick={() => handleTabClick('mine', '/mine')}
+                        className={`p-2 text-sm ${activeTab === 'mine' ? 'text-blue-600' : 'text-gray-500'}`}
                     >
-                        Profile
+                        我的
                     </button>
                 </div>
             </nav>

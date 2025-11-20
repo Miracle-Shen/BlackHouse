@@ -1,132 +1,92 @@
-@import url('https://fonts.googleapis.com/css2?family=Nunito&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700&display=swap');
 
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
-* {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
-}
-
-html {
-    font-family: 'Nunito', sans-serif;
-    font-size: 22px;
-    color: black;
-}
-
-body {
-    min-height: 100vh;
-    /* background-color: dodgerblue; */
-    
-}
-
+/* Custom component styles that can't be replaced by Tailwind */
 .App {
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  min-height: 100vh; 
-  padding: 1rem 0.5rem;
+  @apply flex flex-col justify-center items-center min-h-screen p-4 sm:p-2;
 }
 
 section {
-    width: 100%;
-    max-width: 420px;
-    min-height: 400px;
-    display: flex;
-    flex-direction: column;
-    justify-content: flex-start;
-    padding: 1rem;
-    background-color: rgb(33, 150, 243);
+  @apply w-full max-w-sm min-h-96 flex flex-col justify-start p-4 bg-primary-500 rounded-2xl shadow-lg hover:shadow-xl transition-shadow duration-200;
 }
 
 form {
-    display: flex;
-    flex-direction: column;
-    justify-content: space-evenly;
-    flex-grow: 1;
-    padding-bottom: 1rem;
-}
-
-a, a:visited {
-    color: #fff;
-}
-
-input[type="text"],
-input[type="password"],
-
-textarea {
-  font-family: 'Nunito', sans-serif;
-  font-size: 22px;
-  padding: 0.25rem;
-  border-radius: 0.5rem;
-}
-
-
-button {
-  font-family: 'Nunito', sans-serif;
-  font-size: 22px;
-  background-color:white;
-  padding: 0.5rem;
-  border-radius: 0.5rem;
-  border-color:RGB(0, 188, 212)  ;
-  margin-top: 1rem; 
-}
-
-li {
-    list-style-type: none;
+  @apply flex flex-col justify-evenly flex-grow pb-4 gap-2;
 }
 
 .instructions {
-    font-size: 0.75rem;
-    border-radius: 0.5rem;
-    background: #000;
-    color: #fff;
-    padding: 0.25rem;
-    position: relative;
-    bottom: -10px;
+  @apply text-xs rounded-lg bg-black text-white p-2 relative -bottom-2.5 flex items-center gap-1;
 }
 
 .instructions > svg {
-    margin-right: 0.25rem;
-}
-
-.offscreen {
-    position: absolute;
-    left: -9999px;
-}
-
-.hide {
-    display: none;
-}
-
-.valid {
-    color: limegreen;
-    margin-left: 0.25rem;
-}
-
-.invalid {
-    color: red;
-    margin-left: 0.25rem;
+  @apply flex-shrink-0;
 }
 
 .errmsg {
-    background-color: lightpink;
-    color: firebrick;
-    font-weight: bold;
-    padding: 0.5rem;
-    margin-bottom: 0.5rem;
+  @apply bg-red-100 text-red-800 font-semibold p-2 mb-2 rounded-lg border-l-4 border-red-500;
+}
+
+/* Utility classes for specific app needs */
+.offscreen {
+  @apply absolute -left-96;
+}
+
+.hide {
+  @apply hidden;
+}
+
+.valid {
+  @apply text-green-500 ml-1;
+}
+
+.invalid {
+  @apply text-red-500 ml-1;
 }
 
 .line {
-    display: inline-block;
+  @apply inline-block;
 }
 
 .flexGrow {
-    flex-grow: 1;
-    display: flex;
-    justify-content: flex-start;
-    align-items: flex-end;
+  @apply flex-grow flex justify-start items-end;
+}
+
+/* Custom loading animation - can't be easily replaced with Tailwind */
+.loading {
+  position: relative;
+  overflow: hidden;
+}
+
+.loading::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(255, 255, 255, 0.3),
+    transparent
+  );
+  animation: shimmer 1.5s infinite;
+}
+
+@keyframes shimmer {
+  to {
+    left: 100%;
+  }
+}
+
+/* Accessibility improvements */
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
 }
