@@ -3,7 +3,7 @@ import Register from './components/Register';
 import FeedPage from './pages/FeedPage';
 import Layout from './components/Layout-simple';
 import { Routes, Route } from 'react-router-dom';
-import PostEditor from './components/publish';
+import PostEditor from './components/edit';
 import Mine from './pages/Mine';
 function App() {
 

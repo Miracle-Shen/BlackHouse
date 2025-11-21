@@ -1,4 +1,4 @@
-import axios, { axiosPrivate } from "../api/axios";
+import { axiosPrivate } from "../api/axios";
 import { useEffect } from "react";
 import useRefreshToken from "./useRefreshToken";
 import useAuth from "./useAuth";
@@ -31,13 +31,14 @@ const useAxiosPrivate = () => {
                     prevRequest.headers['authorization'] = `Bearer ${refreshToken}`;
                     return axiosPrivate(prevRequest);
                 }
+                return Promise.reject(error);
             }
         );
-        return () => {
+         return () => {
             axiosPrivate.interceptors.response.eject(responseIntercept);
             axiosPrivate.interceptors.request.eject(requestIntercept);
-        }
-    }, [auth, refresh])
+        };
+    }, [auth, refresh]) //浅比较，每次refresh函数变化时重新执行useEffect
 
     return axiosPrivate;
 }

@@ -1,18 +1,20 @@
-import { useNavigate } from "react-router-dom";
+import { Navigate, useLocation, useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
-import { axiosPrivate } from "../api/axios";
+import useAxiosPrivate from "../hooks/useAxiosPrivate";
 import useAuth from "../hooks/useAuth";
 import User from "../components/User";
 
 const Mine = () => {
    const { auth } = useAuth();
    const navigate = useNavigate();
+   const location = useLocation();
    const [users, setUsers] = useState([]);
     const [isLoading, setIsLoading] = useState(true);
+    const axiosPrivate = useAxiosPrivate();
    useEffect(() => {
       // 如果用户未登录，直接导航到登录页
       if (!auth?.accessToken) {
-         navigate('/login');
+         navigate("/login", { state: { from: location.pathname }, replace: true });
          return;
       }
 
@@ -21,7 +23,7 @@ const Mine = () => {
       
       const fetchUsers = async () => {
          try {
-            const response = await axiosPrivate.get('/users', {
+            const response = await axiosPrivate.get('/user', {
                signal: controller.signal
             });
             if (isMounted) {
@@ -46,7 +48,7 @@ const Mine = () => {
          isMounted = false;
          controller.abort();
       };
-   }, [auth, navigate]);
+   }, [auth]);
 
 
 
@@ -56,13 +58,12 @@ const Mine = () => {
            <div>正在验证用户身份...</div>
         ) : (
             <>
-            <h1>用户信息页面</h1>
-        {users.length > 0 ? (
-           <User/>
-        ) : (
-          <div>加载用户信息中...</div>
-        )}
-        </>
+            {users? (
+                  <User/>
+               ) : (
+               <div>加载用户信息中...</div>
+            )}
+            </>
         )}
       </>
    );

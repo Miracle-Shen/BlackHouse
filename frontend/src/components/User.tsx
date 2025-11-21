@@ -1,13 +1,12 @@
 import { useNavigate, useLocation, Link } from "react-router-dom";
 import { useContext, useEffect, useState } from "react";
 import AuthContext from "../context/AuthProvider";
-import  { axiosPrivate } from "../api/axios";
-import useRefreshToken from "../hooks/useRefreshToken";
+import  useAxiosPrivate  from "../hooks/useAxiosPrivate";
 const User = () => {
    const[users,setUsers]=useState([]);
     const navigate=useNavigate();
-    const location=useLocation();
     const {setAuth}=useContext(AuthContext);
+    const axiosPrivate = useAxiosPrivate();
     const logout = async () => {
         try {
             // 调用后端退出登录接口
@@ -27,7 +26,6 @@ const User = () => {
             const response=await axiosPrivate.get('/user',{
                signal:controller.signal
             });
-            console.log("try to fetch user info", response.data);
             isMounted && setUsers(response.data);
          }catch(err){
             console.error(err);
@@ -42,16 +40,20 @@ const User = () => {
     }, []);
     return (
       <>
-        <h1>用户信息页面</h1>
+        <h1>我的</h1>
         {users ? (
             <>
             <section>
-                personal info
-                <a>
-                    您好！{users.userName}
-                </a>
-                <div>
-                    您的兴趣tags：{users.interestTags}
+                <div className="flex-row align-item">
+                    <img 
+                        src="frontend\public\vite.svg"
+                        alt="用户头像"
+                        className="w-15 h-15 rounded-full"
+                    />
+                    <div className="flex-row">
+                        <h3>{users.userName}</h3>
+                        <p>你的tag：{users.interestTags}</p>
+                    </div>
                 </div>
             </section>
             <div>

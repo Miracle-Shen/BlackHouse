@@ -14,8 +14,9 @@ const Login = () => {
     const [pwd, setPwd] = useState('');
     const [errMsg, setErrMsg] = useState(''); 
     const [success, setSuccess] = useState(false); 
-
-
+    const navigate = useNavigate();
+    const location = useLocation();
+    const from = location.state?.from || '/';
     useEffect(() => {
         userRef.current.focus(); // 自动聚焦用户名输入框
     }, [])
@@ -42,7 +43,7 @@ const Login = () => {
             setUser(''); 
             setPwd(''); 
             setSuccess(true);
-            // navigate(from, { replace: true }); 
+            navigate(from, { replace: true }); 
         } catch (err) {
             if (!err?.response) {
                 setErrMsg('无服务器响应');
@@ -63,7 +64,7 @@ const Login = () => {
             <>
                 <p>登录成功!</p>
                 <section>
-                <Link to="/User" >返回</Link>
+                <Link to="/Mine" >返回</Link>
                 </section>
             </>
         ) : 
