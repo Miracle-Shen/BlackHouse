@@ -1,15 +1,16 @@
 const { Client, ID, TablesDB,Query } = require( "appwrite");
-
+const dotenv = require('dotenv');
+dotenv.config();
 const client = new Client()
-    .setEndpoint('https://nyc.cloud.appwrite.io/v1') // Replace <REGION> with your Appwrite region
-    .setProject('691ec46d0011cc0af217'); // BlackHouse Project ID
+    .setEndpoint(process.env.APPWRITE_ENDPOINT) // Replace <REGION> with your Appwrite region
+    .setProject(process.env.APPWRITE_PROJECT_ID); // BlackHouse Project ID
 
 const tablesDB = new TablesDB(client);
 
 const createUser = async (userId, userName) => {
     try {
         const response = await tablesDB.createRow({
-            databaseId: '691ec498000fad4f52be', // Replace with your database ID
+            databaseId: process.env.DATABASE_ID, // Replace with your database ID
             tableId: 'user', // Replace with your table ID
             rowId: ID.unique(),
             data: {
@@ -29,7 +30,7 @@ const createUser = async (userId, userName) => {
 const fetchUser =  async (userId) => {
     try {
         const response = await tablesDB.listRows({
-            databaseId: '691ec498000fad4f52be', 
+            databaseId: process.env.DATABASE_ID,
             tableId: 'user',
             queries: [
                 Query.equal('userId', userId)
@@ -45,7 +46,7 @@ const fetchUser =  async (userId) => {
 const fetchTags =  async (userId) => {
     try {
         const response = await tablesDB.listRows({
-            databaseId: '691ec498000fad4f52be', 
+            databaseId:  process.env.DATABASE_ID,
             tableId: 'user_tag',
             queries: [
                 Query.equal('userId', userId)

@@ -20,7 +20,7 @@ const PORT = process.env.PORT || 3500;
 app.use(cors(corsOptions));
 
 // 内置中间件：解析urlencoded格式的表单数据
-app.use(express.urlencoded({ extended: false }));
+app.use(express.urlencoded({ extended: true }));
 
 // 内置中间件：解析JSON格式的数据
 app.use(express.json());
@@ -35,9 +35,10 @@ app.use('/register', require('./routes/register')); // 注册路由
 app.use('/logout', require('./routes/logout')); // 注销路由
 app.use('/auth', require('./routes/auth')); // 认证路由
 app.use('/refresh', require('./routes/refresh')); // 刷新令牌路由   
-
+app.use('/upload', require('./routes/upload')); // 文件上传路由
 app.use(verifyJWT); // JWT验证中间件，保护后续路由
 app.use('/user', require('./routes/user')); // 用户路由  
+
 // 处理所有未匹配的路由
 // app.all('*', (req, res) => {
 //     res.status(404); // 设置状态码为404

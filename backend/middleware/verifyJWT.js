@@ -3,9 +3,8 @@ require('dotenv').config();
 
 const verifyJWT = (req, res, next) => {
     const authHeader = req.headers['authorization'];
-    console.log("authHeader:", authHeader);
+    console.log("req authHeader:", authHeader);
     if(!authHeader) return res.sendStatus(401); //未授权
-    console.log(authHeader);
     const token = authHeader.split(' ')[1];
     JWT.verify(
         token,

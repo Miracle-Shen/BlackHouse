@@ -18,11 +18,10 @@ const usersDB = {
 };
 const handleLogin = async (req, res) => {
     const { user, pwd } = req.body;
-    console.log(user,pwd);
     if (!user || !pwd) return res.status(400).json({ 'message': 'Username and password are required.' });
     const foundUser = usersDB.users.find(person => person.username === user);
 
-        console.log("foundUser:", foundUser);
+    console.log("foundUser:", foundUser);
     if (!foundUser) return res.status(401).json({ 'message': '未注册用户' }); //Unauthorized 未授权
 
     //密码验证
@@ -37,7 +36,7 @@ const handleLogin = async (req, res) => {
         const refreshToken = JWT.sign(
             {"username": foundUser.username},
             process.env.REFRESH_TOKEN_SECRET,
-            {expiresIn:'15d'}
+            {expiresIn:'10000s'}
         );
         //保存刷新令牌
         const otherUsers = usersDB.users.filter(person => person.username !== foundUser.username);

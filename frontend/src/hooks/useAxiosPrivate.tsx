@@ -15,8 +15,9 @@ const useAxiosPrivate = () => {
                 if (!config.headers['authorization']) {
                     config.headers['authorization'] = `Bearer ${auth?.accessToken}`;
                 }
+                console.log("first time config:",auth.accessToken);
                 return config;
-            }
+            },(error) => Promise.reject(error)
         );
         const responseIntercept = axiosPrivate.interceptors.response.use(
             // 情况1：请求成功 → 直接返回响应数据
@@ -27,8 +28,10 @@ const useAxiosPrivate = () => {
                 const prevRequest = error?.config;
                 if(error?.response?.status === 403 && !prevRequest?.sent){
                     prevRequest.sent = true;//只重试一次
-                    const refreshToken = await refresh();
-                    prevRequest.headers['authorization'] = `Bearer ${refreshToken}`;
+                    debugger;
+                    const accessToken = await refresh();
+                    console.log("accessToken", accessToken );
+                    prevRequest.headers['authorization'] = `Bearer ${accessToken}`;
                     return axiosPrivate(prevRequest);
                 }
                 return Promise.reject(error);

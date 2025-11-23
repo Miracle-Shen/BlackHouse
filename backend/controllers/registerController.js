@@ -27,8 +27,7 @@ const  handleNewUser = async (req, res) => {
             path.join(__dirname, '..', 'model', 'users.json'), 
             JSON.stringify(usersDB.users)
         );
-        console.log(usersDB.users);
-      
+
         await createUser(userId, user);
         console.log(`User ${user} created in Appwrite DB`);
         res.status(201).json({ 'success': `New user ${user} created!` }); //201 Created 成功创建
