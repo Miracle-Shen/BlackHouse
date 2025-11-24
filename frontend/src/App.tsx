@@ -1,7 +1,7 @@
 import Login from './components/Login';
 import Register from './components/Register';
 import FeedPage from './pages/FeedPage';
-import Layout from './components/Layout-simple';
+import Layout from './components/Layout';
 import { Routes, Route } from 'react-router-dom';
 import PostEditor from './components/edit';
 import Mine from './pages/Mine';

@@ -8,10 +8,13 @@
 .App {
   @apply flex flex-col justify-center items-center min-h-screen p-4 sm:p-2 bg-primary-50;
 }
-
-link{
-  @apply text-blue-600 hover:text-blue-800 underline;
+.custom-scrollbar::-webkit-scrollbar-thumb:hover {
+  background: #7878a3;
 }
+.common-container {
+  @apply flex flex-col flex-1 items-center gap-10 overflow-scroll py-10 px-5 md:px-8 lg:p-14 custom-scrollbar;
+}
+
 section {
   @apply w-full max-w-sm min-h-96 flex flex-col justify-start p-4 bg-primary-50 rounded-2xl shadow-lg hover:shadow-xl transition-shadow duration-200;
 }

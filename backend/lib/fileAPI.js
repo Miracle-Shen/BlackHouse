@@ -8,15 +8,25 @@ const client = new Client()
 const storage = new Storage(client);
 
 
-exports.uploadFile = async (file) => {
-    console.log("Uploading file:", file);
+exports.uploadFile = async (file,res) => {
+    console.log("Uploading file:", typeof(file));
     try {
+        const appwriteFile = new File(
+            [file.buffer],          // 文件内容（ArrayBuffer 或 Buffer）
+            file.originalname,      // 文件名
+            { type: file.mimetype } // 文件类型
+        );
+        
+        console.log("是否为 File 实例:", appwriteFile instanceof File); // true
+        
+        // 使用对象参数形式上传
         const response = await storage.createFile({
             bucketId: process.env.STORAGE_BUCKET_ID,
-            fileId: ID.unique(),    
-            file: file.buffer, // Use the file buffer
-            contentType: file.mimetype // Set the content type
+            fileId: ID.unique(),
+            file: appwriteFile,
+            contentType: file.mimetype
         });
+
         res.status(200).json(response);
     } catch (error) {
         console.log("Error uploading file:", error);

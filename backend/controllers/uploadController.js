@@ -13,6 +13,8 @@ const usersDB = {
         fs.writeFileSync(path.join(__dirname, '../model/users.json'), JSON.stringify(data, null, 2));
     }
 };
+
+
 const handleUpload = async (req, res) => {
     console.log("Handling file upload request");
     const cookie = req.cookies;
@@ -24,15 +26,14 @@ const handleUpload = async (req, res) => {
     if(!foundUser) {
         return res.status(403).json({message: "No matching user found"}); //Forbidden 禁止访问
     }
-    const  fileURL  = req.body;
+    const  fileURL  = req.file;
 
     console.log("fileURL:", fileURL);
     if (!fileURL) return res.status(400).json({ 'message': 'fileURL is required.' });
 
 
     //文件上传逻辑待实现
-    await uploadFile(fileURL);
-    res.status(200).json({ 'message': `File uploaded successfully!` });
+    await uploadFile(fileURL,res);
 }
 
 module.exports = { handleUpload };

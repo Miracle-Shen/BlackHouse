@@ -3,11 +3,13 @@ import { useContext, useEffect, useState, useRef } from "react";
 import AuthContext from "../context/AuthProvider";
 import  useAxiosPrivate  from "../hooks/useAxiosPrivate";
 const User = () => {
-   const[users,setUsers]=useState([]);
+    const[users,setUsers]=useState([]);
+    const [isStorage,setIsStorage]=useState(false);
     const navigate=useNavigate();
     const {setAuth}=useContext(AuthContext);
     const axiosPrivate = useAxiosPrivate();
     const fileInputRef = useRef(null); // Reference for file input
+
 
     const logout = async () => {
         try {
@@ -27,43 +29,66 @@ const User = () => {
         if (!file) return;
 
         const formData = new FormData();
-        formData.append("fileURL", file);
-        const param ={
-            fileURL:formData
-        }
+        formData.append('file', file);
+
         try {
-            const response = await axiosPrivate.post("/upload", param, {
+            const response = await axiosPrivate.post("/upload", formData, {
                 headers: {
                     "Content-Type": "multipart/form-data",
                 },
             });
-            console.log("Avatar uploaded successfully:", response.data);
+            
+            const avatarURL =  `https://nyc.cloud.appwrite.io/v1/storage/buckets/69230b780026a1648b96/files/${response.data.$id}/view?project=691ec46d0011cc0af217&mode=admin`;
+                                //https://nyc.cloud.appwrite.io/v1/storage/buckets/69230b780026a1648b96/files/69242d6d001192d4e231/view?project=691ec46d0011cc0af217&mode=admin
+            setUsers(prevUsers => ({
+                ...prevUsers,
+                avatar: avatarURL
+            }));
+          
         } catch (err) {
             console.error("Avatar upload failed:", err);
         }
     };
+    useEffect(() => {
+        if (users) {
+            localStorage.setItem("user", JSON.stringify(users));
+        }
+    }, [users]);
 
+    useEffect(() => {
+        const cachedUser = localStorage.getItem('user');
+        if (cachedUser) {
+            setUsers(JSON.parse(cachedUser));
+            setIsStorage(true);
+        }
 
-   useEffect(()=>{
-      let isMounted=true;
-      const controller=new AbortController(); // 取消请求的控制器
-      const fetchUsers=async()=>{
-         try{
-            const response=await axiosPrivate.get('/user',{
-               signal:controller.signal
-            });
-            isMounted && setUsers(response.data);
-         }catch(err){
-            console.error(err);
-            //navigate('/login',{state:{from:location},replace:true});
-         }
+        let isMounted = true;
+        const controller = new AbortController();
+
+        const fetchUsers = async () => {
+            try {
+                const response = await axiosPrivate.get('/user', {
+                    signal: controller.signal,
+                });
+                if (isMounted) {
+                    setUsers(response.data);
+                    localStorage.setItem('user', JSON.stringify(response.data));
+                }
+            } catch (err) {
+                console.error(err);
+            }
         };
-        fetchUsers();
+
+        if (!cachedUser) {
+            fetchUsers();
+        }
+
         return () => {
             isMounted = false;
             controller.abort();
         };
     }, []);
+
     return (
       <>
         <h1 className="text-center">我的</h1>
