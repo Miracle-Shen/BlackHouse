@@ -1,5 +1,5 @@
-import { FeedStream } from '../components/Feed'
-import PostCardExample from '../components/PostCardExample'
+import { FeedStream } from '@/components/Feed'
+
 
 const FeedPage = () => {
   // 可以通过环境变量或配置来切换显示模式
@@ -7,7 +7,7 @@ const FeedPage = () => {
 
   return (
     <div className="bg-gray-50 min-h-screen">
-      {showExample ? <PostCardExample /> : <FeedStream />}
+      <FeedStream />
     </div>
   )
 }

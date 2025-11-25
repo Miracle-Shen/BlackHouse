@@ -1,176 +1,139 @@
-import * as z from "zod";
-import { Models } from "appwrite";
-import { useForm } from "react-hook-form";
-import { useNavigate } from "react-router-dom";
-import { zodResolver } from "@hookform/resolvers/zod";
+import * as z from "zod"; // 导入 zod 库，用于定义和验证表单数据的模式
+import type { Models } from 'appwrite';
+import { useForm } from "react-hook-form"; // 导入 react-hook-form，用于管理表单状态
+import { useNavigate } from "react-router-dom"; // 导入 useNavigate，用于页面导航
+// import { zodResolver } from "@hookform/resolvers/zod"; // 可选：用于将 zod 与 react-hook-form 集成
 
 import {
-  Form,
-  FormControl,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-  Button,
-  Input,
-  Textarea,
-} from "@/components/ui";
-import { PostValidation } from "@/lib/validation";
-import { useToast } from "@/components/ui/use-toast";
-import { useUserContext } from "@/context/AuthContext";
-import { FileUploader, Loader } from "@/components/shared";
-import { useCreatePost, useUpdatePost } from "@/lib/react-query/queries";
+  Form, // 表单组件
+  FormControl, // 表单控件包装器
+  FormField, // 表单字段组件
+  FormItem, // 表单项组件
+  FormMessage, // 表单消息组件（如错误提示）
+  // Button, // 按钮组件s
+  // Textarea, // 文本区域组件
+} from "./ui/Form"; // 从自定义 UI 组件库中导入表单相关组件
+import { Textarea } from "./ui/textarea"; // 导入自定义的文本区域组件
+import FileUploader from "./common/FileUploader";
+import { PostValidation } from "@/types/index"; // 可选：导入表单验证规则
+// import { useToast } from "@/components/ui/use-toast"; // 可选：导入 Toast 消息组件
+// import { useUserContext } from "@/context/AuthContext"; // 可选：导入用户上下文，用于获取当前用户信息
+// import { FileUploader, Loader } from "@/components/shared"; // 可选：导入文件上传器和加载器组件
+// import { useCreatePost, useUpdatePost } from "@/lib/react-query/queries"; // 可选：导入创建和更新 post 的自定义查询
 
 type PostFormProps = {
-  post?: Models.Document;
-  action: "Create" | "Update";
+  post?: Models.Document; // 可选的 post 数据，用于编辑模式
+  action: "Create" | "Update"; // 表单操作类型：创建或更新
 };
 
 const PostForm = ({ post, action }: PostFormProps) => {
-  const navigate = useNavigate();
-  const { toast } = useToast();
-  const { user } = useUserContext();
+  const navigate = useNavigate(); // 初始化导航函数
+  // const { toast } = useToast(); // 获取 Toast 消息函数
+  // const { user } = useUserContext(); // 获取当前用户信息
   const form = useForm<z.infer<typeof PostValidation>>({
-    resolver: zodResolver(PostValidation),
+    // resolver: zodResolver(PostValidation), // 使用 zod 验证规则解析器
     defaultValues: {
-      caption: post ? post?.caption : "",
-      file: [],
-      location: post ? post.location : "",
-      tags: post ? post.tags.join(",") : "",
+      caption: post ? post?.caption : "", // 如果是编辑模式，设置默认值为 post 的 caption
+      file: [], // 默认文件列表为空
+      tags: post ? post.tags.join(",") : "", // 如果是编辑模式，设置默认值为 post 的 tags
     },
   });
 
   // Query
-  const { mutateAsync: createPost, isLoading: isLoadingCreate } =
-    useCreatePost();
-  const { mutateAsync: updatePost, isLoading: isLoadingUpdate } =
-    useUpdatePost();
+  //const { mutateAsync: createPost, isLoading: isLoadingCreate } = useCreatePost(); // 创建 post 的异步函数
+  //const { mutateAsync: updatePost, isLoading: isLoadingUpdate } = useUpdatePost(); // 更新 post 的异步函数
 
   // Handler
   const handleSubmit = async (value: z.infer<typeof PostValidation>) => {
     // ACTION = UPDATE
     if (post && action === "Update") {
       const updatedPost = await updatePost({
-        ...value,
-        postId: post.$id,
-        imageId: post.imageId,
-        imageUrl: post.imageUrl,
+        ...value, // 合并表单数据
+        postId: post.$id, // 设置要更新的 post ID
+        imageId: post.imageId, // 设置要更新的图片 ID
+        imageUrl: post.imageUrl, // 设置要更新的图片 URL
       });
 
       if (!updatedPost) {
-        toast({
-          title: `${action} post failed. Please try again.`,
-        });
+        // toast({
+        //   title: `${action} post failed. Please try again.`, // 显示错误消息
+        // });
       }
-      return navigate(`/posts/${post.$id}`);
+      return navigate(`/posts/${post.$id}`); // 更新成功后跳转到 post 的详情页
     }
 
     // ACTION = CREATE
     const newPost = await createPost({
-      ...value,
-      userId: user.id,
+      ...value, // 合并表单数据
+      userId: user.id, // 设置当前用户 ID
     });
 
     if (!newPost) {
       toast({
-        title: `${action} post failed. Please try again.`,
+        title: `${action} post failed. Please try again.`, // 显示错误消息
       });
     }
-    navigate("/");
+    navigate("/"); // 创建成功后跳转到首页
   };
 
   return (
-    <Form {...form}>
+    <Form {...form}> {/* 表单组件，传入表单实例 */}
       <form
-        onSubmit={form.handleSubmit(handleSubmit)}
+        onSubmit={form.handleSubmit(handleSubmit)} // 提交表单时调用 handleSubmit
         className="flex flex-col gap-9 w-full  max-w-5xl">
         <FormField
-          control={form.control}
-          name="caption"
+          control={form.control} // 绑定表单控制器
+          name="caption" // 字段名称
           render={({ field }) => (
             <FormItem>
-              <FormLabel className="shad-form_label">Caption</FormLabel>
+          
               <FormControl>
                 <Textarea
-                  className="shad-textarea custom-scrollbar"
-                  {...field}
+                  className="shad-textarea custom-scrollbar" // 文本区域样式
+                  {...field} // 绑定字段
                 />
               </FormControl>
-              <FormMessage className="shad-form_message" />
+              <FormMessage className="shad-form_message" /> {/* 显示验证消息 */}
             </FormItem>
           )}
         />
 
         <FormField
-          control={form.control}
-          name="file"
+          control={form.control} // 绑定表单控制器
+          name="file" // 字段名称
           render={({ field }) => (
             <FormItem>
-              <FormLabel className="shad-form_label">Add Photos</FormLabel>
+
               <FormControl>
                 <FileUploader
-                  fieldChange={field.onChange}
-                  mediaUrl={post?.imageUrl}
+                  fieldChange={field.onChange} // 文件上传时触发字段更新
+                  mediaUrl={post?.imageUrl} // 如果是编辑模式，显示已有图片
                 />
               </FormControl>
-              <FormMessage className="shad-form_message" />
+              <FormMessage className="shad-form_message" /> {/* 显示验证消息 */}
             </FormItem>
           )}
         />
 
-        <FormField
-          control={form.control}
-          name="location"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel className="shad-form_label">Add Location</FormLabel>
-              <FormControl>
-                <Input type="text" className="shad-input" {...field} />
-              </FormControl>
-              <FormMessage className="shad-form_message" />
-            </FormItem>
-          )}
-        />
 
-        <FormField
-          control={form.control}
-          name="tags"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel className="shad-form_label">
-                Add Tags (separated by comma " , ")
-              </FormLabel>
-              <FormControl>
-                <Input
-                  placeholder="Art, Expression, Learn"
-                  type="text"
-                  className="shad-input"
-                  {...field}
-                />
-              </FormControl>
-              <FormMessage className="shad-form_message" />
-            </FormItem>
-          )}
-        />
-
-        <div className="flex gap-4 items-center justify-end">
-          <Button
-            type="button"
-            className="shad-button_dark_4"
-            onClick={() => navigate(-1)}>
+        <div className="flex gap-4 items-center justify-end"> {/* 按钮容器样式 */}
+          <button
+            type="button" // 按钮类型
+            className="shad-button_dark_4" // 按钮样式
+            onClick={() => navigate(-1)}> {/* 点击返回上一页 */}
             Cancel
-          </Button>
-          <Button
-            type="submit"
-            className="shad-button_primary whitespace-nowrap"
-            disabled={isLoadingCreate || isLoadingUpdate}>
-            {(isLoadingCreate || isLoadingUpdate) && <Loader />}
+          </button>
+          {/* <button
+            type="submit" 
+            className="shad-button_primary whitespace-nowrap" 
+            disabled={isLoadingCreate || isLoadingUpdate}> 
+            {(isLoadingCreate || isLoadingUpdate) && <Loader />} 
             {action} Post
-          </Button>
+          </button> */}
         </div>
       </form>
     </Form>
   );
 };
 
-export default PostForm;
+export default PostForm; // 导出组件
