@@ -2,8 +2,8 @@ import { useNavigate, useLocation, Link } from "react-router-dom";
 import { useContext, useEffect, useState, useRef } from "react";
 import AuthContext from "../context/AuthProvider";
 import  useAxiosPrivate  from "../hooks/useAxiosPrivate";
-const User = () => {
-    const[users,setUsers]=useState([]);
+const User = ({users}) => {
+    // const[users,setUsers]=useState([]);
     const [isStorage,setIsStorage]=useState(false);
     const navigate=useNavigate();
     const {setAuth}=useContext(AuthContext);
@@ -49,45 +49,45 @@ const User = () => {
             console.error("Avatar upload failed:", err);
         }
     };
-    useEffect(() => {
-        if (users) {
-            localStorage.setItem("user", JSON.stringify(users));
-        }
-    }, [users]);
+    // useEffect(() => {
+    //     if (users) {
+    //         localStorage.setItem("user", JSON.stringify(users));
+    //     }
+    // }, [users]);
 
-    useEffect(() => {
-        const cachedUser = localStorage.getItem('user');
-        if (cachedUser) {
-            setUsers(JSON.parse(cachedUser));
-            setIsStorage(true);
-        }
+    // useEffect(() => {
+    //     const cachedUser = localStorage.getItem('user');
+    //     if (cachedUser) {
+    //         setUsers(JSON.parse(cachedUser));
+    //         setIsStorage(true);
+    //     }
 
-        let isMounted = true;
-        const controller = new AbortController();
+    //     let isMounted = true;
+    //     const controller = new AbortController();
 
-        const fetchUsers = async () => {
-            try {
-                const response = await axiosPrivate.get('/user', {
-                    signal: controller.signal,
-                });
-                if (isMounted) {
-                    setUsers(response.data);
-                    localStorage.setItem('user', JSON.stringify(response.data));
-                }
-            } catch (err) {
-                console.error(err);
-            }
-        };
+    //     const fetchUsers = async () => {
+    //         try {
+    //             const response = await axiosPrivate.get('/user', {
+    //                 signal: controller.signal,
+    //             });
+    //             if (isMounted) {
+    //                 setUsers(response.data);
+    //                 localStorage.setItem('user', JSON.stringify(response.data));
+    //             }
+    //         } catch (err) {
+    //             console.error(err);
+    //         }
+    //     };
 
-        if (!cachedUser) {
-            fetchUsers();
-        }
+    //     if (!cachedUser) {
+    //         fetchUsers();
+    //     }
 
-        return () => {
-            isMounted = false;
-            controller.abort();
-        };
-    }, []);
+    //     return () => {
+    //         isMounted = false;
+    //         controller.abort();
+    //     };
+    // }, []);
 
     return (
       <>

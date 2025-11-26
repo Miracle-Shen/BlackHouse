@@ -5,6 +5,7 @@ import Layout from './components/Layout';
 import { Routes, Route } from 'react-router-dom';
 import PublishPage from './pages/PublishPage';
 import Mine from './pages/Mine';
+import PostDetails from './pages/PostDetails';
 function App() {
 
   return (
@@ -13,6 +14,7 @@ function App() {
       <Route path="/login" element={<Login />} />
       <Route path="/register" element={<Register />} />
       <Route path="/publish" element={<PublishPage />} />
+      <Route path="/posts/:id" element={<PostDetails />} />
       {/* 其他页面使用布局 */}
       <Route path="/" element={<Layout />}>
         <Route index element={<FeedPage />} />

@@ -5,6 +5,8 @@ import useAuth from "./useAuth";
 
 // 无感知刷新：
 // 当访问令牌（accessToken）过期导致请求失败（返回 403）时，自动调用刷新令牌接口获取新令牌，并用新令牌重试原来的请求，
+
+//axiosPrivate 根本不是稳定单例对象，每次导入都会新建一个实例
 const useAxiosPrivate = () => {
     const refresh = useRefreshToken();
     const { auth } = useAuth();
@@ -28,7 +30,7 @@ const useAxiosPrivate = () => {
                 const prevRequest = error?.config;
                 if(error?.response?.status === 403 && !prevRequest?.sent){
                     prevRequest.sent = true;//只重试一次
-                    debugger;
+
                     const accessToken = await refresh();
                     console.log("accessToken", accessToken );
                     prevRequest.headers['authorization'] = `Bearer ${accessToken}`;
@@ -41,7 +43,7 @@ const useAxiosPrivate = () => {
             axiosPrivate.interceptors.response.eject(responseIntercept);
             axiosPrivate.interceptors.request.eject(requestIntercept);
         };
-    }, [auth, refresh]) //浅比较，每次refresh函数变化时重新执行useEffect
+    }, [ ]) //浅比较，每次refresh函数变化时重新执行useEffect
 
     return axiosPrivate;
 }
