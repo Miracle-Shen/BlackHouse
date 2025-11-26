@@ -1,5 +1,5 @@
-import Login from './components/Login';
-import Register from './components/Register';
+import Login from './pages/Login';
+import Register from './pages/Register';
 import FeedPage from './pages/FeedPage';
 import Layout from './components/Layout';
 import { Routes, Route } from 'react-router-dom';

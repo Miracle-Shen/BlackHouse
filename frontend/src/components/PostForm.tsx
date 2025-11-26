@@ -47,8 +47,6 @@ const PostForm = ({ post, action }: PostFormProps) => {
 
   // Handler
   const handleSubmit = async (value: z.infer<typeof PostValidation>) => {
-    console.log("Form values:", value); // 表单提交的值
-    console.log("Post object:", post); // 完整的post对象
     // ACTION = UPDATE
     if (post && action === "Update") {
       const updatedPost = await updatePost({
@@ -63,7 +61,6 @@ const PostForm = ({ post, action }: PostFormProps) => {
           title: `${action} post failed. Please try again.`, // 显示错误消息
         });
       }
-      console.log("going to",post.$id);
       return navigate(`/posts/${post.$id}`); // 更新成功后跳转到 post 的详情页
     }
 
@@ -81,8 +78,7 @@ const PostForm = ({ post, action }: PostFormProps) => {
       });
     }
     // navigate("/"); // 创建成功后跳转到首页
-     console.log("going to",newPost.$id);
-      return navigate(`/posts/${newPost.$id}`); // 更新成功后跳转到 post 的详情页
+    return navigate(`/posts/${newPost.$id}`); // 更新成功后跳转到 post 的详情页
   };
 
   return (
@@ -90,6 +86,7 @@ const PostForm = ({ post, action }: PostFormProps) => {
       <form
         onSubmit={form.handleSubmit(handleSubmit)} // 提交表单时调用 handleSubmit
         className="flex flex-col gap-9 w-full  max-w-5xl">
+          <h2 className="h3-bold md:h2-bold  ">输入标题</h2>
           <FormField
             control={form.control} // 绑定表单控制器
             name="title" // 字段名称
@@ -105,6 +102,7 @@ const PostForm = ({ post, action }: PostFormProps) => {
               </FormItem>
             )}
           />
+        <h2 className="h3-bold md:h2-bold  ">输入内容</h2>
         <FormField
           control={form.control} // 绑定表单控制器
           name="caption" // 字段名称
@@ -120,7 +118,7 @@ const PostForm = ({ post, action }: PostFormProps) => {
             </FormItem>
           )}
         />
-
+        <h2 className="h3-bold md:h2-bold  ">添加图片</h2>
         <FormField
           control={form.control} // 绑定表单控制器
           name="file" // 字段名称
@@ -150,7 +148,7 @@ const PostForm = ({ post, action }: PostFormProps) => {
             className="shad-button_primary whitespace-nowrap" 
             disabled={isLoadingCreate || isLoadingUpdate}> 
             {(isLoadingCreate || isLoadingUpdate) && <Loader />} 
-            {action} Post
+            {action} 发布
           </button>
         </div>
       </form>

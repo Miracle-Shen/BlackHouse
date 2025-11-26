@@ -1,18 +1,17 @@
-import { Navigate, useLocation, useNavigate } from "react-router-dom";
+import {  useLocation, useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
 import useAxiosPrivate from "../hooks/useAxiosPrivate";
-import useAuth from "../hooks/useAuth";
 import User from "../components/User";
-import { de } from "zod/v4/locales";
-import { CanceledError } from "axios";
 
+import useAuth from "@/hooks/useAuth";
 const Mine = () => {
-   const { auth } = useAuth();
+   const { auth } = useAuth ();
    const navigate = useNavigate();
    const location = useLocation();
    const [users, setUsers] = useState([]);
    const [isLoading, setIsLoading] = useState(true);
    const axiosPrivate = useAxiosPrivate();
+   console.log("auth in mine:", auth);
    useEffect(() => {
       let isIgnore = false;
       const controller = new AbortController(); 

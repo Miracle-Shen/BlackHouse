@@ -6,7 +6,7 @@ const PublishPage = () => {
         <div className="common-container">
           <div className="max-w-5xl justify-center  gap-3">
             <img
-              src="/src/assets/react.svg"
+              src="/icons/gallery-add.svg"
               width={36}
               height={36}
               alt="add"

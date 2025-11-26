@@ -1,13 +1,30 @@
 import { FeedStream } from '@/components/Feed'
+import PostCard from '@/components/PostCard';
+import { useGetCurrentUser, useGetRecentPosts } from '@/lib/react-query/queries';
+
 
 
 const FeedPage = () => {
-  // 可以通过环境变量或配置来切换显示模式
-  const showExample = true // 设置为 true 显示示例数据，false 显示真实 API 数据
-
+  const {data: posts,isPending: isLoading,isError}=useGetRecentPosts();
+  console.log("posts", posts);
   return (
     <div className="bg-gray-50 min-h-screen">
-      <FeedStream />
+      <h1 className="text-center py-4">动态</h1>
+      {isLoading && !posts ? (
+        <>
+          <p>加载中...</p>
+        </>
+      ) : (
+        <ul className='flex flex-col max-w-md mx-auto'>
+          {posts?.documents.map((post)=>{
+            return (
+              <li key={post.id} className="border-b border-gray-200 p-4 bg-white mb-2">
+                <PostCard post={post} />
+              </li>
+            )
+          })}
+        </ul>
+      )}
     </div>
   )
 }
