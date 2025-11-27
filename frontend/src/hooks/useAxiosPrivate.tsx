@@ -43,7 +43,7 @@ const useAxiosPrivate = () => {
             axiosPrivate.interceptors.response.eject(responseIntercept);
             axiosPrivate.interceptors.request.eject(requestIntercept);
         };
-    }, [ ]) //浅比较，每次refresh函数变化时重新执行useEffect
+    }, [refresh, auth]) //浅比较，每次refresh函数变化时重新执行useEffect
 
     return axiosPrivate;
 }

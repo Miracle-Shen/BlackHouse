@@ -27,13 +27,13 @@ import { INewPost, INewUser, IUpdatePost, IUpdateUser } from "@/types";
 // AUTH QUERIES
 // ============================================================
 
-export const useCreateUserAccount = () => {
+/* export const useCreateUserAccount = () => {
   return useMutation({
     mutationFn: (user: INewUser) => createUserAccount(user),
   });
-};
+}; */
 
-export const useSignInAccount = () => {
+/* export const useSignInAccount = () => {
   return useMutation({
     mutationFn: (user: { email: string; password: string }) =>
       signInAccount(user),
@@ -44,7 +44,7 @@ export const useSignOutAccount = () => {
   return useMutation({
     mutationFn: signOutAccount,
   });
-};
+}; */
 
 // ============================================================
 // POST QUERIES
@@ -135,7 +135,7 @@ export const useDeletePost = () => {
   });
 };
 
-export const useLikePost = () => {
+/* export const useLikePost = () => {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: ({
@@ -197,7 +197,7 @@ export const useDeleteSavedPost = () => {
       });
     },
   });
-};
+}; */
 
 // ============================================================
 // USER QUERIES
