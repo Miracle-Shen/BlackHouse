@@ -6,7 +6,7 @@ import App from './App.tsx'
 import { AuthProvider } from './context/AuthProvider';
 import {  QueryProvider } from './lib/react-query/QueryProvider';
 createRoot(document.getElementById('root')!).render(
-  <StrictMode>
+
     <BrowserRouter>
       <AuthProvider>
         <QueryProvider>
@@ -14,5 +14,5 @@ createRoot(document.getElementById('root')!).render(
         </QueryProvider>
       </AuthProvider>
     </BrowserRouter>
-  </StrictMode>,
+
 )

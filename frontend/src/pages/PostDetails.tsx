@@ -88,7 +88,7 @@ const PostDetails = () => {
 
               <div className="flex-center gap-4">
                 <Link
-                  to={`/update-post/${post?.$id}`}
+                  to={`/publish/${post?.$id}`}
                   className={`${userId !== post?.userId && "hidden"}`}>
                   <img
                     src={"/icons/edit.svg"}
@@ -147,7 +147,8 @@ const PostDetails = () => {
         {isUserPostLoading || !relatedPosts ? (
           <Loader />
         ) : (
-          <GridPostList posts={relatedPosts} />
+        //   <GridPostList posts={relatedPosts} />
+            <div>更多推荐内容</div>
         )}
       </div>
     </div>

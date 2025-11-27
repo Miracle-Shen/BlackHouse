@@ -1,18 +1,19 @@
-import {  useLocation, useNavigate } from "react-router-dom";
+import { Navigate, useLocation, useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
 import useAxiosPrivate from "../hooks/useAxiosPrivate";
+import useAuth from "../hooks/useAuth";
 import User from "../components/User";
 
-import useAuth from "@/hooks/useAuth";
 const Mine = () => {
-   const { auth } = useAuth ();
+   const { auth } = useAuth();
    const navigate = useNavigate();
    const location = useLocation();
    const [users, setUsers] = useState([]);
    const [isLoading, setIsLoading] = useState(true);
    const axiosPrivate = useAxiosPrivate();
-   console.log("auth in mine:", auth);
    useEffect(() => {
+      console.log("%c[Mine render]", "color:orange;font-weight:bold;");
+
       let isIgnore = false;
       const controller = new AbortController(); 
       const fetchUsers = async () => {
@@ -41,11 +42,12 @@ const Mine = () => {
             setIsLoading(false);
          }
       };
+      console.log("Mine.fetchUser start", new Error().stack.split("\n").slice(1,5));
       fetchUsers();
       return ()=>{
          isIgnore = true;
       }
-   }, [auth]);
+   },  []);
 
 
 

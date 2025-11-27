@@ -29,6 +29,8 @@ const Login = () => {
         e.preventDefault(); // 阻止默认的表单提交行为
 
         try {
+            const timestamp = new Date().toISOString();
+            console.log(`[${timestamp}] Sending login request to ${LOGIN_URL} with user:`, user);
             const response = await axios.post(LOGIN_URL,
                 JSON.stringify({ user:user, pwd:pwd }), 
                 {
@@ -36,10 +38,10 @@ const Login = () => {
                     withCredentials: true 
                 }
             );
+            console.log(`[${timestamp}] Login response received:`, response?.data);
            
             const accessToken = response?.data?.accessToken; 
             const userId = response?.data?.userId;
-            console.log("Login Response: " ,userId); 
             setAuth({ user, userId, accessToken });
             setUser(''); 
             setPwd(''); 

@@ -17,14 +17,16 @@ export type INewPost = {
   userId: string;
   title: string;
   caption: string;
+  imageId?: string;
+  imageUrl?: URL;
   file: File[];
   tags?: string;
 };
 
 export type IUpdatePost = {
   postId: string;
-  caption: string;
   title: string;
+  caption: string;
   imageId?: string;
   imageUrl?: URL;
   file: File[];
@@ -73,6 +75,6 @@ export const ProfileValidation = z.object({
 export const PostValidation = z.object({
   caption: z.string().min(5, { message: "Minimum 5 characters." }).max(2200, { message: "Maximum 2,200 caracters" }),
   file: z.custom<File[]>(),
-  tags: z.string(),
+  tags: z.string() .optional(),
   title: z.string(),
 });

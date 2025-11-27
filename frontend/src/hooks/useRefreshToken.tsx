@@ -1,3 +1,4 @@
+import { useCallback } from 'react';
 import axios from '../api/axios';
 import useAuth from './useAuth';
 
@@ -6,17 +7,24 @@ import useAuth from './useAuth';
 const useRefreshToken = () => {
     const { setAuth } = useAuth();
 
-    const refresh = async () => {
-        const response = await axios.get('/refresh', {
-            withCredentials: true // 发送请求时携带凭据（如cookie）
-        });
-        setAuth(prev => {
-            console.log("prev",JSON.stringify(prev));
-            console.log("prev acc",response.data.accessToken);
-            return { ...prev, accessToken: response.data.accessToken }
-        });
+    const refresh = useCallback(async () => {
+        const ts = Date.now();
+       console.log(
+            `%c[REFRESH CALL] ts=${ts}`,
+            "color:purple;font-weight:bold;"
+        );
+        const response = await axios.get('/refresh', { withCredentials: true });
+        console.log(
+            `%c[REFRESH OK] new accessToken=${response.data.accessToken.substring(0,20)}...`,
+            "color:green;font-weight:bold;"
+        );
+        setAuth(prev => ({
+            ...prev,
+            accessToken: response.data.accessToken
+        }));
+
         return response.data.accessToken;
-    }
+    }, []); // setAuth 是稳定的，不会变化
     return refresh;
 };
 

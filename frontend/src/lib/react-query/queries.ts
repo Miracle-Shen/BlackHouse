@@ -7,7 +7,6 @@ import {
 
 import { QUERY_KEYS } from "@/lib/react-query/queryKeys";
 import {
-  getCurrentUser,
   getUsers,
   createPost,
   getPostById,

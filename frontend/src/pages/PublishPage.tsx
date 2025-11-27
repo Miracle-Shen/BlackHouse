@@ -1,6 +1,20 @@
-import PostForm from "@/components/PostForm"
+import PostForm from "@/components/PostForm";
+import { useGetPostById } from "@/lib/react-query/queries";
+import Loader from "@/components/common/Loader";
+import { useParams } from "react-router-dom";
 
 const PublishPage = () => {
+  const { id } = useParams();
+  console.log("PublishPage id",id);
+  const { data: post, isLoading } = useGetPostById(id);
+
+  if (isLoading && id)
+    return (
+      <div className="flex-center w-full h-full">
+        <Loader />
+      </div>
+    );
+
   return (
       <div className="bg-gray-50 flex">
         <div className="common-container">
@@ -11,10 +25,10 @@ const PublishPage = () => {
               height={36}
               alt="add"
             />
-            <h2 className="h3-bold md:h2-bold  ">Create Post</h2>
+            <h2 className="h3-bold md:h2-bold  ">{id ? "Edit Post" : "Create Post"}</h2>
           </div>
 
-          <PostForm action="Create" />
+          <PostForm action={id ? "Update" : "Create"} post={post ? post : undefined} />
         </div>
     </div>
   )

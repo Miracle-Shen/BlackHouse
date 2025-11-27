@@ -70,37 +70,37 @@ export async function saveUserToDB(user: {
 // }
 
 // ============================== GET ACCOUNT
-export async function getAccount() {
-  try {
-    const currentAccount = await account.get();
+// export async function getAccount() {
+//   try {
+//     const currentAccount = await account.get();
 
-    return currentAccount;
-  } catch (error) {
-    console.log(error);
-  }
-}
+//     return currentAccount;
+//   } catch (error) {
+//     console.log(error);
+//   }
+// }
 
 // ============================== GET USER
-export async function getCurrentUser() {
-  try {
-    const currentAccount = await getAccount();
+// export async function getCurrentUser() {
+//   try {
+//     const currentAccount = await getAccount();
 
-    if (!currentAccount) throw Error;
+//     if (!currentAccount) throw Error;
 
-    const currentUser = await databases.listDocuments(
-      appwriteConfig.databaseId,
-      appwriteConfig.userCollectionId,
-      [Query.equal("accountId", currentAccount.$id)]
-    );
+//     const currentUser = await databases.listDocuments(
+//       appwriteConfig.databaseId,
+//       appwriteConfig.userCollectionId,
+//       [Query.equal("accountId", currentAccount.$id)]
+//     );
 
-    if (!currentUser) throw Error;
+//     if (!currentUser) throw Error;
 
-    return currentUser.documents[0];
-  } catch (error) {
-    console.log(error);
-    return null;
-  }
-}
+//     return currentUser.documents[0];
+//   } catch (error) {
+//     console.log(error);
+//     return null;
+//   }
+// }
 
 // ============================== SIGN OUT
 // export async function signOutAccount() {
@@ -272,20 +272,25 @@ export async function getPostById(postId?: string) {
 // ============================== UPDATE POST
 export async function updatePost(post: IUpdatePost) {
   const hasFileToUpdate = post.file.length > 0;
-
+  console.log("当前post",post.file[0]);
   try {
     let image = {
       imageUrl: post.imageUrl,
       imageId: post.imageId,
     };
-
+    console
     if (hasFileToUpdate) {
       // Upload new file to appwrite storage
       const uploadedFile = await uploadFile(post.file[0]);
+      console.log("上传新的image",uploadedFile);
       if (!uploadedFile) throw Error;
 
       // Get new file url
-      const fileUrl = getFilePreview(uploadedFile.$id);
+      // const fileUrl = getFilePreview(uploadedFile.$id);
+      const fileUrl = uploadedFile.$id 
+      ? `https://nyc.cloud.appwrite.io/v1/storage/buckets/69230b780026a1648b96/files/${uploadedFile.$id}/view?project=691ec46d0011cc0af217&mode=admin`
+      : '';
+      console.log("新的image url",fileUrl);
       if (!fileUrl) {
         await deleteFile(uploadedFile.$id);
         throw Error;
@@ -296,19 +301,21 @@ export async function updatePost(post: IUpdatePost) {
 
     // Convert tags into array
     const tags = post.tags?.replace(/ /g, "").split(",") || [];
-
+    console.log("tags",tags);
     //  Update post
+     const payload: Record<string, any> = {
+      imageUrl: image.imageUrl,
+      imageId: image.imageId,
+      title: post.title,
+      caption: post.caption,
+    };
     const updatedPost = await databases.updateDocument(
       appwriteConfig.databaseId,
       appwriteConfig.postCollectionId,
       post.postId,
-      {
-        title: post.title,
-        caption: post.caption,
-        imageUrl: image.imageUrl,
-        imageId: image.imageId,
-        tags: tags,
-      }
+
+       payload
+      
     );
 
     // Failed to update
@@ -364,7 +371,7 @@ export async function getUserPosts(userId?: string) {
     const post = await databases.listDocuments(
       appwriteConfig.databaseId,
       appwriteConfig.postCollectionId,
-      [Query.equal("creator", userId), Query.orderDesc("$createdAt")]
+      [Query.equal("userId", userId), Query.orderDesc("$createdAt")]
     );
 
     if (!post) throw Error;

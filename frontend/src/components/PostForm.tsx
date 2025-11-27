@@ -3,7 +3,7 @@ import type { Models } from 'appwrite';
 import { useForm } from "react-hook-form"; // 导入 react-hook-form，用于管理表单状态
 import { useNavigate } from "react-router-dom"; // 导入 useNavigate，用于页面导航
 import { zodResolver } from "@hookform/resolvers/zod"; // 可选：用于将 zod 与 react-hook-form 集成
-
+import  Loader  from "./common/Loader"; // 可选：导入加载器组件
 import {
   Form, // 表单组件
   FormControl, // 表单控件包装器
@@ -19,7 +19,7 @@ import { PostValidation } from "@/types/index"; // 可选：导入表单验证�
 import { useCreatePost, useUpdatePost } from "@/lib/react-query/queries"; // 可选：导入创建和更新 post 的自定义查询
 import { useToast } from "@/hooks/use-toast"
 import AuthContext from "@/context/AuthProvider";
-import { useContext } from "react";
+import { useContext, useState } from "react";
 type PostFormProps = {
   post?: Models.Document; // 可选的 post 数据，用于编辑模式
   action: "Create" | "Update"; // 表单操作类型：创建或更新
@@ -27,7 +27,8 @@ type PostFormProps = {
 
 const PostForm = ({ post, action }: PostFormProps) => {
   const navigate = useNavigate(); // 初始化导航函数
-  // const { user } = useUserContext(); // 获取当前用户信息
+  const [currentImageUrl, setCurrentImageUrl] = useState(post?.imageUrl || "");
+
   const { toast } = useToast();
   const {auth} = useContext(AuthContext);
   const userId = auth.userId;
@@ -37,16 +38,19 @@ const PostForm = ({ post, action }: PostFormProps) => {
       caption: post ? post?.caption : "", // 如果是编辑模式，设置默认值为 post 的 caption
       title: post ? post?.title : "", // 如果是编辑模式，设置默认值为 post 的 title
       file: [], // 默认文件列表为空
-      tags: post ? post.tags.join(",") : "", // 如果是编辑模式，设置默认值为 post 的 tags
+      tags: post ? post?.tags  : "", // 如果是编辑模式，设置默认值为 post 的 tags
     },
   });
-
+  // console.log("PostForm post",post);
+  console.log("action",action);
   // Query
   const { mutateAsync: createPost, isLoading: isLoadingCreate } = useCreatePost(); // 创建 post 的异步函数
   const { mutateAsync: updatePost, isLoading: isLoadingUpdate } = useUpdatePost(); // 更新 post 的异步函数
 
   // Handler
   const handleSubmit = async (value: z.infer<typeof PostValidation>) => {
+    console.log("Form values:", value); // 表单提交的值
+    console.log("Post object:", post); // 完整的post对象
     // ACTION = UPDATE
     if (post && action === "Update") {
       const updatedPost = await updatePost({
@@ -61,6 +65,7 @@ const PostForm = ({ post, action }: PostFormProps) => {
           title: `${action} post failed. Please try again.`, // 显示错误消息
         });
       }
+      console.log("going to",post.$id);
       return navigate(`/posts/${post.$id}`); // 更新成功后跳转到 post 的详情页
     }
 
@@ -78,15 +83,15 @@ const PostForm = ({ post, action }: PostFormProps) => {
       });
     }
     // navigate("/"); // 创建成功后跳转到首页
+    console.log("going to",newPost.$id);
     return navigate(`/posts/${newPost.$id}`); // 更新成功后跳转到 post 的详情页
   };
-
+  
   return (
     <Form {...form}> {/* 表单组件，传入表单实例 */}
       <form
         onSubmit={form.handleSubmit(handleSubmit)} // 提交表单时调用 handleSubmit
         className="flex flex-col gap-9 w-full  max-w-5xl">
-          <h2 className="h3-bold md:h2-bold  ">输入标题</h2>
           <FormField
             control={form.control} // 绑定表单控制器
             name="title" // 字段名称
@@ -102,7 +107,6 @@ const PostForm = ({ post, action }: PostFormProps) => {
               </FormItem>
             )}
           />
-        <h2 className="h3-bold md:h2-bold  ">输入内容</h2>
         <FormField
           control={form.control} // 绑定表单控制器
           name="caption" // 字段名称
@@ -118,7 +122,7 @@ const PostForm = ({ post, action }: PostFormProps) => {
             </FormItem>
           )}
         />
-        <h2 className="h3-bold md:h2-bold  ">添加图片</h2>
+
         <FormField
           control={form.control} // 绑定表单控制器
           name="file" // 字段名称
@@ -127,7 +131,7 @@ const PostForm = ({ post, action }: PostFormProps) => {
               <FormControl>
                 <FileUploader
                   fieldChange={field.onChange} // 文件上传时触发字段更新
-                  mediaUrl={post?.imageUrl} // 如果是编辑模式，显示已有图片
+                  mediaUrl={currentImageUrl} // 如果是编辑模式，显示已有图片
                 />
               </FormControl>
               <FormMessage className="shad-form_message" /> {/* 显示验证消息 */}
@@ -148,7 +152,7 @@ const PostForm = ({ post, action }: PostFormProps) => {
             className="shad-button_primary whitespace-nowrap" 
             disabled={isLoadingCreate || isLoadingUpdate}> 
             {(isLoadingCreate || isLoadingUpdate) && <Loader />} 
-            {action} 发布
+            {action} Post
           </button>
         </div>
       </form>
