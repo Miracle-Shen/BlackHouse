@@ -16,7 +16,6 @@ import { useForm } from "react-hook-form";
 import { ProfileValidation } from "@/types";
 import ProfileUploader from "./common/ProfileUploader";
 import { Button } from "./ui/button";
-import Loader from "./common/Loader";
 import { useUpdateUser } from "@/lib/react-query/queries";
 const User = ({users}) => {
     // const[users,setUsers]=useState([]);
@@ -24,7 +23,6 @@ const User = ({users}) => {
     const navigate=useNavigate();
     const {setAuth}=useContext(AuthContext);
     const axiosPrivate = useAxiosPrivate();
-    const fileInputRef = useRef(null); // Reference for file input
 
 
     const logout = async () => {
@@ -48,6 +46,7 @@ const User = ({users}) => {
     });
     const handleUpdate = async (value: z.infer<typeof ProfileValidation>) => {
         const updatedUser = await updateUser({
+            id: users.id,
             userId: users.userId,
             userName: users.userName,
             file: value.file,
@@ -64,21 +63,21 @@ const User = ({users}) => {
         // return navigate(`/profile/${id}`);
     };
 
-    const handleAvatarUpload = async (event) => {
-        const file = event.target.files[0];
-        if (!file) return;
-        const newUser = {
-            ...users,
-            file:file
-        }
-        console.log("newUse",newUser);
-        debugger;
-        updateUser(newUser);
-        setAuth(prev=>({
-            ...prev,
-            avatarUrl: avatarUrl
-        }));
-    };
+    // const handleAvatarUpload = async (event) => {
+    //     const file = event.target.files[0];
+    //     if (!file) return;
+    //     const newUser = {
+    //         ...users,
+    //         file:file
+    //     }
+    //     console.log("newUse",newUser);
+    //     debugger;
+    //     updateUser(newUser);
+    //     setAuth(prev=>({
+    //         ...prev,
+    //         avatarUrl: avatarUrl
+    //     }));
+    // };
     // useEffect(() => {
     //     if (users) {
     //         localStorage.setItem("user", JSON.stringify(users));

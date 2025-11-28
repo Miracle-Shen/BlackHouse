@@ -21,14 +21,18 @@ const  handleNewUser = async (req, res) => {
         //密码加密
         const hashedPwd = await bcrypt.hash(pwd, 10); //这个数字 10 是 成本因子 或 salt的轮数。
         const userId = uuidv4();
-        const newUser = {"username": user,"userId": userId, "password": hashedPwd};
+      
+
+        const userInfo = await createUser(userId, user);
+        const id = userInfo.$id;
+
+        const newUser = {"id": id, "username": user,"userId": userId, "password": hashedPwd};
         usersDB.setUsers([...usersDB.users, newUser]);
         await fsPromises.writeFile(
             path.join(__dirname, '..', 'model', 'users.json'), 
             JSON.stringify(usersDB.users)
         );
 
-        await createUser(userId, user);
         console.log(`User ${user} created in Appwrite DB`);
         res.status(201).json({ 'success': `New user ${user} created!` }); //201 Created 成功创建
     }catch(err){

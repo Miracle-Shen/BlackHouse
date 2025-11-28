@@ -473,7 +473,7 @@ export async function updateUser(user: IUpdateUser) {
     const updatedUser = await databases.updateDocument(
       appwriteConfig.databaseId,
       appwriteConfig.userCollectionId,
-      "691f3e420009f1bba6aa",
+      user.id,
       {
         avatarUrl: image.avatarUrl,
         avatarId: image.avatarId,

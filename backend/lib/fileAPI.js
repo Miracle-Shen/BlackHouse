@@ -34,16 +34,16 @@ exports.uploadFile = async (file,res) => {
     }   
 }
 
-exports.fetchFile = async (req, res) => {
-    const fileId = req.params.fileId;
-    try{
-        const file = await storage.getFileDownload({
-            bucketId: process.env.STORAGE_BUCKET_ID,
-            fileId: fileId
-        });
-        res.status(200).json(file);
-    } catch(error){
-        console.log("Error fetching file:", error);
-        res.status(500).json({ message: "Error fetching file" });
-    }
-}
+// exports.fetchFile = async (req, res) => {
+//     const fileId = req.params.fileId;
+//     try{
+//         const file = await storage.getFileDownload({
+//             bucketId: process.env.STORAGE_BUCKET_ID,
+//             fileId: fileId
+//         });
+//         res.status(200).json(file);
+//     } catch(error){
+//         console.log("Error fetching file:", error);
+//         res.status(500).json({ message: "Error fetching file" });
+//     }
+// }

@@ -1,7 +1,7 @@
 const {fetchUser, fetchTags} = require('../lib/userAPI.js');
 const fs = require('fs');
 const path = require('path');
-const { fetchFile } = require('../lib/fileAPI.js');
+
 
 const usersDB = {
     get users() {
@@ -23,30 +23,30 @@ const getUserInfo = async (req, res) => {
     if(!foundUser) {
         return res.status(403).json({message: "No matching user found"}); //Forbidden 禁止访问
     }
-    const userId = foundUser.userId;
-    console.log("foundUser:", userId);
+    const id = foundUser.id;
+    console.log("foundUser:", id);
     try {
-        const userResponse = await fetchUser(userId); 
-        console.log("userResponse:", userResponse);
-        if (userResponse.total === 0) {
-            return res.status(404).json({ 'message': 'User not found.' });
-        }
-        const user = userResponse.rows[0];
+        const user = await fetchUser(id); 
+        // console.log("userResponse:", userResponse);
+        // if (userResponse.total === 0) {
+        //     return res.status(404).json({ 'message': 'User not found.' });
+        // }
+        // const user = userResponse.rows[0];
 
-        const tagsResponse = await fetchTags(userId);
-        let tags;
-        if (tagsResponse.total !== 0) {
-            tags = tagsResponse.rows[0].map(doc => doc.interest_tags).flat();   
-        }
+        // const tagsResponse = await fetchTags(id);
+        // let tags;
+        // if (tagsResponse.total !== 0) {
+        //     tags = tagsResponse.rows[0].map(doc => doc.interest_tags).flat();   
+        // }
 
-        const avatarURL = await fetchFile(user.profile_picture);
+        // const avatarUrl = await fetchFile(user.profile_picture);
 
         const userInfo = {
             id: user.$id,
             userId: user.userId,
             userName: user.userName,
-            interestTags: tags || " ",
-            avatarURL: avatarURL || null
+            interestTags: user.tags || " ",
+            avatarUrl: user.avatarUrl || null
         };
         return res.status(200).json(userInfo);
     } catch (error) {
