@@ -6,7 +6,6 @@ import {
   FormControl,
   FormField,
   FormItem,
-  FormLabel,
   FormMessage,
 } from "@/components/ui/form";
 import * as z from "zod";
@@ -53,73 +52,56 @@ const User = ({ users, setAuth }) => {
         // return navigate(`/profile/${id}`);
     };
 
-    // Set auth when users prop changes instead of during render
     useEffect(() => {
       if (users && setAuth) {
         setAuth({ ...users });
       }
-      // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [users]);
 
     return (
       <>
-        <h1 className="text-center">我的</h1>
         {users ? (
             <div className="flex flex-col items-center gap-4">
             <section>
                 <div className="flex flex-col items-center gap-4">
-                    {/* <div className="avatar">
-                        <img 
-                            src={users.avatar || "./icons/people.svg"}  
-                            alt="用户头像"
-                            className="w-16 h-16 rounded-full border border-gray-300"
-                        />
-                        <input
-                            type="file"
-                            ref={fileInputRef}
-                            className="hidden"
-                            onChange={handleAvatarUpload}
-                        />
-                        <button onClick={() => fileInputRef.current.click()}>
-                            上传头像
-                        </button>
-                    </div> */}
-                    <Form {...form}>
-                        <form
-                            onSubmit={form.handleSubmit(handleUpdate)}
-                            className="flex flex-col gap-7 w-full mt-4 max-w-5xl">
-                            <FormField
-                            control={form.control}
-                            name="file"
-                            render={({ field }) => (
-                                <FormItem className="flex">
-                                <FormControl>
-                                    <ProfileUploader
-                                    fieldChange={field.onChange}
-                                    mediaUrl={users?.avatarUrl || "./icons/profile-placeholder.svg"}
-                                    />
-                                </FormControl>
-                                <FormMessage className="shad-form_message" />
-                                </FormItem>
-                            )}
-                         />
-                           <div className="flex gap-4 items-center justify-end">
-                            {/* <Button
-                                type="button"
-                                className="shad-button_dark_4"
-                                onClick={() => navigate(-1)}>
-                                Cancel
-                            </Button> */}
-                            <Button
-                                type="submit"
-                                className="shad-button_primary whitespace-nowrap"
-                                >
-                                Update Profile
-                            </Button>
-                            </div>
-                        </form>
-                       
-                    </Form>
+                    <div className="flex">
+                        <Form {...form}>
+                            <form
+                                onSubmit={form.handleSubmit(handleUpdate)}
+                                className="flex flex-col gap-7 w-full mt-4 max-w-5xl">
+                                <FormField
+                                control={form.control}
+                                name="file"
+                                render={({ field }) => (
+                                    <FormItem className="flex">
+                                    <FormControl>
+                                        <ProfileUploader
+                                        fieldChange={field.onChange}
+                                        mediaUrl={users?.avatarUrl || "./icons/profile-placeholder.svg"}
+                                        />
+                                    </FormControl>
+                                    <FormMessage className="shad-form_message" />
+                                    </FormItem>
+                                )}
+                            />
+                            <div className="flex gap-4 items-center justify-end">
+                                {/* <Button
+                                    type="button"
+                                    className="shad-button_dark_4"
+                                    onClick={() => navigate(-1)}>
+                                    Cancel
+                                </Button> */}
+                                <Button
+                                    type="submit"
+                                    className="shad-button_primary whitespace-nowrap"
+                                    >
+                                    Update Profile
+                                </Button>
+                                </div>
+                            </form>
+                        
+                        </Form>
+                    </div>
                     <div className="text-center">
                         <h3 className="text-lg font-semibold">{users.userName}</h3>
                         <p className="text-sm text-gray-600">兴趣：{users.interestTags}</p>
