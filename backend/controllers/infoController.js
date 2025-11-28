@@ -42,6 +42,8 @@ const getUserInfo = async (req, res) => {
         const avatarURL = await fetchFile(user.profile_picture);
 
         const userInfo = {
+            id: user.$id,
+            userId: user.userId,
             userName: user.userName,
             interestTags: tags || " ",
             avatarURL: avatarURL || null
