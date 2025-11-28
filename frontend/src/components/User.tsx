@@ -2,6 +2,22 @@ import { useNavigate, useLocation, Link } from "react-router-dom";
 import { useContext, useEffect, useState, useRef } from "react";
 import AuthContext from "../context/AuthProvider";
 import  useAxiosPrivate  from "../hooks/useAxiosPrivate";
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form";
+import * as z from "zod";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useForm } from "react-hook-form";
+import { ProfileValidation } from "@/types";
+import ProfileUploader from "./common/ProfileUploader";
+import { Button } from "./ui/button";
+import Loader from "./common/Loader";
+import { useUpdateUser } from "@/lib/react-query/queries";
 const User = ({users}) => {
     // const[users,setUsers]=useState([]);
     const [isStorage,setIsStorage]=useState(false);
@@ -23,31 +39,45 @@ const User = ({users}) => {
             //navigate('/login', { replace: true });  // 确保退出后跳转到登录页
         }
     };
+    const {mutateAsync:updateUser,isLoading: isLoadingUpdate} = useUpdateUser();
+    const form = useForm<z.infer<typeof ProfileValidation>>({
+        resolver: zodResolver(ProfileValidation),
+        defaultValues: {
+        file: [],
+        },
+    });
+    const handleUpdate = async (value: z.infer<typeof ProfileValidation>) => {
+        const updatedUser = await updateUser({
+            userId: users.userId,
+            userName: users.userName,
+            file: value.file,
+            avatarUrl: users.avatarUrl,
+            avatarId: users.avatarId,
+        });
+
+   
+
+        setAuth({
+        ...users,
+        avatarUrl: updatedUser?.avatarUrl,
+        });
+        // return navigate(`/profile/${id}`);
+    };
 
     const handleAvatarUpload = async (event) => {
         const file = event.target.files[0];
         if (!file) return;
-
-        const formData = new FormData();
-        formData.append('file', file);
-
-        try {
-            const response = await axiosPrivate.post("/upload", formData, {
-                headers: {
-                    "Content-Type": "multipart/form-data",
-                },
-            });
-            
-            const avatarURL =  `https://nyc.cloud.appwrite.io/v1/storage/buckets/69230b780026a1648b96/files/${response.data.$id}/view?project=691ec46d0011cc0af217&mode=admin`;
-                                //https://nyc.cloud.appwrite.io/v1/storage/buckets/69230b780026a1648b96/files/69242d6d001192d4e231/view?project=691ec46d0011cc0af217&mode=admin
-            setUsers(prevUsers => ({
-                ...prevUsers,
-                avatar: avatarURL
-            }));
-          
-        } catch (err) {
-            console.error("Avatar upload failed:", err);
+        const newUser = {
+            ...users,
+            file:file
         }
+        console.log("newUse",newUser);
+        debugger;
+        updateUser(newUser);
+        setAuth(prev=>({
+            ...prev,
+            avatarUrl: avatarUrl
+        }));
     };
     // useEffect(() => {
     //     if (users) {
@@ -96,9 +126,9 @@ const User = ({users}) => {
             <div className="flex flex-col items-center gap-4">
             <section>
                 <div className="flex flex-col items-center gap-4">
-                    <div className="avatar">
+                    {/* <div className="avatar">
                         <img 
-                            src={users.avatar ||  fileInputRef.current}  
+                            src={users.avatar || "./icons/people.svg"}  
                             alt="用户头像"
                             className="w-16 h-16 rounded-full border border-gray-300"
                         />
@@ -111,7 +141,43 @@ const User = ({users}) => {
                         <button onClick={() => fileInputRef.current.click()}>
                             上传头像
                         </button>
-                    </div>
+                    </div> */}
+                    <Form {...form}>
+                        <form
+                            onSubmit={form.handleSubmit(handleUpdate)}
+                            className="flex flex-col gap-7 w-full mt-4 max-w-5xl">
+                            <FormField
+                            control={form.control}
+                            name="file"
+                            render={({ field }) => (
+                                <FormItem className="flex">
+                                <FormControl>
+                                    <ProfileUploader
+                                    fieldChange={field.onChange}
+                                    mediaUrl={users?.avatarUrl || "./icons/profile-placeholder.svg"}
+                                    />
+                                </FormControl>
+                                <FormMessage className="shad-form_message" />
+                                </FormItem>
+                            )}
+                         />
+                           <div className="flex gap-4 items-center justify-end">
+                            {/* <Button
+                                type="button"
+                                className="shad-button_dark_4"
+                                onClick={() => navigate(-1)}>
+                                Cancel
+                            </Button> */}
+                            <Button
+                                type="submit"
+                                className="shad-button_primary whitespace-nowrap"
+                                >
+                                Update Profile
+                            </Button>
+                            </div>
+                        </form>
+                       
+                    </Form>
                     <div className="text-center">
                         <h3 className="text-lg font-semibold">{users.userName}</h3>
                         <p className="text-sm text-gray-600">兴趣：{users.interestTags}</p>

@@ -17,8 +17,8 @@ import { Loader } from "lucide-react";
 const PostDetails = () => {
   const navigate = useNavigate();
   const { id } = useParams();
-    const { auth } = useContext(AuthContext);
-    const userId = auth.userId;
+  const { auth } = useContext(AuthContext);
+  const userId = auth.userId;
 
   const { data: post, isLoading } = useGetPostById(id);
   const { data: userPosts, isLoading: isUserPostLoading } = useGetUserPosts(
@@ -39,7 +39,7 @@ const PostDetails = () => {
     <div className="post_details-container">
       <div className=" md:flex max-w-5xl w-full">
         <Button
-          onClick={() => navigate(-1)}
+          onClick={() => navigate(`/`)}
           variant="ghost"
           className="shad-button_ghost">
           <img

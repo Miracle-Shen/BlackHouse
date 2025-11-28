@@ -25,7 +25,7 @@ import { Title } from "@radix-ui/react-toast";
 //       accountId: newAccount.$id,
 //       name: newAccount.name,
 //       username: user.username,
-//       imageUrl: avatarUrl,
+//       avatarUrl: avatarUrl,
 //     });
 
 //     return newUser;
@@ -40,7 +40,7 @@ import { Title } from "@radix-ui/react-toast";
 //   accountId: string;
 //   email: string;
 //   name: string;
-//   imageUrl: URL;
+//   avatarUrl: URL;
 //   username?: string;
 // }) {
 //   try {
@@ -147,7 +147,7 @@ export async function createPost(post: INewPost) {
       {
         userId: post.userId,
         caption: post.caption,
-        imageUrl: fileUrl,
+        avatarUrl: fileUrl,
         imageId: uploadedFile.$id,
         title: post.title,
       }
@@ -271,10 +271,10 @@ export async function getPostById(postId?: string) {
 // ============================== UPDATE POST
 export async function updatePost(post: IUpdatePost) {
   const hasFileToUpdate = post.file.length > 0;
-  console.log("当前post",post);
+
   try {
     let image = {
-      imageUrl: post.imageUrl,
+      avatarUrl: post.avatarUrl,
       imageId: post.imageId,
     };
     console
@@ -295,7 +295,7 @@ export async function updatePost(post: IUpdatePost) {
         throw Error;
       }
 
-      image = { ...image, imageUrl: fileUrl, imageId: uploadedFile.$id };
+      image = { ...image, avatarUrl: fileUrl, imageId: uploadedFile.$id };
     }
 
     // Convert tags into array
@@ -304,7 +304,7 @@ export async function updatePost(post: IUpdatePost) {
     //  Update post
      const payload: Record<string, any> = {
       userId: post.userId,
-      imageUrl: image.imageUrl,
+      avatarUrl: image.avatarUrl,
       imageId: image.imageId,
       title: post.title,
       caption: post.caption,
@@ -444,11 +444,12 @@ export async function getUserById(userId: string) {
 
 // ============================== UPDATE USER
 export async function updateUser(user: IUpdateUser) {
+  console.log("Updating user:", user);
   const hasFileToUpdate = user.file.length > 0;
   try {
     let image = {
-      imageUrl: user.imageUrl,
-      imageId: user.imageId,
+      avatarUrl: user.avatarUrl,
+      avatarId: user.avatarId,
     };
 
     if (hasFileToUpdate) {
@@ -457,25 +458,25 @@ export async function updateUser(user: IUpdateUser) {
       if (!uploadedFile) throw Error;
 
       // Get new file url
-      const fileUrl = getFilePreview(uploadedFile.$id);
-      if (!fileUrl) {
+      const avatarUrl = uploadedFile.$id 
+      ? `https://nyc.cloud.appwrite.io/v1/storage/buckets/69230b780026a1648b96/files/${uploadedFile.$id}/view?project=691ec46d0011cc0af217&mode=admin`
+      : '';
+      if (!avatarUrl) {
         await deleteFile(uploadedFile.$id);
         throw Error;
       }
 
-      image = { ...image, imageUrl: fileUrl, imageId: uploadedFile.$id };
+      image = { ...image, avatarUrl: avatarUrl, avatarId: uploadedFile.$id };
     }
 
     //  Update user
     const updatedUser = await databases.updateDocument(
       appwriteConfig.databaseId,
       appwriteConfig.userCollectionId,
-      user.userId,
+      "691f3e420009f1bba6aa",
       {
-        name: user.name,
-        bio: user.bio,
-        imageUrl: image.imageUrl,
-        imageId: image.imageId,
+        avatarUrl: image.avatarUrl,
+        avatarId: image.avatarId,
       }
     );
 
@@ -483,15 +484,15 @@ export async function updateUser(user: IUpdateUser) {
     if (!updatedUser) {
       // Delete new file that has been recently uploaded
       if (hasFileToUpdate) {
-        await deleteFile(image.imageId);
+        await deleteFile(image.avatarId);
       }
       // If no new file uploaded, just throw error
       throw Error;
     }
 
     // Safely delete old file after successful update
-    if (user.imageId && hasFileToUpdate) {
-      await deleteFile(user.imageId);
+    if (user.avatarId && hasFileToUpdate) {
+      await deleteFile(user.avatarId);
     }
 
     return updatedUser;

@@ -8,8 +8,8 @@ export type IUpdateUser = {
   userId: string;
   userName: string;
   bio?: string;
-  imageId?: string;
-  imageUrl?: URL | string;
+  avatarId?: string;
+  avatarUrl?: URL | string;
   file: File[];
 };
 
@@ -37,7 +37,7 @@ export type IUser = {
   id: string;
   name: string;
   username: string;
-  imageUrl?: string;
+  avatarUrl?: string;
 };
 
 export type INewUser = {
@@ -64,9 +64,6 @@ export const SigninValidation = z.object({
 
 export const ProfileValidation = z.object({
   file: z.custom<File[]>(),
-  name: z.string().min(2, { message: "Name must be at least 2 characters." }),
-  username: z.string().min(2, { message: "Name must be at least 2 characters." }),
-  bio: z.string(),
 });
 
 // ============================================================

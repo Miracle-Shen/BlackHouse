@@ -40,6 +40,9 @@ const getUserInfo = async (req, res) => {
         }
         const userInfo = {
             userName: user.userName,
+            userId: user.userId,
+            avatarUrl: user.avatarUrl,
+            avatarId: user.avatarId,
             interestTags: tags || " "
         };
         return res.status(200).json(userInfo);

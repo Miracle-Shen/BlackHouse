@@ -3,7 +3,6 @@ import { createContext, useEffect, useState } from "react";
 const AuthContext = createContext({});
 
 export const AuthProvider = ({ children }) => {
-    //const [auth, setAuth] = useState({});
     const [auth, setAuth] = useState(() => {
         const storeAuth = localStorage.getItem('auth');
         return storeAuth ? JSON.parse(storeAuth) : {};
