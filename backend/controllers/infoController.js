@@ -1,6 +1,7 @@
 const {fetchUser, fetchTags} = require('../lib/userAPI.js');
 const fs = require('fs');
 const path = require('path');
+const { fetchFile } = require('../lib/fileAPI.js');
 
 const usersDB = {
     get users() {
@@ -13,7 +14,6 @@ const usersDB = {
 };
 const getUserInfo = async (req, res) => {
     const cookie = req.cookies;
-    console.log("cookie:", cookie);
     if(!cookie?.jwt) {
         return res.status(401).json({message: "No jwt"}); //Unauthorized 未授权
     }
@@ -38,12 +38,13 @@ const getUserInfo = async (req, res) => {
         if (tagsResponse.total !== 0) {
             tags = tagsResponse.rows[0].map(doc => doc.interest_tags).flat();   
         }
+
+        const avatarURL = await fetchFile(user.profile_picture);
+
         const userInfo = {
             userName: user.userName,
-            userId: user.userId,
-            avatarUrl: user.avatarUrl,
-            avatarId: user.avatarId,
-            interestTags: tags || " "
+            interestTags: tags || " ",
+            avatarURL: avatarURL || null
         };
         return res.status(200).json(userInfo);
     } catch (error) {
