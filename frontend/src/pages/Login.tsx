@@ -1,6 +1,6 @@
 import { useRef, useState, useEffect, useContext } from 'react';
 import AuthContext from '../context/AuthProvider';
-import { Link, useNavigate, useLocation } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 
 import axios from '../api/axios';
 const LOGIN_URL = '/auth';
@@ -15,8 +15,6 @@ const Login = () => {
     const [errMsg, setErrMsg] = useState(''); 
     const [success, setSuccess] = useState(false); 
     const navigate = useNavigate();
-    const location = useLocation();
-    const from = location.state?.from || '/';
     useEffect(() => {
         userRef.current.focus(); // 自动聚焦用户名输入框
     }, [])
@@ -42,11 +40,12 @@ const Login = () => {
            
             const accessToken = response?.data?.accessToken; 
             const userId = response?.data?.userId;
-            setAuth({ user, userId, accessToken });
+            const id = response?.data?.id;
+            setAuth({ id, userId, accessToken });
             setUser(''); 
             setPwd(''); 
             setSuccess(true);
-            navigate(from, { replace: true }); 
+            navigate('/Mine', { replace: true }); 
         } catch (err) {
             if (!err?.response) {
                 setErrMsg('无服务器响应');

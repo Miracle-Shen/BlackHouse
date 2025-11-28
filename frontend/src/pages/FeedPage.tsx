@@ -1,6 +1,6 @@
 import { FeedStream } from '@/components/Feed'
 import PostCard from '@/components/PostCard';
-import { useGetCurrentUser, useGetRecentPosts } from '@/lib/react-query/queries';
+import {  useGetRecentPosts } from '@/lib/react-query/queries';
 
 
 

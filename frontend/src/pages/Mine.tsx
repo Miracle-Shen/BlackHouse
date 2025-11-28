@@ -5,12 +5,12 @@ import useAuth from "../hooks/useAuth";
 import User from "../components/User";
 
 const Mine = () => {
-   const { auth } = useAuth();
    const navigate = useNavigate();
    const location = useLocation();
    const [users, setUsers] = useState([]);
    const [isLoading, setIsLoading] = useState(true);
    const axiosPrivate = useAxiosPrivate();
+   const { setAuth } = useAuth();
    useEffect(() => {
       console.log("%c[Mine render]", "color:orange;font-weight:bold;");
 
@@ -34,7 +34,8 @@ const Mine = () => {
                if (error.response?.status === 401 || error.response?.status === 403) {
                   navigate("/login", { state: { from: location.pathname }, replace: true });
                }
-               else if(error.response?.status === 500){
+               else {
+                  navigate("/login", { state: { from: location.pathname }, replace: true });
                    console.error("网络不好，请稍后！");
                }
             }
@@ -42,7 +43,7 @@ const Mine = () => {
             setIsLoading(false);
          }
       };
-      console.log("Mine.fetchUser start", new Error().stack.split("\n").slice(1,5));
+      //console.log("Mine.fetchUser start", new Error().stack.split("\n").slice(1,5));
       fetchUsers();
       return ()=>{
          isIgnore = true;
@@ -59,7 +60,7 @@ const Mine = () => {
         ) : (
             <>
             {users? (
-                  <User users={users} />
+                  <User users={users} setAuth={setAuth} />
                ) : (
                <div>加载用户信息中...</div>
             )}

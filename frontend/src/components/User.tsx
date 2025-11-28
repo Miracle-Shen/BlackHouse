@@ -1,6 +1,5 @@
 import { useNavigate, useLocation, Link } from "react-router-dom";
-import { useContext, useEffect, useState, useRef } from "react";
-import AuthContext from "../context/AuthProvider";
+import { useEffect } from "react";
 import  useAxiosPrivate  from "../hooks/useAxiosPrivate";
 import {
   Form,
@@ -17,24 +16,21 @@ import { ProfileValidation } from "@/types";
 import ProfileUploader from "./common/ProfileUploader";
 import { Button } from "./ui/button";
 import { useUpdateUser } from "@/lib/react-query/queries";
-const User = ({users}) => {
-    // const[users,setUsers]=useState([]);
-    const [isStorage,setIsStorage]=useState(false);
-    const navigate=useNavigate();
-    const {setAuth}=useContext(AuthContext);
-    const axiosPrivate = useAxiosPrivate();
 
+
+const User = ({ users, setAuth }) => {
+    const navigate = useNavigate();
+    const axiosPrivate = useAxiosPrivate();
 
     const logout = async () => {
         try {
-            // 调用后端退出登录接口
             await axiosPrivate.post('/logout');
         } catch (err) {
             console.error('Logout error:', err);
         } finally {
             setAuth({});
             //localStorage.removeItem('auth'); 
-            //navigate('/login', { replace: true });  // 确保退出后跳转到登录页
+            navigate('/login', { replace: true });  // 确保退出后跳转到登录页
         }
     };
     const {mutateAsync:updateUser,isLoading: isLoadingUpdate} = useUpdateUser();
@@ -53,70 +49,17 @@ const User = ({users}) => {
             avatarUrl: users.avatarUrl,
             avatarId: users.avatarId,
         });
-
-   
-
-        setAuth({
-        ...users,
-        avatarUrl: updatedUser?.avatarUrl,
-        });
+        setAuth({ ...users, avatarUrl: updatedUser?.avatarUrl });
         // return navigate(`/profile/${id}`);
     };
 
-    // const handleAvatarUpload = async (event) => {
-    //     const file = event.target.files[0];
-    //     if (!file) return;
-    //     const newUser = {
-    //         ...users,
-    //         file:file
-    //     }
-    //     console.log("newUse",newUser);
-    //     debugger;
-    //     updateUser(newUser);
-    //     setAuth(prev=>({
-    //         ...prev,
-    //         avatarUrl: avatarUrl
-    //     }));
-    // };
-    // useEffect(() => {
-    //     if (users) {
-    //         localStorage.setItem("user", JSON.stringify(users));
-    //     }
-    // }, [users]);
-
-    // useEffect(() => {
-    //     const cachedUser = localStorage.getItem('user');
-    //     if (cachedUser) {
-    //         setUsers(JSON.parse(cachedUser));
-    //         setIsStorage(true);
-    //     }
-
-    //     let isMounted = true;
-    //     const controller = new AbortController();
-
-    //     const fetchUsers = async () => {
-    //         try {
-    //             const response = await axiosPrivate.get('/user', {
-    //                 signal: controller.signal,
-    //             });
-    //             if (isMounted) {
-    //                 setUsers(response.data);
-    //                 localStorage.setItem('user', JSON.stringify(response.data));
-    //             }
-    //         } catch (err) {
-    //             console.error(err);
-    //         }
-    //     };
-
-    //     if (!cachedUser) {
-    //         fetchUsers();
-    //     }
-
-    //     return () => {
-    //         isMounted = false;
-    //         controller.abort();
-    //     };
-    // }, []);
+    // Set auth when users prop changes instead of during render
+    useEffect(() => {
+      if (users && setAuth) {
+        setAuth({ ...users });
+      }
+      // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [users]);
 
     return (
       <>

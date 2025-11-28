@@ -137,7 +137,7 @@ export async function createPost(post: INewPost) {
     }
 
     // Convert tags into array
-    const tags = post.tags?.replace(/ /g, "").split(",") || [];
+    //const tags = post.tags?.replace(/ /g, "").split(",") || [];
 
     // Create post
     const newPost = await databases.createDocument(
@@ -147,7 +147,7 @@ export async function createPost(post: INewPost) {
       {
         userId: post.userId,
         caption: post.caption,
-        avatarUrl: fileUrl,
+        imageUrl: fileUrl,
         imageId: uploadedFile.$id,
         title: post.title,
       }

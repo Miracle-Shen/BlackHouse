@@ -24,7 +24,7 @@ const useRefreshToken = () => {
         }));
 
         return response.data.accessToken;
-    }, []); // setAuth 是稳定的，不会变化
+    }, []); 
     return refresh;
 };
 

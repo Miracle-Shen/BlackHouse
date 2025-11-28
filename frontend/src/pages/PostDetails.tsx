@@ -1,8 +1,6 @@
 import { useParams, Link, useNavigate } from "react-router-dom";
 
 import { Button } from "@/components/ui/button";
-// import { Loader } from "@/components/shared";
-// import { GridPostList, PostStats } from "@/components/shared";
 
 import {
   useGetPostById,
@@ -19,7 +17,8 @@ const PostDetails = () => {
   const { id } = useParams();
   const { auth } = useContext(AuthContext);
   const userId = auth.userId;
-
+/*   const avatarUrl = auth.avatarUrl;
+  const userName = auth.userName; */
   const { data: post, isLoading } = useGetPostById(id);
   const { data: userPosts, isLoading: isUserPostLoading } = useGetUserPosts(
     post?.userId
@@ -57,7 +56,7 @@ const PostDetails = () => {
       ) : (
         <div className="post_details-card">
           <img
-            src={post?.imageUrl}
+            src={post.imageUrl || "./icons/profile-placeholder.svg"}
             alt="imageUrl"
             className="post_details-img"
           />
