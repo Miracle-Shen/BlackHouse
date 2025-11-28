@@ -24,7 +24,6 @@ import { Title } from "@radix-ui/react-toast";
 //     const newUser = await saveUserToDB({
 //       accountId: newAccount.$id,
 //       name: newAccount.name,
-//       email: newAccount.email,
 //       username: user.username,
 //       imageUrl: avatarUrl,
 //     });
@@ -37,26 +36,26 @@ import { Title } from "@radix-ui/react-toast";
 // }
 
 // ============================== SAVE USER TO DB
-export async function saveUserToDB(user: {
-  accountId: string;
-  email: string;
-  name: string;
-  imageUrl: URL;
-  username?: string;
-}) {
-  try {
-    const newUser = await databases.createDocument(
-      appwriteConfig.databaseId,
-      appwriteConfig.userCollectionId,
-      ID.unique(),
-      user
-    );
+// export async function saveUserToDB(user: {
+//   accountId: string;
+//   email: string;
+//   name: string;
+//   imageUrl: URL;
+//   username?: string;
+// }) {
+//   try {
+//     const newUser = await databases.createDocument(
+//       appwriteConfig.databaseId,
+//       appwriteConfig.userCollectionId,
+//       ID.unique(),
+//       user
+//     );
 
-    return newUser;
-  } catch (error) {
-    console.log(error);
-  }
-}
+//     return newUser;
+//   } catch (error) {
+//     console.log(error);
+//   }
+// }
 
 // ============================== SIGN IN
 // export async function signInAccount(user: { email: string; password: string }) {
@@ -260,7 +259,7 @@ export async function getPostById(postId?: string) {
       appwriteConfig.postCollectionId,
       postId
     );
-
+    console.log("from database  Fetched post:", post);
     if (!post) throw Error;
 
     return post;
@@ -272,7 +271,7 @@ export async function getPostById(postId?: string) {
 // ============================== UPDATE POST
 export async function updatePost(post: IUpdatePost) {
   const hasFileToUpdate = post.file.length > 0;
-  console.log("当前post",post.file[0]);
+  console.log("当前post",post);
   try {
     let image = {
       imageUrl: post.imageUrl,
@@ -304,18 +303,18 @@ export async function updatePost(post: IUpdatePost) {
     console.log("tags",tags);
     //  Update post
      const payload: Record<string, any> = {
+      userId: post.userId,
       imageUrl: image.imageUrl,
       imageId: image.imageId,
       title: post.title,
       caption: post.caption,
     };
+    console.log("payload",payload);
     const updatedPost = await databases.updateDocument(
       appwriteConfig.databaseId,
       appwriteConfig.postCollectionId,
       post.postId,
-
-       payload
-      
+      payload
     );
 
     // Failed to update

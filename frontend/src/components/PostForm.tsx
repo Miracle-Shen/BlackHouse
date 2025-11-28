@@ -39,10 +39,9 @@ const PostForm = ({ post, action }: PostFormProps) => {
       title: post ? post?.title : "", // 如果是编辑模式，设置默认值为 post 的 title
       file: [], // 默认文件列表为空
       tags: post ? post?.tags  : "", // 如果是编辑模式，设置默认值为 post 的 tags
+      userId: userId, // 设置当前用户 ID
     },
   });
-  // console.log("PostForm post",post);
-  console.log("action",action);
   // Query
   const { mutateAsync: createPost, isLoading: isLoadingCreate } = useCreatePost(); // 创建 post 的异步函数
   const { mutateAsync: updatePost, isLoading: isLoadingUpdate } = useUpdatePost(); // 更新 post 的异步函数
@@ -72,7 +71,6 @@ const PostForm = ({ post, action }: PostFormProps) => {
     // ACTION = CREATE
     const newPost = await createPost({
       ...value, // 合并表单数据
-      userId: userId, // 设置当前用户 ID
     });
  
 

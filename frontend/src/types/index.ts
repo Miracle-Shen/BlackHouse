@@ -77,4 +77,5 @@ export const PostValidation = z.object({
   file: z.custom<File[]>(),
   tags: z.string() .optional(),
   title: z.string(),
+  userId: z.string(),
 });

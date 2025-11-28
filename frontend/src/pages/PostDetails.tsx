@@ -19,16 +19,17 @@ const PostDetails = () => {
   const { id } = useParams();
     const { auth } = useContext(AuthContext);
     const userId = auth.userId;
+
   const { data: post, isLoading } = useGetPostById(id);
   const { data: userPosts, isLoading: isUserPostLoading } = useGetUserPosts(
     post?.userId
   );
   const { mutate: deletePost } = useDeletePost();
-  console.log("post",post?.imageUrl);
   const relatedPosts = userPosts?.documents.filter(
     (userPost) => userPost.$id !== id
   );
-
+    console.log("当前用户ID",userId);
+    console.log("帖子用户",post);
   const handleDeletePost = () => {
     deletePost({ postId: id, imageId: post?.imageId });
     navigate(-1);
