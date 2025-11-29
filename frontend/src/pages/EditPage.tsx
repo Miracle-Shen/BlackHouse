@@ -3,9 +3,8 @@ import { useGetPostById } from "@/lib/react-query/queries";
 import Loader from "@/components/common/Loader";
 import { useParams } from "react-router-dom";
 
-const PublishPage = () => {
+const EditPage = () => {
   const { id } = useParams();
-  console.log("PublishPage id",id);
   const { data: post, isLoading } = useGetPostById(id);
 
   if (isLoading && id)
@@ -34,4 +33,4 @@ const PublishPage = () => {
   )
 }
 
-export default PublishPage
+export default EditPage 

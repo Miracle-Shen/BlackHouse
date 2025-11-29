@@ -1,4 +1,3 @@
-import { FeedStream } from '@/components/Feed'
 import PostCard from '@/components/PostCard';
 import {  useGetRecentPosts } from '@/lib/react-query/queries';
 
@@ -16,7 +15,7 @@ const FeedPage = () => {
         </>
       ) : (
         <ul className='flex flex-col max-w-md mx-auto'>
-          {posts?.documents.map((post)=>{
+          {posts?.map((post)=>{
             return (
               <li key={post.id} className="border-b border-gray-200 p-4 bg-white mb-2">
                 <PostCard post={post} />

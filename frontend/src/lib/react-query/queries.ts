@@ -202,12 +202,12 @@ export const useDeleteSavedPost = () => {
 // USER QUERIES
 // ============================================================
 
-export const useGetCurrentUser = () => {
-  return useQuery({
-    queryKey: [QUERY_KEYS.GET_CURRENT_USER],
-    queryFn: getCurrentUser,
-  });
-};
+// export const useGetCurrentUser = () => {
+//   return useQuery({
+//     queryKey: [QUERY_KEYS.GET_CURRENT_USER],
+//     queryFn: getCurrentUser,
+//   });
+// };
 
 export const useGetUsers = (limit?: number) => {
   return useQuery({

@@ -26,8 +26,8 @@ const Layout = () => {
                     </button>
                     
                     <button
-                        onClick={() => handleTabClick('publish', '/publish')}
-                        className={`p-2 text-sm ${activeTab === 'publish' ? 'text-blue-600' : 'text-gray-500'}`}
+                        onClick={() => handleTabClick('edit', '/edit')}
+                        className={`p-2 text-sm ${activeTab === 'edit' ? 'text-blue-600' : 'text-gray-500'}`}
                     >
                         +
                     </button>

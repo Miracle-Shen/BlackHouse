@@ -48,8 +48,6 @@ const PostForm = ({ post, action }: PostFormProps) => {
 
   // Handler
   const handleSubmit = async (value: z.infer<typeof PostValidation>) => {
-    console.log("Form values:", value); // 表单提交的值
-    console.log("Post object:", post); // 完整的post对象
     // ACTION = UPDATE
     if (post && action === "Update") {
       const updatedPost = await updatePost({
@@ -71,6 +69,7 @@ const PostForm = ({ post, action }: PostFormProps) => {
     // ACTION = CREATE
     const newPost = await createPost({
       ...value, // 合并表单数据
+      creator: auth.id, // 设置创建者 ID
     });
  
 
@@ -90,6 +89,7 @@ const PostForm = ({ post, action }: PostFormProps) => {
       <form
         onSubmit={form.handleSubmit(handleSubmit)} // 提交表单时调用 handleSubmit
         className="flex flex-col gap-9 w-full  max-w-5xl">
+          <p>输入标题</p>
           <FormField
             control={form.control} // 绑定表单控制器
             name="title" // 字段名称
@@ -105,6 +105,7 @@ const PostForm = ({ post, action }: PostFormProps) => {
               </FormItem>
             )}
           />
+          <p>输入内容</p>
         <FormField
           control={form.control} // 绑定表单控制器
           name="caption" // 字段名称

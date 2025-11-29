@@ -5,6 +5,7 @@ export type INavLink = {
 };
 
 export type IUpdateUser = {
+  creator: string;
   id: string;
   userId: string;
   userName: string;
@@ -15,6 +16,7 @@ export type IUpdateUser = {
 };
 
 export type INewPost = {
+  creator: string;
   id: string;
   userId: string;
   title: string;

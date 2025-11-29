@@ -1,13 +1,18 @@
 import { multiFormatDateString } from "@/lib/utils";
+import type { Models } from "node_modules/appwrite/types/client";
 import { Link } from "react-router-dom";
-const PostCard = ({post}) => {
+
+type PostCardProps = {
+  post: Models.Document;
+};
+const PostCard = ({post}: PostCardProps) => {
     return (
     <div className="post-card">
       <div className="flex-between">
         <div className="flex items-center gap-3">
             <img
               src={
-                post.imageUrl ||
+                post.creator?.avatarUrl  ||
                 "/assets/icons/profile-placeholder.svg"
               }
               alt="creator"
@@ -16,7 +21,7 @@ const PostCard = ({post}) => {
 
           <div className="flex flex-col">
             <p className="base-medium lg:body-bold text-light-1">
-              {post.userId}
+              {post.creator?.userName}
             </p>
             <div className="flex-center gap-2 text-light-3">
               <p className="subtle-semibold lg:small-regular ">
@@ -25,16 +30,6 @@ const PostCard = ({post}) => {
             </div>
           </div>
         </div>
-
-        {/* <Link
-          to={`/update-post/${post.$id}`}>
-          <img
-            src={"/assets/icons/edit.svg"}
-            alt="edit"
-            width={20}
-            height={20}
-          />
-        </Link> */}
       </div>
 
       <Link to={`/posts/${post.$id}`}>

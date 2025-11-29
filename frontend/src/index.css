@@ -11,6 +11,11 @@
 .custom-scrollbar::-webkit-scrollbar-thumb:hover {
   @apply bg-slate-500;
 }
+
+.grid-container {
+    @apply w-full grid grid-cols-1 sm:grid-cols-2 md:grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-7 max-w-5xl;
+  }
+
 .common-container {
   @apply flex flex-col flex-1 items-center gap-10 overflow-scroll py-10 px-5 md:px-8 lg:p-14 custom-scrollbar;
 }

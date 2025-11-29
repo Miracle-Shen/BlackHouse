@@ -14,7 +14,8 @@ import { useForm } from "react-hook-form";
 import { ProfileValidation } from "@/types";
 import ProfileUploader from "./common/ProfileUploader";
 import { Button } from "./ui/button";
-import { useUpdateUser } from "@/lib/react-query/queries";
+import { useGetUserPosts, useUpdateUser } from "@/lib/react-query/queries";
+import GridPostList from "./common/GridPostList";
 
 
 const User = ({ users, setAuth }) => {
@@ -51,12 +52,17 @@ const User = ({ users, setAuth }) => {
         setAuth({ ...users, avatarUrl: updatedUser?.avatarUrl });
         // return navigate(`/profile/${id}`);
     };
-
+    // const myPosts = getUserPosts(users.id);
     useEffect(() => {
       if (users && setAuth) {
         setAuth({ ...users });
       }
     }, [users]);
+
+    const { data: userPosts, isLoading: isUserPostLoading } = useGetUserPosts(
+        users.id
+    );
+
 
     return (
       <>
@@ -85,17 +91,11 @@ const User = ({ users, setAuth }) => {
                                 )}
                             />
                             <div className="flex gap-4 items-center justify-end">
-                                {/* <Button
-                                    type="button"
-                                    className="shad-button_dark_4"
-                                    onClick={() => navigate(-1)}>
-                                    Cancel
-                                </Button> */}
                                 <Button
                                     type="submit"
                                     className="shad-button_primary whitespace-nowrap"
                                     >
-                                    Update Profile
+                                    提交新头像
                                 </Button>
                                 </div>
                             </form>
@@ -112,7 +112,7 @@ const User = ({ users, setAuth }) => {
                 <div className="flex flex-col items-center gap-4">
                     <div className="text-center">
                         <h3 className="text-lg font-semibold">我的内容</h3>
-                        <p className="text-sm text-gray-600">兴趣：{users.interestTags}</p>
+                         <GridPostList posts={userPosts?.documents} />
                     </div>
                 </div>
             </section>

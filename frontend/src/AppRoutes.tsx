@@ -1,7 +1,7 @@
 import { Routes, Route } from 'react-router-dom'
 import Layout from './components/Layout-simple'
 import FeedPage from './pages/FeedPage'
-import PublishPage from './pages/PublishPage'
+import PublishPage from './pages/EditPage'
 import MinePage from './pages/MinePage'
 
 function App() {

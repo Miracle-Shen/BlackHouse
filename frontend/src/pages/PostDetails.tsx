@@ -12,25 +12,26 @@ import { multiFormatDateString } from "@/lib/utils";
 import AuthContext from "@/context/AuthProvider";
 import { useContext } from "react";
 import { Loader } from "lucide-react";
+import GridPostList from "@/components/common/GridPostList";
 const PostDetails = () => {
   const navigate = useNavigate();
   const { id } = useParams();
   const { auth } = useContext(AuthContext);
-  const userId = auth.userId;
-/*   const avatarUrl = auth.avatarUrl;
-  const userName = auth.userName; */
+  const userId = auth.id;     
+  console.log("当前用户ID",userId);
   const { data: post, isLoading } = useGetPostById(id);
-  const { data: userPosts, isLoading: isUserPostLoading } = useGetUserPosts(
-    post?.userId
-  );
-  const { mutate: deletePost } = useDeletePost();
-  const relatedPosts = userPosts?.documents.filter(
-    (userPost) => userPost.$id !== id
-  );
-    console.log("当前用户ID",userId);
-    console.log("帖子用户",post);
+  // const { data: userPosts, isLoading: isUserPostLoading } = useGetUserPosts(
+  //   userId
+  // );
+  // const { mutate: deletePost } = useDeletePost();
+  // const relatedPosts = userPosts?.documents.filter(
+  //   (userPost) => userPost.$id !== id
+  // );
+    // console.log("当前用户ID",userId);
+    // console.log("帖子用户",post?.creator);
+    // console.log("相关帖子", relatedPosts);
   const handleDeletePost = () => {
-    deletePost({ postId: id, imageId: post?.imageId });
+    // deletePost({ postId: id, imageId: post?.imageId });
     navigate(-1);
   };
 
@@ -68,7 +69,7 @@ const PostDetails = () => {
                 className="flex items-center gap-3">
                 <img
                   src={
-                    post?.imageUrl ||
+                    post?.creator?.avatarUrl ||
                     "/icons/profile-placeholder.svg"
                   }
                   alt="creator"
@@ -76,7 +77,7 @@ const PostDetails = () => {
                 />
                 <div className="flex gap-1 flex-col">
                   <p className="base-medium lg:body-bold text-light-1">
-                    {post?.userId}
+                    {post?.creator?.userName}
                   </p>
                   <div className="flex-center gap-2 text-light-3">
                     <p className="subtle-semibold lg:small-regular ">
@@ -144,12 +145,12 @@ const PostDetails = () => {
         <h3 className="body-bold md:h3-bold w-full my-10">
             更多推荐
         </h3>
-        {isUserPostLoading || !relatedPosts ? (
+        {/* {isUserPostLoading || !relatedPosts ? (
           <Loader />
         ) : (
-        //   <GridPostList posts={relatedPosts} />
-            <div>更多推荐内容</div>
-        )}
+          <GridPostList posts={relatedPosts} />
+      
+        )} */}
       </div>
     </div>
   );

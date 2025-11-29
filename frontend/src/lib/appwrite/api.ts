@@ -145,6 +145,7 @@ export async function createPost(post: INewPost) {
       appwriteConfig.postCollectionId,
       ID.unique(),
       {
+        creator: post.creator,
         userId: post.userId,
         caption: post.caption,
         imageUrl: fileUrl,
@@ -259,10 +260,16 @@ export async function getPostById(postId?: string) {
       appwriteConfig.postCollectionId,
       postId
     );
-    console.log("from database  Fetched post:", post);
+
     if (!post) throw Error;
 
-    return post;
+    try {
+      const user = await getUserById(post.creator);
+      return { ...post, creator: user };
+    } catch (error) {
+      console.log(`Failed to fetch user for post ${post.$id}:`, error);
+      return post; // Return the post as is if user fetch fails
+    }
   } catch (error) {
     console.log(error);
   }
@@ -274,7 +281,7 @@ export async function updatePost(post: IUpdatePost) {
 
   try {
     let image = {
-      avatarUrl: post.avatarUrl,
+      imageUrl: post.imageUrl,
       imageId: post.imageId,
     };
     console
@@ -295,16 +302,17 @@ export async function updatePost(post: IUpdatePost) {
         throw Error;
       }
 
-      image = { ...image, avatarUrl: fileUrl, imageId: uploadedFile.$id };
+      image = { ...image, imageUrl: fileUrl, imageId: uploadedFile.$id };
     }
 
-    // Convert tags into array
+    // Convert tags into arrays
     const tags = post.tags?.replace(/ /g, "").split(",") || [];
     console.log("tags",tags);
     //  Update post
      const payload: Record<string, any> = {
+      creator: post.creator,
       userId: post.userId,
-      avatarUrl: image.avatarUrl,
+      imageUrl: image.imageUrl,
       imageId: image.imageId,
       title: post.title,
       caption: post.caption,
@@ -365,12 +373,12 @@ export async function deletePost(postId?: string, imageId?: string) {
 // ============================== GET USER'S POST
 export async function getUserPosts(userId?: string) {
   if (!userId) return;
-
+  console.log("###getUserPosts", userId);
   try {
     const post = await databases.listDocuments(
       appwriteConfig.databaseId,
       appwriteConfig.postCollectionId,
-      [Query.equal("userId", userId), Query.orderDesc("$createdAt")]
+      [Query.equal("creator", userId), Query.orderDesc("$createdAt")]
     );
 
     if (!post) throw Error;
@@ -392,7 +400,20 @@ export async function getRecentPosts() {
 
     if (!posts) throw Error;
 
-    return posts;
+    // Replace post.creator with user object
+    const postsWithUserDetails = await Promise.all(
+      posts.documents.map(async (post) => {
+        try {
+          const user = await getUserById(post.creator);
+          return { ...post, creator: user };
+        } catch (error) {
+          console.log(`Failed to fetch user for post ${post.$id}:`, error);
+          return post; // Return the post as is if user fetch fails
+        }
+      })
+    );
+
+    return postsWithUserDetails;
   } catch (error) {
     console.log(error);
   }
