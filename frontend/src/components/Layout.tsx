@@ -16,25 +16,25 @@ const Layout = () => {
                 <Outlet /> 
             </main>
             
-            <nav className="fixed bottom-0 left-0 right-0 bg-white border-t p-2">
+            <nav className="fixed bottom-0 left-0 right-0 bg-white border-t p-1">
                 <div className="flex justify-around max-w-md mx-auto">
                     <button
                         onClick={() => handleTabClick('home', '/')}
-                        className={`p-2 text-sm ${activeTab === 'home' ? 'text-blue-600' : 'text-gray-500'}`}
+                        className={`w-24 p-2 text-sm ${activeTab === 'home' ? 'text-red-600' : 'text-black'}`}
                     >
                         首页
                     </button>
                     
                     <button
                         onClick={() => handleTabClick('edit', '/edit')}
-                        className={`p-2 text-sm ${activeTab === 'edit' ? 'text-blue-600' : 'text-gray-500'}`}
+                        className={`w-24 p-2 text-sm ${activeTab === 'edit' ? 'text-red-600' : 'text-black'}`}
                     >
                         +
                     </button>
                     
                     <button
                         onClick={() => handleTabClick('mine', '/mine')}
-                        className={`p-2 text-sm ${activeTab === 'mine' ? 'text-blue-600' : 'text-gray-500'}`}
+                        className={`w-24 p-2 text-sm ${activeTab === 'mine' ? 'text-red-600' : 'text-black'}`}
                     >
                         我的
                     </button>

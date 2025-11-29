@@ -17,7 +17,6 @@ import { Button } from "./ui/button";
 import { useGetUserPosts, useUpdateUser } from "@/lib/react-query/queries";
 import GridPostList from "./common/GridPostList";
 
-
 const User = ({ users, setAuth }) => {
     const navigate = useNavigate();
     const axiosPrivate = useAxiosPrivate();
@@ -63,62 +62,62 @@ const User = ({ users, setAuth }) => {
         users.id
     );
 
-
+    console.log("userPosts?.documents", userPosts?.documents);
     return (
       <>
         {users ? (
-            <div className="flex flex-col items-center gap-4">
-            <section>
-                <div className="flex flex-col items-center gap-4">
-                    <div className="flex">
-                        <Form {...form}>
-                            <form
-                                onSubmit={form.handleSubmit(handleUpdate)}
-                                className="flex flex-col gap-7 w-full mt-4 max-w-5xl">
-                                <FormField
-                                control={form.control}
-                                name="file"
-                                render={({ field }) => (
-                                    <FormItem className="flex">
-                                    <FormControl>
-                                        <ProfileUploader
-                                        fieldChange={field.onChange}
-                                        mediaUrl={users?.avatarUrl || "./icons/profile-placeholder.svg"}
-                                        />
-                                    </FormControl>
-                                    <FormMessage className="shad-form_message" />
-                                    </FormItem>
-                                )}
-                            />
-                            <div className="flex gap-4 items-center justify-end">
-                                <Button
-                                    type="submit"
-                                    className="shad-button_primary whitespace-nowrap"
-                                    >
-                                    提交新头像
-                                </Button>
-                                </div>
-                            </form>
-                        
-                        </Form>
-                    </div>
-                    <div className="text-center">
-                        <h3 className="text-lg font-semibold">{users.userName}</h3>
-                        <p className="text-sm text-gray-600">兴趣：{users.interestTags}</p>
-                    </div>
+            <div className="flex flex-col items-center gap-8 w-full max-w-2xl mx-auto p-6 bg-white rounded-xl shadow-md">
+              <section className="w-full">
+                <div className="flex flex-col items-center gap-6">
+                  <div className="flex justify-center w-full">
+                    <Form {...form}>
+                      <form
+                        onSubmit={form.handleSubmit(handleUpdate)}
+                        className="flex flex-col gap-6 w-full max-w-md mx-auto mt-4"
+                      >
+                        <FormField
+                          control={form.control}
+                          name="file"
+                          render={({ field }) => (
+                            <FormItem className="flex flex-col items-center gap-2">
+                              <FormControl>
+                                <ProfileUploader
+                                  fieldChange={field.onChange}
+                                  mediaUrl={users?.avatarUrl || './icons/profile-placeholder.svg'}
+                                />
+                              </FormControl>
+                              <FormMessage className="shad-form_message" />
+                            </FormItem>
+                          )}
+                        />
+                        <div className="flex gap-4 items-center justify-center">
+                          <Button
+                            type="submit"
+                            className="shad-button_primary whitespace-nowrap px-6 py-2 rounded-lg"
+                          >
+                            提交新头像
+                          </Button>
+                        </div>
+                      </form>
+                    </Form>
+                  </div>
+                  <div className="text-center w-full">
+                    <h3 className="text-xl font-bold mb-1">{users.userName}</h3>
+                    <p className="text-base text-gray-600">兴趣：{users.interestTags}</p>
+                  </div>
                 </div>
-            </section>
-             <section>
-                <div className="flex flex-col items-center gap-4">
-                    <div className="text-center">
-                        <h3 className="text-lg font-semibold">我的内容</h3>
-                         <GridPostList posts={userPosts?.documents} />
-                    </div>
+              </section>
+              <section className="w-full">
+                <div className="flex flex-col items-center gap-4 bg-gray-50 rounded-lg p-4">
+                  <div className="text-center w-full">
+                    <h3 className="text-lg font-semibold mb-2">我的内容</h3>
+                    <GridPostList posts={userPosts?.documents || []} />
+                  </div>
                 </div>
-            </section>
-            <div>
-                <button className="text-center" onClick={logout}>退出登录</button>
-            </div>
+              </section>
+              <div className="w-full flex justify-center mt-4">
+                <button className="px-6 py-2 bg-red-500 text-white rounded-lg shadow hover:bg-red-600 transition" onClick={logout}>退出登录</button>
+              </div>
             </div>
         )
         :

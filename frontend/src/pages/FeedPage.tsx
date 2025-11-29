@@ -1,31 +1,37 @@
 import PostCard from '@/components/PostCard';
 import {  useGetRecentPosts } from '@/lib/react-query/queries';
 
-
-
 const FeedPage = () => {
-  const {data: posts,isPending: isLoading,isError}=useGetRecentPosts();
-  console.log("posts", posts);
+  // 1. 先调用自定义hook（注意：不能在useEffect里调用hook！这是React规则）
+  const { data: posts = [], isPending: isLoading } = useGetRecentPosts();
+
   return (
     <div className="bg-gray-50 min-h-screen">
       <h1 className="text-center py-4">动态</h1>
-      {isLoading && !posts ? (
-        <>
-          <p>加载中...</p>
-        </>
+      {isLoading ? (
+        <p className="text-center">加载中...</p>
       ) : (
-        <ul className='flex flex-col max-w-md mx-auto'>
-          {posts?.map((post)=>{
-            return (
-              <li key={post.id} className="border-b border-gray-200 p-4 bg-white mb-2">
-                <PostCard post={post} />
-              </li>
-            )
-          })}
-        </ul>
+        <div className="max-w-md mx-auto">
+          {posts.length > 0 ? (
+            <ul className='flex flex-col'>
+              {posts.map((post) => (
+                <li
+                  key={`post-${post.id}`}
+                  className="border-b border-gray-200 p-4 bg-white mb-2"
+                >
+                  <PostCard post={post} />
+                </li>
+              ))}
+            </ul>
+          ) : (
+            <p className="text-center text-gray-500 py-4">
+              暂无动态，快去发布第一条吧～
+            </p>
+          )}
+        </div>
       )}
     </div>
-  )
-}
+  );
+};
 
-export default FeedPage
+export default FeedPage;

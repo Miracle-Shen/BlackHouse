@@ -11,27 +11,31 @@ type GridPostListProps = {
 
 const GridPostList = ({
   posts,
-  showUser = true,
-  showStats = true,
 }: GridPostListProps) => {
-    const {auth:user} = useContext(AuthContext);
 
   return (
+    <>
     <ul className="grid-container">
-      {posts.map((post) => (
-        <li key={post.$id} className="relative min-w-40 h-40">
-          <Link to={`/posts/${post.$id}`} className="grid-post_link">
-            <a>{post.title}</a>
-            <img
-              src={post.imageUrl}
-              alt="post"
-              className="h-full w-full object-cover"
-            />
-          </Link>
-        </li>
-      ))}
+      {posts && posts.length > 0 ? (
+        posts.map((post) => (
+          <li key={post.$id} className="relative min-w-40 h-40">
+            <Link to={`/posts/${post.$id}`} className="grid-post_link">
+              <a>{post.title}</a>
+              <img
+                src={post.imageUrl}
+                alt="post"
+                className="h-full w-full object-cover"
+              />
+            </Link>
+          </li>
+        ))
+      ) : (
+        <>暂无内容，快去发布第一条吧～</>
+      )}
     </ul>
+    </>
   );
 };
 
 export default GridPostList;
+

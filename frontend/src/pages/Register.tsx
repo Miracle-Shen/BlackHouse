@@ -86,8 +86,10 @@ const Register = () => {
         <>
         {success ? 
         (<>
-        <h2>注册成功！</h2>
-        <Link to="/login">点击这里登录</Link>
+         <h1 className="text-center py-4">注册成功！</h1>
+        <p className="text-center text-blue-500">
+          <Link to="/login">点击这里登录</Link>
+        </p>
         </>)
            :
         (<section>

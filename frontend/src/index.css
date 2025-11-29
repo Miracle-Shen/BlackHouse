@@ -12,8 +12,17 @@
   @apply bg-slate-500;
 }
 
+
+/* Post Card */
+.post-card {
+  @apply rounded-3xl border p-5 lg:p-7 w-full max-w-screen-sm;
+}
+
+.post-card_img {
+  @apply h-full w-full object-cover rounded-[24px] mb-5;
+}
 .grid-container {
-    @apply w-full grid grid-cols-1 sm:grid-cols-2 md:grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-7 max-w-5xl;
+    @apply w-full grid grid-cols-1 sm:grid-cols-2 md:grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-7 max-w-5xl rounded-md;
   }
 
 .common-container {
@@ -21,11 +30,11 @@
 }
 
 section {
-  @apply w-full max-w-sm min-h-96 flex flex-col justify-start p-4  bg-slate-700 rounded-2xl shadow-lg hover:shadow-xl transition-shadow duration-200;
+  @apply w-full max-w-sm min-h-96 flex flex-col justify-start p-4  bg-primary-50 rounded-2xl shadow-lg hover:shadow-xl transition-shadow duration-200;
 }
 
 button {
-  @apply bg-slate-700 text-white font-semibold py-2 px-4 rounded-lg hover:bg-slate-800 transition-colors duration-200;
+  @apply bg-primary-100 text-black font-semibold py-2 px-4 rounded-lg hover:bg-primary-100 transition-colors duration-200;
 }
 
 form {
@@ -33,7 +42,7 @@ form {
 }
 
 .instructions {
-  @apply text-xs rounded-lg bg-slate-800 text-white p-2 relative -bottom-2.5 flex items-center gap-1;
+  @apply text-xs rounded-lg bg-primary-100 text-white p-2 relative -bottom-2.5 flex items-center gap-1;
 }
 
 .instructions > svg {

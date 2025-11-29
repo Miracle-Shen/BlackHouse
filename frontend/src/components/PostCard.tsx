@@ -13,10 +13,10 @@ const PostCard = ({post}: PostCardProps) => {
             <img
               src={
                 post.creator?.avatarUrl  ||
-                "/assets/icons/profile-placeholder.svg"
+                "./icons/profile-placeholder.svg"
               }
               alt="creator"
-              className="w-12 lg:h-12 rounded-full"
+              className="w-11 lg:h-11 rounded-full"
             />
 
           <div className="flex flex-col">
@@ -35,21 +35,22 @@ const PostCard = ({post}: PostCardProps) => {
       <Link to={`/posts/${post.$id}`}>
         <div className="small-medium lg:base-medium py-5">
           <p>{post.title}</p>
-          <p className="text-light-2">{post.caption}</p>
-          {post?.tags ? (<ul className="flex gap-1 mt-2">
+         {/*  <p className="text-light-2">{post.caption}</p> */}
+{/*           {post?.tags ? (<ul className="flex gap-1 mt-2">
             {post.tags.map((tag: string, index: string) => (
               <li key={`${tag}${index}`} className="text-light-3 small-regular">
                 #{tag}
               </li>
             ))}
-          </ul>) : null}
+          </ul>) : null} */}
         </div>
-
+        <div className="w-full h-32 lg:h-64">
         <img
-          src={post.imageUrl || "/assets/icons/profile-placeholder.svg"}
+          src={post.imageUrl || "./icons/posts.svg"}
           alt="post image"
           className="post-card_img"
         />
+        </div>
       </Link>
 
       {/* <PostStats post={post} userId={user.id} /> */}

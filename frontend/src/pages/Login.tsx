@@ -99,7 +99,7 @@ const Login = () => {
             </form>
             <p>
                 还没有账号？<br />
-                <Link to="/register">注册</Link>
+                <span className="text-blue-500">点击注册</span>
             </p>
         </section>
         )}

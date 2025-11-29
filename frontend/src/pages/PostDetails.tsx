@@ -21,15 +21,7 @@ const PostDetails = () => {
   console.log("当前用户ID",userId);
   const { data: post, isLoading } = useGetPostById(id);
   // const { data: userPosts, isLoading: isUserPostLoading } = useGetUserPosts(
-  //   userId
-  // );
-  // const { mutate: deletePost } = useDeletePost();
-  // const relatedPosts = userPosts?.documents.filter(
-  //   (userPost) => userPost.$id !== id
-  // );
-    // console.log("当前用户ID",userId);
-    // console.log("帖子用户",post?.creator);
-    // console.log("相关帖子", relatedPosts);
+
   const handleDeletePost = () => {
     // deletePost({ postId: id, imageId: post?.imageId });
     navigate(-1);
@@ -53,7 +45,7 @@ const PostDetails = () => {
       </div>
 
       {isLoading || !post ? (
-        <div>这里是loading</div>
+        <div>这里是loading,请稍等...</div>
       ) : (
         <div className="post_details-card">
           <img
@@ -114,7 +106,7 @@ const PostDetails = () => {
                 </Button>
               </div>
             </div>
-            <p>{post?.title}</p>
+            <p className="text-lg font-bold">{post?.title}</p>
             <hr className="border w-full border-dark-4/80" />
 
             <div className="flex flex-col flex-1 w-full small-medium lg:base-regular">
