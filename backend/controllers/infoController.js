@@ -40,7 +40,7 @@ const getUserInfo = async (req, res) => {
         // }
 
         // const avatarUrl = await fetchFile(user.profile_picture);
-
+        console.log("user:", user);
         const userInfo = {
             id: user.$id,
             userId: user.userId,

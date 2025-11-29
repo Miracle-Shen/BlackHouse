@@ -1,10 +1,18 @@
-const usersDB = {
-    users:require('../model/users.json'),
-    setUsers: function (data) { this.users = data; }
-}
 
+const fs = require('fs');
+const path = require('path');
 const JWT = require('jsonwebtoken');
+
 require('dotenv').config();
+const usersDB = {
+    get users() {
+        const data = fs.readFileSync(path.join(__dirname, '../model/users.json'), 'utf-8');
+        return JSON.parse(data);
+    },
+    setUsers: function (data) { 
+        fs.writeFileSync(path.join(__dirname, '../model/users.json'), JSON.stringify(data, null, 2));
+    }
+};
 
 const handleRefreshToken =  (req, res) => {
     const cookie = req.cookies;
