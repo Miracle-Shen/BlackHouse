@@ -13,10 +13,10 @@ const PostDetails = () => {
   const { data: post, isLoading } = useGetPostById(id);
   // const { data: userPosts, isLoading: isUserPostLoading } = useGetUserPosts(
 
-  const handleDeletePost = () => {
-    // deletePost({ postId: id, imageId: post?.imageId });
-    navigate(-1);
-  };
+  // const handleDeletePost = () => {
+  //   deletePost({ postId: id, imageId: post?.imageId });
+  //   navigate(-1);
+  // };
 
   return (
     <div className="post_details-container">

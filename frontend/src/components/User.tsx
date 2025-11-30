@@ -60,7 +60,7 @@ const User = ({ users, setAuth }: UserProps) => {
       }
     }, [users]);
  
-    const { data: userPosts, isPending: isUserPostLoading } = useGetUserPosts(
+    const { data: userPosts } = useGetUserPosts(
         users.id
     );
 

@@ -270,23 +270,68 @@ type PostWithCreator = Models.Document & {
 };
 
 // 显式指定返回类型为 Promise<PostWithCreator[] | undefined>
-export async function getRecentPosts(): Promise<PostWithCreator[] | undefined> {
+// export async function getRecentPosts(): Promise<PostWithCreator[] | undefined> {
+//   try {
+//     const posts = await databases.listDocuments(
+//       appwriteConfig.databaseId,
+//       appwriteConfig.postCollectionId,
+//       [Query.orderDesc("$createdAt"), Query.limit(20)]
+//     );
+
+//     if (!posts) throw Error;
+
+//     const postsWithUserDetails = await Promise.all(
+//       posts.documents.map(async (post) => {
+//         try {
+//           const user = await getUserById(post.creator);
+//           return { ...post, creator: user } as PostWithCreator; // 断言为定义的类型
+//         } catch (error) {
+//           return { ...post, creator: undefined } as PostWithCreator; // 处理用户获取失败的情况
+//         }
+//       })
+//     );
+
+//     return postsWithUserDetails;
+//   } catch (error) {
+//     console.log(error);
+//     return undefined; // 显式返回 undefined，符合返回类型定义
+//   }
+// }
+// 修改 getRecentPosts 函数的返回处理
+export async function getRecentPosts() {
   try {
     const posts = await databases.listDocuments(
       appwriteConfig.databaseId,
       appwriteConfig.postCollectionId,
       [Query.orderDesc("$createdAt"), Query.limit(20)]
     );
-
     if (!posts) throw Error;
 
     const postsWithUserDetails = await Promise.all(
       posts.documents.map(async (post) => {
         try {
           const user = await getUserById(post.creator);
-          return { ...post, creator: user } as PostWithCreator; // 断言为定义的类型
+          // 明确转换为 INewPost 结构，确保 creator 是用户信息对象（而非 INewPost）
+          return {
+            id: post.$id, // 映射文档 ID 到 INewPost 的 id
+            userId: post.userId,
+            creator: user || post.creator, // 确保 creator 是用户对象或字符串
+            title: post.title,
+            caption: post.caption,
+            imageUrl: post.imageUrl,
+            imageId: post.imageId,
+            file: [], // 非必要时可设为空数组（根据实际需求调整）
+            tags: post.tags,
+            $createdAt: post.$createdAt
+          } as INewPost; // 显式断言为 INewPost 类型
         } catch (error) {
-          return { ...post, creator: undefined } as PostWithCreator; // 处理用户获取失败的情况
+          // 错误处理时也保持类型一致
+          return {
+            ...post,
+            id: post.$id,
+            creator: post.creator,
+            file: []
+          } as INewPost;
         }
       })
     );
@@ -294,10 +339,8 @@ export async function getRecentPosts(): Promise<PostWithCreator[] | undefined> {
     return postsWithUserDetails;
   } catch (error) {
     console.log(error);
-    return undefined; // 显式返回 undefined，符合返回类型定义
   }
 }
-
 // ============================================================
 // USER
 // ============================================================

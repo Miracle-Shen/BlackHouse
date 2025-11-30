@@ -22,7 +22,7 @@ const EditPage = () => {
   }
 const userInfoStr = localStorage.getItem("user");
 const userInfo = userInfoStr ? JSON.parse(userInfoStr) : null; // 解析为对象
-const userId = userInfo?.userId; // 可选链避免 null 错误
+// const userId = userInfo?.userId; // 可选链避免 null 错误
 const creatorId = userInfo?.id;
 
 
@@ -35,7 +35,7 @@ const creatorId = userInfo?.id;
 
   return (
     <>
-      {userId && id ?
+      {id ?
       (<>
         <div className="bg-gray-50 flex">
           <div className="common-container">
@@ -49,7 +49,7 @@ const creatorId = userInfo?.id;
               <h2 className="h3-bold md:h2-bold  ">{id ? "Edit Post" : "Create Post"}</h2>
             </div>
 
-            <PostForm action={id ? "Update" : "Create"} post={post ? post : undefined} userId = {userId} creatorId={creatorId} />
+            <PostForm action={id ? "Update" : "Create"} post={post ? post : undefined}  creatorId={creatorId} />
           </div>
       </div>
     </>):

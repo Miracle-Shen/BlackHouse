@@ -20,11 +20,11 @@ import type {INewPost, IUpdatePost} from '@/types'
 type PostFormProps = {
   post?:INewPost;
   action: "Create" | "Update";
-  userId: string;
+  userId?: string;
   creatorId: string;
 };
 
-const PostForm = ({ post, action, userId, creatorId }: PostFormProps) => {
+const PostForm = ({ post, action, creatorId }: PostFormProps) => {
   const navigate = useNavigate();
   const { toast } = useToast();
 

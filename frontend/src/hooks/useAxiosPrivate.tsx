@@ -29,35 +29,25 @@ const useAxiosPrivate = () => {
         );
         const responseIntercept = axiosPrivate.interceptors.response.use(
             // 情况1：请求成功 → 直接返回响应数据
-            response => {
-                const reqId = response.config?.headers["x-debug-id"];
-                const ts = response.config?._debugTs;
-                const now = Date.now();
-
-                console.log(
-                    `%c[RES ${reqId}] OK (${response.status}) ts=${ts} duration=${now - ts}ms`,
-                    "color:green;font-weight:bold;"
-                );
-
-                return response;
+            response => {return response;
             },
             
             // 情况2：请求失败 → 进入这里处理 
             async(error) => {
                  const prevRequest = error?.config;
-                const reqId = prevRequest?.headers["x-debug-id"];
-                const ts = prevRequest?._debugTs;
+                // const reqId = prevRequest?.headers["x-debug-id"];
+                // const ts = prevRequest?._debugTs;
 
-                console.log(
-                    `%c[RES ${reqId}] ERROR ${error?.response?.status} ts=${ts}`,
-                    "color:red;font-weight:bold;"
-                );
+                // console.log(
+                //     `%c[RES ${reqId}] ERROR ${error?.response?.status} ts=${ts}`,
+                //     "color:red;font-weight:bold;"
+                // );
                 if(error?.response?.status === 403 && !prevRequest?.sent){
                     prevRequest.sent = true;//只重试一次
-                    console.log(
-                        `%c[RES ${reqId}] → TRY REFRESH`,
-                        "color:orange;font-weight:bold;"
-                    );
+                    // console.log(
+                    //     `%c[RES ${reqId}] → TRY REFRESH`,
+                    //     "color:orange;font-weight:bold;"
+                    // );
                     const accessToken = await refresh();
                     console.log("accessToken", accessToken );
                     prevRequest.headers['authorization'] = `Bearer ${accessToken}`;

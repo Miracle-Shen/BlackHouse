@@ -18,7 +18,7 @@ import {
   getInfinitePosts,
   searchPosts,
 } from "@/lib/appwrite/api";
-import type{ INewPost, INewUser, IUpdatePost, IUpdateUser } from "@/types";
+import type{ INewPost, IUpdatePost, IUpdateUser } from "@/types";
 
 import type { Models } from 'appwrite';
 // ============================================================
@@ -51,16 +51,22 @@ export const useSearchPosts = (searchTerm: string) => {
   });
 };
 
+// export const useGetRecentPosts = () => {
+//   return useQuery<(Models.Document & { creator:INewPost })[]>({ 
+//     queryKey: [QUERY_KEYS.GET_RECENT_POSTS],
+//     queryFn: async () => {
+//       const data = await getRecentPosts();
+//       if (!data) {
+//         return [];
+//       }
+//       return data as (Models.Document & { creator:INewPost })[];
+//     },
+//   });
+// };
 export const useGetRecentPosts = () => {
-  return useQuery<(Models.Document & { creator:INewPost })[]>({ 
+  return useQuery<INewPost[]>({ // 修正返回类型为 INewPost[]
     queryKey: [QUERY_KEYS.GET_RECENT_POSTS],
-    queryFn: async () => {
-      const data = await getRecentPosts();
-      if (!data) {
-        return [];
-      }
-      return data as (Models.Document & { creator:INewPost })[];
-    },
+    queryFn: getRecentPosts,
   });
 };
 export const useCreatePost = () => {
