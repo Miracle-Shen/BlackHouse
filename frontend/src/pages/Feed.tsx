@@ -2,8 +2,10 @@ import PostCard from '@/components/PostCard';
 import {  useGetRecentPosts } from '@/lib/react-query/queries';
 import type { INewPost } from '@/types';
 const FeedPage = () => {
-  const { data: posts = [], isPending: isLoading } = useGetRecentPosts();
-
+  const { data: posts = [], isPending: isLoading } = useGetRecentPosts() as {
+    data: INewPost[];
+    isPending: boolean;
+  };
   console.log('Recent posts data:', posts);
  if (isLoading) return <div>Loading...</div>;
   return (

@@ -265,9 +265,9 @@ export async function getUserPosts(userId?: string) {
 }
 
 // ============================== GET POPULAR POSTS (BY HIGHEST LIKE COUNT)
-type PostWithCreator = Models.Document & {
-  creator: INewPost | undefined; // creator 可能是用户文档或 undefined
-};
+// type PostWithCreator = Models.Document & {
+//   creator: INewPost | undefined; // creator 可能是用户文档或 undefined
+// };
 
 // 显式指定返回类型为 Promise<PostWithCreator[] | undefined>
 // export async function getRecentPosts(): Promise<PostWithCreator[] | undefined> {
