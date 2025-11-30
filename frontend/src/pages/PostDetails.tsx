@@ -1,24 +1,15 @@
 import { useParams, Link, useNavigate } from "react-router-dom";
-
 import { Button } from "@/components/ui/button";
-
 import {
   useGetPostById,
-  useGetUserPosts,
-  useDeletePost,
 } from "@/lib/react-query/queries";
 import { multiFormatDateString } from "@/lib/utils";
-// import { useUserContext } from "@/context/AuthContext";
-import AuthContext from "@/context/AuthProvider";
-import { useContext } from "react";
-import { Loader } from "lucide-react";
-import GridPostList from "@/components/common/GridPostList";
+import { useAuth } from "@/hooks/useAuth";
 const PostDetails = () => {
   const navigate = useNavigate();
   const { id } = useParams();
-  const { auth } = useContext(AuthContext);
+  const { auth } = useAuth();
   const userId = auth.id;     
-  console.log("当前用户ID",userId);
   const { data: post, isLoading } = useGetPostById(id);
   // const { data: userPosts, isLoading: isUserPostLoading } = useGetUserPosts(
 

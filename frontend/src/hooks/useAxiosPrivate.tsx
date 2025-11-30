@@ -2,14 +2,13 @@ import { axiosPrivate } from "../api/axios";
 import { useEffect } from "react";
 import useRefreshToken from "./useRefreshToken";
 import useAuth from "./useAuth";
-import { useContext } from "react";
 // 无感知刷新：
 // 当访问令牌（accessToken）过期导致请求失败（返回 403）时，自动调用刷新令牌接口获取新令牌，并用新令牌重试原来的请求，
 let GLOBAL_REQ_ID = 1; 
 //axiosPrivate 根本不是稳定单例对象，每次导入都会新建一个实例
 const useAxiosPrivate = () => {
     const refresh = useRefreshToken();
-    const { auth } = useContext(useAuth());
+    const { auth } = useAuth();
 
     useEffect(() => {
         const requestIntercept = axiosPrivate.interceptors.request.use(

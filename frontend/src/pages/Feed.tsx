@@ -1,12 +1,18 @@
 import PostCard from '@/components/PostCard';
 import {  useGetRecentPosts } from '@/lib/react-query/queries';
 import { useEffect } from 'react';
-
+import useAuth from '@/hooks/useAuth';
 const FeedPage = () => {
   const { data: posts = [], isPending: isLoading } = useGetRecentPosts();
+  const { auth } = useAuth();
+
   useEffect(() => {
-    const userInfo = localStorage.getItem('user');
+    if(!auth){
+      const userInfo = localStorage.getItem('user');
+      // updatePost(userInfo)
+    }
   }, []);
+
   return (
     <div className="bg-gray-50 min-h-screen">
       <h1 className="text-center py-4">动态</h1>
