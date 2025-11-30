@@ -18,20 +18,20 @@ import { PostValidation } from "@/types/index"; // 可选：导入表单验证�
 // import { FileUploader, Loader } from "@/components/shared"; // 可选：导入文件上传器和加载器组件
 import { useCreatePost, useUpdatePost } from "@/lib/react-query/queries"; // 可选：导入创建和更新 post 的自定义查询
 import { useToast } from "@/hooks/use-toast"
-import AuthContext from "@/context/AuthProvider";
-import { useContext, useState } from "react";
+import { useState } from "react";
 type PostFormProps = {
   post?: Models.Document; // 可选的 post 数据，用于编辑模式
   action: "Create" | "Update"; // 表单操作类型：创建或更新
+  userId: string;
+  creatorId:string;
 };
 
-const PostForm = ({ post, action }: PostFormProps) => {
+const PostForm = ({ post, action,userId, creatorId }: PostFormProps) => {
   const navigate = useNavigate(); // 初始化导航函数
   const [currentImageUrl, setCurrentImageUrl] = useState(post?.imageUrl || "");
 
   const { toast } = useToast();
-  const {auth} = useContext(AuthContext);
-  const userId = auth.userId;
+
   const form = useForm<z.infer<typeof PostValidation>>({
     resolver: zodResolver(PostValidation), // 使用 zod 验证规则解析器
     defaultValues: {
@@ -68,8 +68,8 @@ const PostForm = ({ post, action }: PostFormProps) => {
 
     // ACTION = CREATE
     const newPost = await createPost({
-      ...value, // 合并表单数据
-      creator: auth.id, // 设置创建者 ID
+      ...value, 
+      creator:creatorId, 
     });
  
 

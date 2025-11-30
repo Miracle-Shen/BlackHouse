@@ -1,9 +1,9 @@
 import Login from './pages/Login';
 import Register from './pages/Register';
-import FeedPage from './pages/FeedPage';
+import FeedPage from './pages/Feed';
 import Layout from './components/Layout';
 import { Routes, Route } from 'react-router-dom';
-import EditPage from './pages/EditPage';
+import EditPage from './pages/Edit';
 import Mine from './pages/Mine';
 import PostDetails from './pages/PostDetails';
 function App() {

@@ -1,4 +1,4 @@
-import { useNavigate, useLocation, Link } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 import { useEffect } from "react";
 import  useAxiosPrivate  from "../hooks/useAxiosPrivate";
 import {
@@ -28,7 +28,7 @@ const User = ({ users, setAuth }) => {
             console.error('Logout error:', err);
         } finally {
             setAuth({});
-            //localStorage.removeItem('auth'); 
+            localStorage.removeItem('user'); 
             navigate('/login', { replace: true });  // 确保退出后跳转到登录页
         }
     };
@@ -49,20 +49,17 @@ const User = ({ users, setAuth }) => {
             avatarId: users.avatarId,
         });
         setAuth({ ...users, avatarUrl: updatedUser?.avatarUrl });
-        // return navigate(`/profile/${id}`);
     };
-    // const myPosts = getUserPosts(users.id);
     useEffect(() => {
       if (users && setAuth) {
-        setAuth({ ...users });
+        setAuth({ ...users });   
       }
     }, [users]);
-
+ 
     const { data: userPosts, isLoading: isUserPostLoading } = useGetUserPosts(
         users.id
     );
 
-    console.log("userPosts?.documents", userPosts?.documents);
     return (
       <>
         {users ? (

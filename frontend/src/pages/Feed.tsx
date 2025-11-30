@@ -1,10 +1,12 @@
 import PostCard from '@/components/PostCard';
 import {  useGetRecentPosts } from '@/lib/react-query/queries';
+import { useEffect } from 'react';
 
 const FeedPage = () => {
-  // 1. 先调用自定义hook（注意：不能在useEffect里调用hook！这是React规则）
   const { data: posts = [], isPending: isLoading } = useGetRecentPosts();
-
+  useEffect(() => {
+    const userInfo = localStorage.getItem('user');
+  }, []);
   return (
     <div className="bg-gray-50 min-h-screen">
       <h1 className="text-center py-4">动态</h1>

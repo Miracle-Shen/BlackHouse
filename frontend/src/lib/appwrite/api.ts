@@ -294,7 +294,7 @@ export async function updatePost(post: IUpdatePost) {
       // Get new file url
       // const fileUrl = getFilePreview(uploadedFile.$id);
       const fileUrl = uploadedFile.$id 
-      ? `https://nyc.cloud.appwrite.io/v1/storage/buckets/69230b780026a1648b96/files/${uploadedFile.$id}/view?project=691ec46d0011cc0af217&mode=admin`
+      ? `https://nyc.cloud.appwrite.io/v1/storage/buckets/${appwriteConfig.storageId}/files/${uploadedFile.$id}/view?project=${appwriteConfig.projectId}&mode=admin`
       : '';
       console.log("新的image url",fileUrl);
       if (!fileUrl) {
@@ -373,7 +373,6 @@ export async function deletePost(postId?: string, imageId?: string) {
 // ============================== GET USER'S POST
 export async function getUserPosts(userId?: string) {
   if (!userId) return;
-  console.log("###getUserPosts", userId);
   try {
     const post = await databases.listDocuments(
       appwriteConfig.databaseId,
@@ -407,7 +406,6 @@ export async function getRecentPosts() {
           const user = await getUserById(post.creator);
           return { ...post, creator: user };
         } catch (error) {
-          console.log(`Failed to fetch user for post ${post.$id}:`, error);
           return post; // Return the post as is if user fetch fails
         }
       })
@@ -466,7 +464,6 @@ export async function getUserById(userId: string) {
 
 // ============================== UPDATE USER
 export async function updateUser(user: IUpdateUser) {
-  console.log("Updating user:", user);
   const hasFileToUpdate = user.file.length > 0;
   try {
     let image = {
@@ -475,13 +472,12 @@ export async function updateUser(user: IUpdateUser) {
     };
 
     if (hasFileToUpdate) {
-      // Upload new file to appwrite storage
       const uploadedFile = await uploadFile(user.file[0]);
       if (!uploadedFile) throw Error;
 
       // Get new file url
       const avatarUrl = uploadedFile.$id 
-      ? `https://nyc.cloud.appwrite.io/v1/storage/buckets/69230b780026a1648b96/files/${uploadedFile.$id}/view?project=691ec46d0011cc0af217&mode=admin`
+      ? `https://nyc.cloud.appwrite.io/v1/storage/buckets/${appwriteConfig.storageId}/files/${uploadedFile.$id}/view?project=${appwriteConfig.projectId}&mode=admin`
       : '';
       if (!avatarUrl) {
         await deleteFile(uploadedFile.$id);

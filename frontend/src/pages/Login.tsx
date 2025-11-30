@@ -42,6 +42,7 @@ const Login = () => {
             const userId = response?.data?.userId;
             const id = response?.data?.id;
             setAuth({ id, userId, accessToken });
+            localStorage.setItem('user', JSON.stringify({userId:userId,id:id}));
             setUser(''); 
             setPwd(''); 
             setSuccess(true);
