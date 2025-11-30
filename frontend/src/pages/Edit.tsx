@@ -2,13 +2,22 @@ import PostForm from "@/components/PostForm";
 import { useGetPostById } from "@/lib/react-query/queries";
 import Loader from "@/components/common/Loader";
 import { Link, useParams } from "react-router-dom";
+import type {INewPost} from '@/types'
 const EditPage = () => {
   const { id } = useParams();
-  let post;
+  let post: INewPost | undefined;
   let isLoad= false;
   if(!id){
     const { data, isLoading } = useGetPostById(id);
-    post = data;
+    post ={
+      id: data ? data.$id : '',
+      title: data?.title, 
+      creator: data?.creator,
+      imageUrl: data?.imageUrl,
+      imageId: data?.imageId,
+      caption: data?.caption,
+      tags: data?.tags,
+    };
     isLoad = isLoading;
   }
 const userInfoStr = localStorage.getItem("user");

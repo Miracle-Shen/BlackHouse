@@ -1,6 +1,6 @@
 import { useRef, useState, useEffect } from "react";
 import axios from '../api/axios';
-
+import type {IRegisterResponse} from '../types/index';
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faCheck, faTimes, faInfoCircle } from "@fortawesome/free-solid-svg-icons";
 import { Link } from "react-router-dom";
@@ -57,7 +57,7 @@ const Register = () => {
             return;
         }
         try {
-            const response = await axios.post(REGISTER_URL,
+            const response = await axios.post<IRegisterResponse>(REGISTER_URL,
                 JSON.stringify({ user:user, pwd:pwd }),
                 {
                     headers: { 'Content-Type': 'application/json' },
@@ -71,9 +71,10 @@ const Register = () => {
             setPwd('');
             setMatchPwd('');
         } catch (err: unknown) {
-            if (!err?.response) {
+            const error = err as { response?: { status?: number; data?: { message?: string } } };
+            if (!error?.response) {
                 setErrMsg('No Server Response');
-            } else if (err.response?.status === 409) {
+            } else if (error.response?.status === 409) {
                 setErrMsg('用户名已被占用');
             } else {
                 setErrMsg('注册失败')

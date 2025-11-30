@@ -1,19 +1,8 @@
 import { multiFormatDateString } from "@/lib/utils";
 import { Link } from "react-router-dom";
+import type {INewPost} from '@/types'
 
-type PostCardProps = {
-  post: {
-    creator?: {
-      avatarUrl?: string;
-      userName?: string;
-    };
-    title?: string;
-    imageUrl?: string;
-    $createdAt: string;
-    $id: string;
-  };
-};
-const PostCard = ({post}: PostCardProps) => {
+const PostCard = ({post: INewPost}) => {
     return (
     <div className="post-card">
       <div className="flex-between">
@@ -40,7 +29,7 @@ const PostCard = ({post}: PostCardProps) => {
         </div>
       </div>
 
-      <Link to={`/posts/${post.$id}`}>
+      <Link to={`/posts/${post.id}`}>
         <div className="small-medium lg:base-medium py-5">
           <p>{post.title}</p>
          {/*  <p className="text-light-2">{post.caption}</p> */}

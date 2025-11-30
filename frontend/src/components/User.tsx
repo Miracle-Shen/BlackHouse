@@ -7,7 +7,7 @@ import {
   FormField,
   FormItem,
   FormMessage,
-} from "@/components/ui/form";
+} from "@/components/ui/Form";
 import * as z from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
@@ -16,8 +16,12 @@ import ProfileUploader from "./common/ProfileUploader";
 import { Button } from "./ui/button";
 import { useGetUserPosts, useUpdateUser } from "@/lib/react-query/queries";
 import GridPostList from "./common/GridPostList";
-
-const User = ({ users, setAuth }) => {
+import Loader from "./common/Loader";
+type UserProps = {
+  users: any; // 建议替换为具体用户类型
+  setAuth: (auth: any) => void; // 明确 setAuth 类型
+};
+const User = ({ users, setAuth }: UserProps) => {
     const navigate = useNavigate();
     const axiosPrivate = useAxiosPrivate();
 
@@ -32,7 +36,7 @@ const User = ({ users, setAuth }) => {
             navigate('/login', { replace: true });  // 确保退出后跳转到登录页
         }
     };
-    const {mutateAsync:updateUser,isLoading: isLoadingUpdate} = useUpdateUser();
+    const {mutateAsync:updateUser,isPending: isLoadingUpdate} = useUpdateUser();
     const form = useForm<z.infer<typeof ProfileValidation>>({
         resolver: zodResolver(ProfileValidation),
         defaultValues: {
@@ -41,12 +45,12 @@ const User = ({ users, setAuth }) => {
     });
     const handleUpdate = async (value: z.infer<typeof ProfileValidation>) => {
         const updatedUser = await updateUser({
-            id: users.id,
-            userId: users.userId,
+            id: users?.id,
+            userId: users?.userId,
             userName: users.userName,
-            file: value.file,
-            avatarUrl: users.avatarUrl,
-            avatarId: users.avatarId,
+            file: value?.file,
+            avatarUrl: users?.avatarUrl,
+            avatarId: users?.avatarId,
         });
         setAuth({ ...users, avatarUrl: updatedUser?.avatarUrl });
     };
@@ -91,7 +95,8 @@ const User = ({ users, setAuth }) => {
                           <Button
                             type="submit"
                             className="shad-button_primary whitespace-nowrap px-6 py-2 rounded-lg"
-                          >
+                           disabled={isLoadingUpdate}>
+                            {isLoadingUpdate && <Loader />}
                             提交新头像
                           </Button>
                         </div>

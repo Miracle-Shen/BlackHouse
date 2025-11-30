@@ -16,9 +16,10 @@ import FileUploader from "./common/FileUploader";
 import { PostValidation } from "@/types/index";
 import { useCreatePost, useUpdatePost } from "@/lib/react-query/queries";
 import { useToast } from "@/hooks/use-toast";
+import type {PostCardProps} from '@/types'
 
 type PostFormProps = {
-  post?: Models.Document;
+  post?:PostCardProps;
   action: "Create" | "Update";
   userId: string;
   creatorId: string;
@@ -36,11 +37,12 @@ const PostForm = ({ post, action, userId, creatorId }: PostFormProps) => {
       file: [],
       tags: post?.tags || "",
       userId: userId,
+      id: post?.$id || "",
     },
   });
 
-  const { mutateAsync: createPost, isLoading: isLoadingCreate } = useCreatePost();
-  const { mutateAsync: updatePost, isLoading: isLoadingUpdate } = useUpdatePost();
+  const { mutateAsync: createPost, isPending: isLoadingCreate } = useCreatePost();
+  const { mutateAsync: updatePost, isPending: isLoadingUpdate } = useUpdatePost();
 
   const handleSubmit = async (value: z.infer<typeof PostValidation>) => {
     try {

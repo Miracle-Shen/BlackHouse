@@ -1,19 +1,11 @@
 import PostCard from '@/components/PostCard';
 import {  useGetRecentPosts } from '@/lib/react-query/queries';
-import { useEffect } from 'react';
-import useAuth from '@/hooks/useAuth';
+
 const FeedPage = () => {
   const { data: posts = [], isPending: isLoading } = useGetRecentPosts();
-  const { auth } = useAuth();
 
-  useEffect(() => {
-    if(!auth){
-      const userInfo = localStorage.getItem('user');
-      // updatePost(userInfo)
-      console.log('FeedPage userInfo from localStorage:', userInfo);
-    }
-  }, []);
 
+ if (isLoading) return <div>Loading...</div>;
   return (
     <div className="bg-gray-50 min-h-screen">
       <h1 className="text-center py-4">动态</h1>
@@ -21,7 +13,7 @@ const FeedPage = () => {
         <p className="text-center">加载中...</p>
       ) : (
         <div className="max-w-md mx-auto">
-          {posts.length > 0 ? (
+          {Array.isArray(posts) && posts.length > 0 ? (
             <ul className='flex flex-col'>
               {posts.map((post) => (
                 <li

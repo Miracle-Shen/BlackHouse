@@ -12,6 +12,22 @@ export type ILoginResponse = {
   accessToken: string;
 };
 // ============================================================
+// export type PostCardProps = {
+//   post: {
+//     creator?: {
+//       id: string;
+//       userId: string;
+//       userName: string;
+//       avatarId?: string;
+//       avatarUrl?: URL | string;
+//     };
+//     title?: string;
+//     imageUrl?: string;
+//     $createdAt: string;
+//     $id: string;
+//   };
+// };
+
 export type INavLink = {
   imgURL: string;
   route: string;
@@ -19,18 +35,16 @@ export type INavLink = {
 };
 
 export type IUpdateUser = {
-  creator: string;
   id: string;
   userId: string;
   userName: string;
-  bio?: string;
   avatarId?: string;
   avatarUrl?: URL | string;
   file: File[];
 };
 
 export type INewPost = {
-  creator: string;
+  creator:string| object;
   id: string;
   userId: string;
   title: string;
@@ -39,10 +53,13 @@ export type INewPost = {
   imageUrl?: URL;
   file: File[];
   tags?: string;
+  $createdAt?: string;
 };
 
 export type IUpdatePost = {
-  postId: string;
+  userId:string;
+  creator: string| object;
+  id: string;
   title: string;
   caption: string;
   imageId?: string;

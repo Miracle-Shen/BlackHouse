@@ -1,5 +1,4 @@
 import { ID, Query } from "appwrite";
-import type { Models } from "appwrite";
 import { appwriteConfig, databases, storage, avatars } from "./config";
 import { IUpdatePost, INewPost, INewUser, IUpdateUser } from "@/types";
 
@@ -71,24 +70,24 @@ export async function uploadFile(file: File) {
 }
 
 // ============================== GET FILE URL
-export function getFilePreview(fileId: string) {
-  try {
-    const fileUrl = storage.getFilePreview(
-      appwriteConfig.storageId,
-      fileId,
-      2000,
-      2000,
-      "top",
-      100
-    );
+// export function getFilePreview(fileId: string) {
+//   try {
+//     const fileUrl = storage.getFilePreview(
+//       appwriteConfig.storageId,
+//       fileId,
+//       2000,
+//       2000,
+//       "top",
+//       100
+//     );
 
-    if (!fileUrl) throw Error;
+//     if (!fileUrl) throw Error;
 
-    return fileUrl;
-  } catch (error) {
-    console.log(error);
-  }
-}
+//     return fileUrl;
+//   } catch (error) {
+//     console.log(error);
+//   }
+// }
 
 // ============================== DELETE FILE
 export async function deleteFile(fileId: string) {
@@ -180,7 +179,7 @@ export async function updatePost(post: IUpdatePost) {
       const uploadedFile = await uploadFile(post.file[0]);
       if (!uploadedFile) throw Error;
 
-      const fileUrl = uploadedFile.$id 
+      const fileUrl =uploadedFile.$id 
       ? `https://nyc.cloud.appwrite.io/v1/storage/buckets/${appwriteConfig.storageId}/files/${uploadedFile.$id}/view?project=${appwriteConfig.projectId}&mode=admin`
       : '';
       if (!fileUrl) {
@@ -194,27 +193,26 @@ export async function updatePost(post: IUpdatePost) {
     // Convert tags into arrays
     const tags = post.tags?.replace(/ /g, "").split(",") || [];
     console.log("tags",tags);
-    //  Update post
-     const payload: Record<string, any> = {
-      creator: post.creator,
-      userId: post.userId,
-      imageUrl: image.imageUrl,
-      imageId: image.imageId,
-      title: post.title,
-      caption: post.caption,
-    };
+
     const updatedPost = await databases.updateDocument(
       appwriteConfig.databaseId,
       appwriteConfig.postCollectionId,
       post.postId,
-      payload
+      {
+        creator: post?.creator?.id || post?.creator,
+        userId: post?.userId,
+        imageUrl: image.imageUrl,
+        imageId: image.imageId,
+        title: post.title,
+        caption: post.caption,
+      }
     );
 
     // Failed to update
     if (!updatedPost) {
       // Delete new file that has been recently uploaded
       if (hasFileToUpdate) {
-        await deleteFile(image.imageId);
+        await deleteFile(image?.imageId);
       }
 
       // If no new file uploaded, just throw error

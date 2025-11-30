@@ -5,7 +5,7 @@ import useAuth from "../hooks/useAuth";
 import User from "../components/User";
 
 const Mine = () => {
-   const { auth } = useAuth();
+   const { auth, setAuth } = useAuth(); 
    const navigate = useNavigate();
    const location = useLocation();
    const [users, setUsers] = useState([]);
@@ -62,7 +62,7 @@ const Mine = () => {
         ) : (
             <>
             {users? (
-                  <User users={users} />
+                  <User users={users} setAuth={setAuth} />
                ) : (
                <div>加载用户信息中...</div>
             )}
