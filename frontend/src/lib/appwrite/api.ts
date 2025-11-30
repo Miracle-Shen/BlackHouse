@@ -1,8 +1,8 @@
 import { ID, Query } from "appwrite";
-import { appwriteConfig, databases, storage, avatars } from "./config";
-import type { IUpdatePost, INewPost, INewUser, IUpdateUser } from "@/types";
+import { appwriteConfig, databases, storage } from "./config";
+import type { IUpdatePost, INewPost, IUpdateUser } from "@/types";
 import type { Models } from "appwrite";
-import { object } from "zod";
+
 // ============================================================
 // POSTS
 // ============================================================

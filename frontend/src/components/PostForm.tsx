@@ -47,8 +47,6 @@ const PostForm = ({ post, action, userId, creatorId }: PostFormProps) => {
       if (post && action === "Update") {
         const updateData: IUpdatePost = {
           ...value,
-          $id: post.$id,
-          creator: post.creator,
           imageId: post.imageId,
           imageUrl: post.imageUrl,
         };

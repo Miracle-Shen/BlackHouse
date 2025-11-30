@@ -1,4 +1,4 @@
-import { Client, Account, Databases, Storage, Avatars } from "appwrite";
+import { Client, Databases, Storage, Avatars } from "appwrite";
 
 export const appwriteConfig = {
   url: "https://nyc.cloud.appwrite.io/v1",

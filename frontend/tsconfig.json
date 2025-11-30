@@ -3,17 +3,5 @@
   "references": [
     { "path": "./tsconfig.app.json" },
     { "path": "./tsconfig.node.json" }
-  ],
-  "compilerOptions": {
-    "baseUrl": ".", // 设置项目的根目录
-    "paths": {
-      "@/*": ["src/*"] // 将 @ 映射到 src 目录
-    },
-    "declaration": true,
-    "declarationDir": "./dist/types",
-    "outDir": "./dist",
-    "skipLibCheck": true,
-    "allowSyntheticDefaultImports": true
-  },
-  "include": ["src"],
+  ]
 }
