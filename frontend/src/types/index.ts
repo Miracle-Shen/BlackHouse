@@ -1,3 +1,17 @@
+// ============================================================
+//RESPONSE TYPES
+// ============================================================
+export type IRegisterResponse = {
+  status: string;
+  message?: string;
+};
+
+export type ILoginResponse = {
+  id: string;
+  userId: string;
+  accessToken: string;
+};
+// ============================================================
 export type INavLink = {
   imgURL: string;
   route: string;

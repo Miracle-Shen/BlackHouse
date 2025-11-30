@@ -1,16 +1,16 @@
-import { Navigate, useLocation, useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
 import useAxiosPrivate from "../hooks/useAxiosPrivate";
 import useAuth from "../hooks/useAuth";
 import User from "../components/User";
 
 const Mine = () => {
+   const { auth } = useAuth();
    const navigate = useNavigate();
    const location = useLocation();
    const [users, setUsers] = useState([]);
    const [isLoading, setIsLoading] = useState(true);
    const axiosPrivate = useAxiosPrivate();
-   const { setAuth } = useAuth();
    useEffect(() => {
       console.log("%c[Mine render]", "color:orange;font-weight:bold;");
 
@@ -19,7 +19,10 @@ const Mine = () => {
       const fetchUsers = async () => {
          try {
             const response = await axiosPrivate.get('/user', {
-               signal: controller.signal
+               signal: controller.signal,
+               params: {
+                  userId: auth?.id
+               }
             });
             console.log("user response",response);
             if (!isIgnore) {
@@ -34,8 +37,7 @@ const Mine = () => {
                if (error.response?.status === 401 || error.response?.status === 403) {
                   navigate("/login", { state: { from: location.pathname }, replace: true });
                }
-               else {
-                  navigate("/login", { state: { from: location.pathname }, replace: true });
+               else if(error.response?.status === 500){
                    console.error("网络不好，请稍后！");
                }
             }
@@ -43,7 +45,7 @@ const Mine = () => {
             setIsLoading(false);
          }
       };
-      //console.log("Mine.fetchUser start", new Error().stack.split("\n").slice(1,5));
+      console.log("Mine.fetchUser start", new Error().stack.split("\n").slice(1,5));
       fetchUsers();
       return ()=>{
          isIgnore = true;
@@ -60,7 +62,7 @@ const Mine = () => {
         ) : (
             <>
             {users? (
-                  <User users={users} setAuth={setAuth} />
+                  <User users={users} />
                ) : (
                <div>加载用户信息中...</div>
             )}

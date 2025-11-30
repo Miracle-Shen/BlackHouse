@@ -2,8 +2,6 @@ import PostForm from "@/components/PostForm";
 import { useGetPostById } from "@/lib/react-query/queries";
 import Loader from "@/components/common/Loader";
 import { Link, useParams } from "react-router-dom";
-import { useContext } from "react";
-import AuthContext from "@/context/AuthProvider";
 const EditPage = () => {
   const { id } = useParams();
   let post;
@@ -17,7 +15,7 @@ const EditPage = () => {
   const userId = userInfo.userId;
   const creatorId = userInfo.id;
 
-  
+
   if (isLoad && id)
     return (
       <div className="flex-center w-full h-full">

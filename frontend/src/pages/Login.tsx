@@ -1,78 +1,62 @@
 import { useRef, useState, useEffect, useContext } from 'react';
 import AuthContext from '../context/AuthProvider';
-import { Link, useNavigate } from 'react-router-dom';
-
+import { useNavigate } from 'react-router-dom';
 import axios from '../api/axios';
+import { ILoginResponse } from '../types/index';
 const LOGIN_URL = '/auth';
 
 const Login = () => {
-    const {setAuth} = useContext(AuthContext); //如果登录成功，更新全局认证状态，存在context中
+    const { setAuth } = useContext(AuthContext) as { setAuth: (auth: any) => void };
 
-    const userRef = useRef<HTMLInputElement>(null);
-    const errRef = useRef<HTMLParagraphElement>(null); 
-    const [user, setUser] = useState(''); 
+    const userRef = useRef<HTMLInputElement | null>(null);
+    const errRef = useRef<HTMLParagraphElement | null>(null);
+    const [user, setUser] = useState('');
     const [pwd, setPwd] = useState('');
-    const [errMsg, setErrMsg] = useState(''); 
-    const [success, setSuccess] = useState(false); 
+    const [errMsg, setErrMsg] = useState('');
     const navigate = useNavigate();
-    useEffect(() => {
-        userRef.current.focus(); // 自动聚焦用户名输入框
-    }, [])
 
     useEffect(() => {
-        setErrMsg(''); // 用户更改了输入时，清除错误信息
-    }, [user, pwd])
+        userRef.current?.focus();
+    }, []);
+
+    useEffect(() => {
+        setErrMsg('');
+    }, [user, pwd]);
 
     const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
-        e.preventDefault(); // 阻止默认的表单提交行为
+        e.preventDefault();
 
         try {
-            const timestamp = new Date().toISOString();
-            console.log(`[${timestamp}] Sending login request to ${LOGIN_URL} with user:`, user);
-            const response = await axios.post(LOGIN_URL,
-                JSON.stringify({ user:user, pwd:pwd }), 
-                {
-                    headers: { 'Content-Type': 'application/json' }, 
-                    withCredentials: true 
-                }
-            );
-            console.log(`[${timestamp}] Login response received:`, response?.data);
-           
-            const accessToken = response?.data?.accessToken; 
-            const userId = response?.data?.userId;
-            const id = response?.data?.id;
+            const response = await axios.post<ILoginResponse>(LOGIN_URL, JSON.stringify({ user, pwd }), {
+                headers: { 'Content-Type': 'application/json' },
+                withCredentials: true,
+            });
+
+            const { accessToken, userId, id } = response.data;
             setAuth({ id, userId, accessToken });
-            localStorage.setItem('user', JSON.stringify({userId:userId,id:id}));
-            setUser(''); 
-            setPwd(''); 
-            setSuccess(true);
-            navigate('/Mine', { replace: true }); 
-        } catch (err) {
+            localStorage.setItem('user', JSON.stringify({ userId, id }));
+            setUser('');
+            setPwd('');
+            navigate('/Mine', { replace: true });
+        } catch (err: any) {
             if (!err?.response) {
                 setErrMsg('无服务器响应');
             } else if (err.response?.status === 400) {
-                setErrMsg('缺少用户名或密码'); 
+                setErrMsg('缺少用户名或密码');
             } else if (err.response?.status === 401) {
-                setErrMsg('未授权'); 
+                setErrMsg('未授权');
             } else {
-                setErrMsg('登录失败'); 
+                setErrMsg('登录失败');
             }
-            errRef.current.focus(); //for 阅读器or升级功能
+            errRef.current?.focus();
         }
-    }
+    };
 
     return (
-        <>
-        {success ? ( 
-            <>
-                <p>登录成功!</p>
-                <section>
-                <Link to="/Mine" >返回</Link>
-                </section>
-            </>
-        ) : 
-        (<section>
-            <p ref={errRef} className={errMsg ? "errmsg" : "offscreen"} aria-live="assertive">{errMsg}</p>
+        <section>
+            <p ref={errRef} className={errMsg ? "errmsg" : "offscreen"} aria-live="assertive">
+                {errMsg}
+            </p>
 
             <h1>请登录</h1>
 
@@ -83,7 +67,7 @@ const Login = () => {
                     id="username"
                     ref={userRef}
                     autoComplete="off"
-                    onChange={(e)=>setUser(e.target.value)}
+                    onChange={(e) => setUser(e.target.value)}
                     value={user}
                     required
                 />
@@ -103,11 +87,7 @@ const Login = () => {
                 <span className="text-blue-500">点击注册</span>
             </p>
         </section>
-        )}
-        </>
-      
-
-    )
-}
+    );
+};
 
 export default Login;

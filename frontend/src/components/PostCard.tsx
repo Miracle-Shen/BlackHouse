@@ -1,9 +1,17 @@
 import { multiFormatDateString } from "@/lib/utils";
-import type { Models } from "node_modules/appwrite/types/client";
 import { Link } from "react-router-dom";
 
 type PostCardProps = {
-  post: Models.Document;
+  post: {
+    creator?: {
+      avatarUrl?: string;
+      userName?: string;
+    };
+    title?: string;
+    imageUrl?: string;
+    $createdAt: string;
+    $id: string;
+  };
 };
 const PostCard = ({post}: PostCardProps) => {
     return (
