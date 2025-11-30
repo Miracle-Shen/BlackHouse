@@ -18,33 +18,10 @@ import {
   getRecentPosts,
   getInfinitePosts,
   searchPosts,
-
 } from "@/lib/appwrite/api";
 import { INewPost, INewUser, IUpdatePost, IUpdateUser } from "@/types";
 
-// ============================================================
-// AUTH QUERIES
-// ============================================================
-
-/* export const useCreateUserAccount = () => {
-  return useMutation({
-    mutationFn: (user: INewUser) => createUserAccount(user),
-  });
-}; */
-
-/* export const useSignInAccount = () => {
-  return useMutation({
-    mutationFn: (user: { email: string; password: string }) =>
-      signInAccount(user),
-  });
-};
-
-export const useSignOutAccount = () => {
-  return useMutation({
-    mutationFn: signOutAccount,
-  });
-}; */
-
+import type { Models } from 'appwrite';
 // ============================================================
 // POST QUERIES
 // ============================================================
@@ -53,6 +30,7 @@ export const useGetPosts = () => {
   return useInfiniteQuery({
     queryKey: [QUERY_KEYS.GET_INFINITE_POSTS],
     queryFn: getInfinitePosts as any,
+    initialPageParam: 0, 
     getNextPageParam: (lastPage: any) => {
       // If there's no data, there are no more pages.
       if (lastPage && lastPage.documents.length === 0) {
@@ -75,12 +53,11 @@ export const useSearchPosts = (searchTerm: string) => {
 };
 
 export const useGetRecentPosts = () => {
-  return useQuery({
+  return useQuery<(Models.Document & { creator: Models.Document })[]>({ // 显式类型
     queryKey: [QUERY_KEYS.GET_RECENT_POSTS],
     queryFn: getRecentPosts,
   });
 };
-
 export const useCreatePost = () => {
   const queryClient = useQueryClient();
   return useMutation({
@@ -134,69 +111,7 @@ export const useDeletePost = () => {
   });
 };
 
-/* export const useLikePost = () => {
-  const queryClient = useQueryClient();
-  return useMutation({
-    mutationFn: ({
-      postId,
-      likesArray,
-    }: {
-      postId: string;
-      likesArray: string[];
-    }) => likePost(postId, likesArray),
-    onSuccess: (data) => {
-      queryClient.invalidateQueries({
-        queryKey: [QUERY_KEYS.GET_POST_BY_ID, data?.$id],
-      });
-      queryClient.invalidateQueries({
-        queryKey: [QUERY_KEYS.GET_RECENT_POSTS],
-      });
-      queryClient.invalidateQueries({
-        queryKey: [QUERY_KEYS.GET_POSTS],
-      });
-      queryClient.invalidateQueries({
-        queryKey: [QUERY_KEYS.GET_CURRENT_USER],
-      });
-    },
-  });
-};
 
-export const useSavePost = () => {
-  const queryClient = useQueryClient();
-  return useMutation({
-    mutationFn: ({ userId, postId }: { userId: string; postId: string }) =>
-      savePost(userId, postId),
-    onSuccess: () => {
-      queryClient.invalidateQueries({
-        queryKey: [QUERY_KEYS.GET_RECENT_POSTS],
-      });
-      queryClient.invalidateQueries({
-        queryKey: [QUERY_KEYS.GET_POSTS],
-      });
-      queryClient.invalidateQueries({
-        queryKey: [QUERY_KEYS.GET_CURRENT_USER],
-      });
-    },
-  });
-};
-
-export const useDeleteSavedPost = () => {
-  const queryClient = useQueryClient();
-  return useMutation({
-    mutationFn: (savedRecordId: string) => deleteSavedPost(savedRecordId),
-    onSuccess: () => {
-      queryClient.invalidateQueries({
-        queryKey: [QUERY_KEYS.GET_RECENT_POSTS],
-      });
-      queryClient.invalidateQueries({
-        queryKey: [QUERY_KEYS.GET_POSTS],
-      });
-      queryClient.invalidateQueries({
-        queryKey: [QUERY_KEYS.GET_CURRENT_USER],
-      });
-    },
-  });
-}; */
 
 // ============================================================
 // USER QUERIES

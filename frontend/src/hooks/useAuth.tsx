@@ -1,19 +1,21 @@
 import { useContext } from "react";
 import AuthContext from "../context/AuthProvider";
 
-type AuthContextType = {
+// 定义上下文类型
+export type AuthContextType = {
   auth: {
-    id?: string;
-    userId?: string;
-    accessToken?: string;
-    [key: string]: any;
-  };
-  setAuth: (auth: any) => void;
-};  
+    id: string;
+    userId: string;
+    accessToken: string;
+  } | null;
+  setAuth: (auth: AuthContextType['auth']) => void;
+};
+
 const useAuth = () => {
-  const context = useContext(AuthContext);
-  //useDebugValue(context.auth as AuthContextType, auth => auth?.user ? "Logged In" : "Logged Out");
-//   console.log("useAuth context:", context.auth);
+  const context = useContext(AuthContext) as AuthContextType; // 指定类型
+  if (!context) {
+    throw new Error("useAuth must be used within an AuthProvider");
+  }
   return context;
 };
 

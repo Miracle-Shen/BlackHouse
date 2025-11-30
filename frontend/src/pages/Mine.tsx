@@ -45,7 +45,7 @@ const Mine = () => {
             setIsLoading(false);
          }
       };
-      console.log("Mine.fetchUser start", new Error().stack.split("\n").slice(1,5));
+      // console.log("Mine.fetchUser start", new Error().stack.split("\n").slice(1,5));
       fetchUsers();
       return ()=>{
          isIgnore = true;

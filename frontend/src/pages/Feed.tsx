@@ -10,6 +10,7 @@ const FeedPage = () => {
     if(!auth){
       const userInfo = localStorage.getItem('user');
       // updatePost(userInfo)
+      console.log('FeedPage userInfo from localStorage:', userInfo);
     }
   }, []);
 

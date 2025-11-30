@@ -2,7 +2,7 @@ import { useRef, useState, useEffect, useContext } from 'react';
 import AuthContext from '../context/AuthProvider';
 import { useNavigate } from 'react-router-dom';
 import axios from '../api/axios';
-import { ILoginResponse } from '../types/index';
+import type { ILoginResponse } from '../types/index';
 const LOGIN_URL = '/auth';
 
 const Login = () => {

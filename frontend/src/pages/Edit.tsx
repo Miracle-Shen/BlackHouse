@@ -11,9 +11,10 @@ const EditPage = () => {
     post = data;
     isLoad = isLoading;
   }
-  const userInfo = localStorage.getItem("user");
-  const userId = userInfo.userId;
-  const creatorId = userInfo.id;
+const userInfoStr = localStorage.getItem("user");
+const userInfo = userInfoStr ? JSON.parse(userInfoStr) : null; // 解析为对象
+const userId = userInfo?.userId; // 可选链避免 null 错误
+const creatorId = userInfo?.id;
 
 
   if (isLoad && id)

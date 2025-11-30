@@ -9,7 +9,7 @@ const PostDetails = () => {
   const navigate = useNavigate();
   const { id } = useParams();
   const { auth } = useAuth();
-  const userId = auth.id;     
+  const userId = auth?.id;     
   const { data: post, isLoading } = useGetPostById(id);
   // const { data: userPosts, isLoading: isUserPostLoading } = useGetUserPosts(
 
