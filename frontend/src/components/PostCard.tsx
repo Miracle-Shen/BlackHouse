@@ -2,7 +2,7 @@ import { multiFormatDateString } from "@/lib/utils";
 import { Link } from "react-router-dom";
 import type {INewPost} from '@/types'
 
-const PostCard = ({post: INewPost}) => {
+const PostCard = ({post}: {post: INewPost}) => {
     return (
     <div className="post-card">
       <div className="flex-between">

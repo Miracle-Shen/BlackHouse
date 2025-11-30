@@ -197,7 +197,7 @@ export async function updatePost(post: IUpdatePost) {
     const updatedPost = await databases.updateDocument(
       appwriteConfig.databaseId,
       appwriteConfig.postCollectionId,
-      post.postId,
+      post.id,
       {
         creator: post?.creator?.id || post?.creator,
         userId: post?.userId,

@@ -16,10 +16,10 @@ import FileUploader from "./common/FileUploader";
 import { PostValidation } from "@/types/index";
 import { useCreatePost, useUpdatePost } from "@/lib/react-query/queries";
 import { useToast } from "@/hooks/use-toast";
-import type {PostCardProps} from '@/types'
+import type {createdAt} from '@/types'
 
 type PostFormProps = {
-  post?:PostCardProps;
+  post?:createdAt;
   action: "Create" | "Update";
   userId: string;
   creatorId: string;
@@ -49,7 +49,6 @@ const PostForm = ({ post, action, userId, creatorId }: PostFormProps) => {
       if (post && action === "Update") {
         const updatedPost = await updatePost({
           ...value,
-          postId: post.$id,
           imageId: post.imageId,
           imageUrl: post.imageUrl,
         });
