@@ -1,7 +1,6 @@
 import { ID, Query } from "appwrite";
 import { appwriteConfig, databases, storage } from "./config";
 import type { IUpdatePost, INewPost, IUpdateUser } from "@/types";
-import type { Models } from "appwrite";
 
 // ============================================================
 // POSTS
@@ -298,47 +297,57 @@ export async function getUserPosts(userId?: string) {
 //   }
 // }
 // 修改 getRecentPosts 函数的返回处理
-export async function getRecentPosts() {
+// 导入 INewPost 类型
+export async function getRecentPosts(): Promise<INewPost[]> {
   try {
     const posts = await databases.listDocuments(
       appwriteConfig.databaseId,
       appwriteConfig.postCollectionId,
       [Query.orderDesc("$createdAt"), Query.limit(20)]
     );
-    if (!posts) throw Error;
 
+    if (!posts) throw new Error("No posts found"); // 明确抛出错误
+
+    // 处理 posts 并转换为 INewPost 结构
     const postsWithUserDetails = await Promise.all(
       posts.documents.map(async (post) => {
         try {
           const user = await getUserById(post.creator);
-          // 明确转换为 INewPost 结构，确保 creator 是用户信息对象（而非 INewPost）
+          // 确保每个 post 都符合 INewPost 结构
           return {
-            id: post.$id, // 映射文档 ID 到 INewPost 的 id
+            id: post.$id,
+            creator: user || post.creator,
             userId: post.userId,
-            creator: user || post.creator, // 确保 creator 是用户对象或字符串
             title: post.title,
             caption: post.caption,
             imageUrl: post.imageUrl,
             imageId: post.imageId,
-            file: [], // 非必要时可设为空数组（根据实际需求调整）
+            file: [], // 适配 INewPost 的 file 字段
             tags: post.tags,
             $createdAt: post.$createdAt
-          } as INewPost; // 显式断言为 INewPost 类型
+          } as INewPost;
         } catch (error) {
-          // 错误处理时也保持类型一致
+          // 单个 post 处理失败时，仍返回基础结构
           return {
-            ...post,
             id: post.$id,
             creator: post.creator,
-            file: []
+            userId: post.userId,
+            title: post.title,
+            caption: post.caption,
+            imageUrl: post.imageUrl,
+            imageId: post.imageId,
+            file: [],
+            tags: post.tags,
+            $createdAt: post.$createdAt
           } as INewPost;
         }
       })
     );
 
-    return postsWithUserDetails;
+    return postsWithUserDetails; // 确保返回 INewPost[]
   } catch (error) {
     console.log(error);
+    return []; // 错误时返回空数组（避免 undefined）
   }
 }
 // ============================================================
