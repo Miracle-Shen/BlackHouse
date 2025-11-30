@@ -9,11 +9,13 @@
 
     /* Bundler mode */
     "moduleResolution": "bundler",
-    "allowImportingTsExtensions": true,
+    // "allowImportingTsExtensions": true,
     "verbatimModuleSyntax": true,
     "moduleDetection": "force",
     "noEmit": false,
     "composite": true,  
+    "declaration": true, // 子项目也生成声明文件
+    "declarationDir": "../dist/types/app"  ,
     
     /* Linting */
     "strict": true,

@@ -1,5 +1,5 @@
 import { ID, Query } from "appwrite";
-
+import type { Models } from "appwrite";
 import { appwriteConfig, databases, storage, avatars } from "./config";
 import { IUpdatePost, INewPost, INewUser, IUpdateUser } from "@/types";
 

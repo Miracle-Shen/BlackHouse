@@ -8,7 +8,10 @@
     "baseUrl": ".", // 设置项目的根目录
     "paths": {
       "@/*": ["src/*"] // 将 @ 映射到 src 目录
-    }
+    },
+     "outDir": "./dist",
+    "declaration": true, // 确保生成 .d.ts 文件
+    "declarationDir": "./dist/types"
   },
   "include": ["src"],
 }
