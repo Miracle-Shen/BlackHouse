@@ -4,7 +4,7 @@ import {
   useGetPostById,
 } from "@/lib/react-query/queries";
 import { multiFormatDateString } from "@/lib/utils";
-import { useAuth } from "@/hooks/useAuth";
+import useAuth from "@/hooks/useAuth";
 const PostDetails = () => {
   const navigate = useNavigate();
   const { id } = useParams();
