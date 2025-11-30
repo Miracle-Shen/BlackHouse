@@ -20,7 +20,6 @@ import {
 } from "@/lib/appwrite/api";
 import type{ INewPost, IUpdatePost, IUpdateUser } from "@/types";
 
-import type { Models } from 'appwrite';
 // ============================================================
 // POST QUERIES
 // ============================================================
