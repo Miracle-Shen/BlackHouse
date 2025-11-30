@@ -7,7 +7,7 @@ export type IRegisterResponse = {
 };
 
 export type ILoginResponse = {
-  id: string;
+  $id: string;
   userId: string;
   accessToken: string;
 };
@@ -35,43 +35,42 @@ export type INavLink = {
 };
 
 export type IUpdateUser = {
-  id: string;
+  $id: string;
   userId: string;
   userName: string;
   avatarId?: string;
-  avatarUrl?: URL | string;
+  avatarUrl?:string;
   file: File[];
 };
 
 export type INewPost = {
-  creator:string| object;
-  id: string;
-  userId: string;
-  title: string;
-  caption: string;
+  creator?:string| IUser;
+  $id?: string;
+  title?: string;
+  caption?: string;
   imageId?: string;
-  imageUrl?: URL;
-  file: File[];
+  imageUrl?: string;
+  file?: File[];
   tags?: string;
   $createdAt?: string;
 };
 
 export type IUpdatePost = {
-  userId:string;
-  creator: string| object;
-  id: string;
+  creator?: string| IUser;
+  $id: string;
   title: string;
   caption: string;
   imageId?: string;
-  imageUrl?: URL;
+  imageUrl?: string;
   file: File[];
   tags?: string;
 };
 
 export type IUser = {
-  id: string;
-  name: string;
-  username: string;
+  $id: string;
+  userId:string;
+  avatarId:string;
+  userName: string;
   avatarUrl?: string;
 };
 
@@ -109,5 +108,5 @@ export const PostValidation = z.object({
   file: z.custom<File[]>(),
   tags: z.string() .optional(),
   title: z.string(),
-  userId: z.string(),
+  $id: z.string(),
 });

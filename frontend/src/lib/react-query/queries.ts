@@ -12,14 +12,13 @@ import {
   getPostById,
   updatePost,
   getUserPosts,
-  deletePost,
   getUserById,
   updateUser,
   getRecentPosts,
   getInfinitePosts,
   searchPosts,
 } from "@/lib/appwrite/api";
-import { INewPost, INewUser, IUpdatePost, IUpdateUser } from "@/types";
+import type{ INewPost, INewUser, IUpdatePost, IUpdateUser } from "@/types";
 
 import type { Models } from 'appwrite';
 // ============================================================
@@ -53,9 +52,15 @@ export const useSearchPosts = (searchTerm: string) => {
 };
 
 export const useGetRecentPosts = () => {
-  return useQuery<(Models.Document & { creator: Models.Document })[]>({ // 显式类型
+  return useQuery<(Models.Document & { creator:INewPost })[]>({ 
     queryKey: [QUERY_KEYS.GET_RECENT_POSTS],
-    queryFn: getRecentPosts,
+    queryFn: async () => {
+      const data = await getRecentPosts();
+      if (!data) {
+        return [];
+      }
+      return data as (Models.Document & { creator:INewPost })[];
+    },
   });
 };
 export const useCreatePost = () => {
@@ -98,18 +103,18 @@ export const useUpdatePost = () => {
   });
 };
 
-export const useDeletePost = () => {
-  const queryClient = useQueryClient();
-  return useMutation({
-    mutationFn: ({ postId, imageId }: { postId?: string; imageId: string }) =>
-      deletePost(postId, imageId),
-    onSuccess: () => {
-      queryClient.invalidateQueries({
-        queryKey: [QUERY_KEYS.GET_RECENT_POSTS],
-      });
-    },
-  });
-};
+// export const useDeletePost = () => {
+//   const queryClient = useQueryClient();
+//   return useMutation({
+//     mutationFn: ({ postId, imageId }: { postId?: string; imageId: string }) =>
+//       deletePost(postId, imageId),
+//     onSuccess: () => {
+//       queryClient.invalidateQueries({
+//         queryKey: [QUERY_KEYS.GET_RECENT_POSTS],
+//       });
+//     },
+//   });
+// };
 
 
 

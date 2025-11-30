@@ -81,20 +81,6 @@ const PostDetails = () => {
                     height={24}
                   />
                 </Link>
-
-                <Button
-                  onClick={handleDeletePost}
-                  variant="ghost"
-                  className={`ost_details-delete_btn ${
-                    userId !== post?.userId && "hidden"
-                  }`}>
-                  <img
-                    src={"/icons/delete.svg"}
-                    alt="delete"
-                    width={24}
-                    height={24}
-                  />
-                </Button>
               </div>
             </div>
             <p className="text-lg font-bold">{post?.title}</p>

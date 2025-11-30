@@ -45,7 +45,7 @@ const User = ({ users, setAuth }: UserProps) => {
     });
     const handleUpdate = async (value: z.infer<typeof ProfileValidation>) => {
         const updatedUser = await updateUser({
-            id: users?.id,
+            $id: users?.id,
             userId: users?.userId,
             userName: users.userName,
             file: value?.file,

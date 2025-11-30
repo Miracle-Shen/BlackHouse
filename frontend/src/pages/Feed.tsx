@@ -1,10 +1,10 @@
 import PostCard from '@/components/PostCard';
 import {  useGetRecentPosts } from '@/lib/react-query/queries';
-
+import type { INewPost } from '@/types';
 const FeedPage = () => {
   const { data: posts = [], isPending: isLoading } = useGetRecentPosts();
 
-
+  console.log('Recent posts data:', posts);
  if (isLoading) return <div>Loading...</div>;
   return (
     <div className="bg-gray-50 min-h-screen">
@@ -17,10 +17,10 @@ const FeedPage = () => {
             <ul className='flex flex-col'>
               {posts.map((post) => (
                 <li
-                  key={`post-${post.id}`}
+                  key={`post-${post.$id}`}
                   className="border-b border-gray-200 p-4 bg-white mb-2"
                 >
-                  <PostCard post={post} />
+                  <PostCard post={post as INewPost} />
                 </li>
               ))}
             </ul>

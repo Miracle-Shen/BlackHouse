@@ -1,14 +1,19 @@
 import { useContext } from "react";
 import AuthContext from "../context/AuthProvider";
 
-// 定义上下文类型
 export type AuthContextType = {
-  auth: {
-    id: string;
-    userId: string;
-    accessToken: string;
-  } | null;
-  setAuth: (auth: AuthContextType['auth']) => void;
+    auth: {
+        id: string;
+        userId: string;
+        accessToken: string;
+    } | null;
+    setAuth: React.Dispatch<
+        React.SetStateAction<{
+            id: string;
+            userId: string;
+            accessToken: string;
+        } | null>
+    >;
 };
 
 const useAuth = () => {

@@ -13,7 +13,7 @@ function App() {
       {/* 登录和注册页面不使用布局 */}
       <Route path="/login" element={<Login />} />
       <Route path="/register" element={<Register />} />
-      <Route path="/edit/:id?" element={<EditPage />} />
+      <Route path="//:id?" element={<EditPage />} />
       <Route path="/posts/:id" element={<PostDetails />} />
       {/* 其他页面使用布局 */}
       <Route path="/" element={<Layout />}>

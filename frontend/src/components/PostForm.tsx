@@ -1,5 +1,4 @@
 import * as z from "zod";
-import type { Models } from 'appwrite';
 import { useForm } from "react-hook-form";
 import { useNavigate } from "react-router-dom";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -16,10 +15,10 @@ import FileUploader from "./common/FileUploader";
 import { PostValidation } from "@/types/index";
 import { useCreatePost, useUpdatePost } from "@/lib/react-query/queries";
 import { useToast } from "@/hooks/use-toast";
-import type {createdAt} from '@/types'
+import type {INewPost, IUpdatePost} from '@/types'
 
 type PostFormProps = {
-  post?:createdAt;
+  post?:INewPost;
   action: "Create" | "Update";
   userId: string;
   creatorId: string;
@@ -36,8 +35,7 @@ const PostForm = ({ post, action, userId, creatorId }: PostFormProps) => {
       title: post?.title || "",
       file: [],
       tags: post?.tags || "",
-      userId: userId,
-      id: post?.$id || "",
+      $id: post?.$id || "",
     },
   });
 
@@ -47,12 +45,14 @@ const PostForm = ({ post, action, userId, creatorId }: PostFormProps) => {
   const handleSubmit = async (value: z.infer<typeof PostValidation>) => {
     try {
       if (post && action === "Update") {
-        const updatedPost = await updatePost({
+        const updateData: IUpdatePost = {
           ...value,
+          $id: post.$id,
+          creator: post.creator,
           imageId: post.imageId,
           imageUrl: post.imageUrl,
-        });
-
+        };
+        const updatedPost = await updatePost(updateData);
         if (!updatedPost) {
           toast({ title: `${action} post failed. Please try again.` });
           return;
@@ -60,16 +60,16 @@ const PostForm = ({ post, action, userId, creatorId }: PostFormProps) => {
         return navigate(`/posts/${post.$id}`);
       }
 
-      const newPost = await createPost({
+      const newPostData: INewPost = {
         ...value,
         creator: creatorId,
-      });
-
+      };
+      const newPost = await createPost(newPostData);
       if (!newPost) {
         toast({ title: `${action} post failed. Please try again.` });
         return;
       }
-      return navigate(`/posts/${newPost.$id}`);
+      return navigate(`/posts/${newPost.id}`);
     } catch (error) {
       console.error("Error submitting post:", error);
       toast({ title: "An unexpected error occurred. Please try again." });

@@ -32,9 +32,9 @@ const Login = () => {
                 withCredentials: true,
             });
 
-            const { accessToken, userId, id } = response.data;
-            setAuth({ id, userId, accessToken });
-            localStorage.setItem('user', JSON.stringify({ userId, id }));
+            const { accessToken, userId, $id } = response.data;
+            setAuth({ $id, userId, accessToken });
+            localStorage.setItem('user', JSON.stringify({ userId, $id }));
             setUser('');
             setPwd('');
             navigate('/Mine', { replace: true });

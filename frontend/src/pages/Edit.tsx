@@ -10,7 +10,7 @@ const EditPage = () => {
   if(!id){
     const { data, isLoading } = useGetPostById(id);
     post ={
-      id: data ? data.$id : '',
+      $id: data ? data.$id : '',
       title: data?.title, 
       creator: data?.creator,
       imageUrl: data?.imageUrl,

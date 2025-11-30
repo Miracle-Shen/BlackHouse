@@ -1,17 +1,17 @@
 import { ID, Query } from "appwrite";
 import { appwriteConfig, databases, storage, avatars } from "./config";
-import { IUpdatePost, INewPost, INewUser, IUpdateUser } from "@/types";
-
+import type { IUpdatePost, INewPost, INewUser, IUpdateUser } from "@/types";
+import type { Models } from "appwrite";
+import { object } from "zod";
 // ============================================================
 // POSTS
 // ============================================================
 
 // ============================== CREATE POST
 export async function createPost(post: INewPost) {
-    console.log("Creating post:", post);
   try {
     // Upload file to appwrite storage
-    const uploadedFile = await uploadFile(post.file[0]);
+    const uploadedFile = await uploadFile(post?.file ? post.file[0] : new File([], ""));
 
     if (!uploadedFile) throw Error;
 
@@ -35,7 +35,6 @@ export async function createPost(post: INewPost) {
       ID.unique(),
       {
         creator: post.creator,
-        userId: post.userId,
         caption: post.caption,
         imageUrl: fileUrl,
         imageId: uploadedFile.$id,
@@ -173,7 +172,6 @@ export async function updatePost(post: IUpdatePost) {
       imageUrl: post.imageUrl,
       imageId: post.imageId,
     };
-    console
     if (hasFileToUpdate) {
       // Upload new file to appwrite storage
       const uploadedFile = await uploadFile(post.file[0]);
@@ -193,14 +191,14 @@ export async function updatePost(post: IUpdatePost) {
     // Convert tags into arrays
     const tags = post.tags?.replace(/ /g, "").split(",") || [];
     console.log("tags",tags);
-
+    // Update post
+   const creatorId = typeof post.creator === "object" && post.creator !== null ? post.creator.$id : post.creator;
     const updatedPost = await databases.updateDocument(
       appwriteConfig.databaseId,
       appwriteConfig.postCollectionId,
-      post.id,
+      post.$id,
       {
-        creator: post?.creator?.id || post?.creator,
-        userId: post?.userId,
+        creator: creatorId,
         imageUrl: image.imageUrl,
         imageId: image.imageId,
         title: post.title,
@@ -211,17 +209,12 @@ export async function updatePost(post: IUpdatePost) {
     // Failed to update
     if (!updatedPost) {
       // Delete new file that has been recently uploaded
-      if (hasFileToUpdate) {
-        await deleteFile(image?.imageId);
+      if (hasFileToUpdate && image.imageId) {
+        await deleteFile(image.imageId);
       }
 
       // If no new file uploaded, just throw error
       throw Error;
-    }
-
-    // Safely delete old file after successful update
-    if (hasFileToUpdate) {
-      await deleteFile(post.imageId);
     }
 
     return updatedPost;
@@ -231,25 +224,25 @@ export async function updatePost(post: IUpdatePost) {
 }
 
 // ============================== DELETE POST
-export async function deletePost(postId?: string, imageId?: string) {
-  if (!postId || !imageId) return;
+// export async function deletePost(postId?: string, imageId?: string) {
+//   if (!postId || !imageId) return;
 
-  try {
-    const statusCode = await databases.deleteDocument(
-      appwriteConfig.databaseId,
-      appwriteConfig.postCollectionId,
-      postId
-    );
+//   try {
+//     const statusCode = await databases.deleteDocument(
+//       appwriteConfig.databaseId,
+//       appwriteConfig.postCollectionId,
+//       postId
+//     );
 
-    if (!statusCode) throw Error;
+//     if (!statusCode) throw Error;
 
-    await deleteFile(imageId);
+//     await deleteFile(imageId);
 
-    return { status: "Ok" };
-  } catch (error) {
-    console.log(error);
-  }
-}
+//     return { status: "Ok" };
+//   } catch (error) {
+//     console.log(error);
+//   }
+// }
 
 
 
@@ -272,7 +265,12 @@ export async function getUserPosts(userId?: string) {
 }
 
 // ============================== GET POPULAR POSTS (BY HIGHEST LIKE COUNT)
-export async function getRecentPosts() {
+type PostWithCreator = Models.Document & {
+  creator: INewPost | undefined; // creator 可能是用户文档或 undefined
+};
+
+// 显式指定返回类型为 Promise<PostWithCreator[] | undefined>
+export async function getRecentPosts(): Promise<PostWithCreator[] | undefined> {
   try {
     const posts = await databases.listDocuments(
       appwriteConfig.databaseId,
@@ -282,14 +280,13 @@ export async function getRecentPosts() {
 
     if (!posts) throw Error;
 
-    // Replace post.creator with user object
     const postsWithUserDetails = await Promise.all(
       posts.documents.map(async (post) => {
         try {
           const user = await getUserById(post.creator);
-          return { ...post, creator: user };
+          return { ...post, creator: user } as PostWithCreator; // 断言为定义的类型
         } catch (error) {
-          return post; // Return the post as is if user fetch fails
+          return { ...post, creator: undefined } as PostWithCreator; // 处理用户获取失败的情况
         }
       })
     );
@@ -297,6 +294,7 @@ export async function getRecentPosts() {
     return postsWithUserDetails;
   } catch (error) {
     console.log(error);
+    return undefined; // 显式返回 undefined，符合返回类型定义
   }
 }
 
@@ -374,22 +372,12 @@ export async function updateUser(user: IUpdateUser) {
     const updatedUser = await databases.updateDocument(
       appwriteConfig.databaseId,
       appwriteConfig.userCollectionId,
-      user.id,
+      user.$id,
       {
         avatarUrl: image.avatarUrl,
         avatarId: image.avatarId,
       }
     );
-
-    // Failed to update
-    if (!updatedUser) {
-      // Delete new file that has been recently uploaded
-      if (hasFileToUpdate) {
-        await deleteFile(image.avatarId);
-      }
-      // If no new file uploaded, just throw error
-      throw Error;
-    }
 
     // Safely delete old file after successful update
     if (user.avatarId && hasFileToUpdate) {
