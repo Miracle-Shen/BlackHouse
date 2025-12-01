@@ -6,13 +6,13 @@ import useAuth from './useAuth';
 //场景：当访问令牌过期时，调用此hook获取新的访问令牌
 const useRefreshToken = () => {
     const { setAuth } = useAuth();
-    
+
      const refresh = useCallback(async (): Promise<string> => { 
         const ts = Date.now();
        console.log(
             `%c[REFRESH CALL] ts=${ts}`,
             "color:purple;font-weight:bold;"
-        );  
+        );
         const response = await axios.get('/refresh', { withCredentials: true });
         console.log(
             `%c[REFRESH OK] new accessToken=${response.data.accessToken.substring(0,20)}...`,

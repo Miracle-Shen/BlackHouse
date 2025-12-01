@@ -24,7 +24,6 @@ const Mine = () => {
                   userId: auth?.id
                }
             });
-            console.log("user response",response);
             if (!isIgnore) {
                setUsers(response.data);
                setIsLoading(false);

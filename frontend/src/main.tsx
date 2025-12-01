@@ -5,6 +5,9 @@ import './index.css';
 import App from './App'
 import { AuthProvider } from './context/AuthProvider';
 import {  QueryProvider } from './lib/react-query/QueryProvider';
+// import {disableReactDevTools} from '@fvilers/disable-react-devtools';
+// if(process.env.NODE_ENV === 'production') disableReactDevTools();
+
 createRoot(document.getElementById('root')!).render(
 
     <BrowserRouter>
