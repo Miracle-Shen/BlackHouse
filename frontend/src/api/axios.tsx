@@ -1,5 +1,6 @@
 import axios from 'axios';
-const BASE_URL = 'http://localhost:3500';
+const BASE_URL = 'https://blackhouse-04o3.onrender.com/';
+//'http://localhost:3500';
 
 export default axios.create({
     baseURL: BASE_URL
