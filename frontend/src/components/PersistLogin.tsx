@@ -13,7 +13,8 @@ const PersistLogin = () => {
   const location = useLocation();
 
   useEffect(() => {
-    let timeoutId: NodeJS.Timeout;
+    let timeoutId: ReturnType<typeof setTimeout>;
+
 
     const verify = async () => {
       try {
