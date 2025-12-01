@@ -1,6 +1,6 @@
 import { useRef, useState, useEffect, useContext } from 'react';
 import AuthContext from '../context/AuthProvider';
-import { useNavigate } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import axios from '../api/axios';
 import type { ILoginResponse } from '../types/index';
 const LOGIN_URL = '/auth';
@@ -84,7 +84,7 @@ const Login = () => {
             </form>
             <p>
                 还没有账号？<br />
-                <span className="text-blue-500">点击注册</span>
+                <span className="text-blue-500" > <Link to="/register">点击注册</Link></span>
             </p>
         </section>
     );
