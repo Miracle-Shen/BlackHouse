@@ -38,6 +38,7 @@ const Mine = () => {
                }
                else if(error.response?.status === 500){
                    console.error("网络不好，请稍后！");
+                    navigate("/login", { state: { from: location.pathname }, replace: true });
                }
             }
          }finally {
@@ -53,22 +54,23 @@ const Mine = () => {
 
 
 
-   return (
-      <>
-        {isLoading ? (
-           <div>正在验证用户身份...</div>
-           
-        ) : (
-            <>
-            {users? (
-                  <User users={users} setAuth={setAuth} />
-               ) : (
-               <div>加载用户信息中...</div>
-            )}
-            </>
-        )}
-      </>
-   );
+   if (isLoading) {
+    return <div>正在验证用户身份...</div>;
+  }
+
+  if (users.length === 0) {
+    return (
+      <div>
+        未获取到用户信息
+        <button onClick={() => navigate("/login", { state: { from: location.pathname }, replace: true })}>
+          前往登录
+        </button>
+      </div>
+    );
+  }
+
+  // 正常渲染用户组件
+  return <User users={users} setAuth={setAuth} />;
 }
 
 export default Mine;
