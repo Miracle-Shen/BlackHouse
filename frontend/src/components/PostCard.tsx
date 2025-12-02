@@ -8,7 +8,8 @@ const PostCard = ({post}: {post: INewPost}) => {
   };
   console.log('PostCard post data:', post);
   const creator = post.creator as PostCreator;
-  const avatarUrl = isUser(creator) ? creator.avatarUrl : "./icons/profile-placeholder.svg";
+ const avatarUrl = isUser(creator) && creator.avatarUrl ? creator.avatarUrl : "./icons/profile-placeholder.svg";
+
   const userName = isUser(creator) ? creator.userName : "Unknown User";
     return (
     <div className="post-card">

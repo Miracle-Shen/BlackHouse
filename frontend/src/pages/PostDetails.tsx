@@ -12,8 +12,9 @@ const PostDetails = () => {
   const userId = auth?.$id;     
   const { data: post, isLoading } = useGetPostById(id);
 
-  const creatID = post?.creator ? (typeof post.creator === 'object' && post.creator !== null && '$id' in post.creator ? post.creator.$id : '') : '';
-
+  const creatID = post?.creator ? (typeof post.creator === 'object' && post.creator !== null && '$id' in post.creator ? post.creator.$id : post.creator) : '';
+  console.log('PostDetails creatID:', creatID);
+  console.log('PostDetails userId:', userId);
   return (
     <div className="post_details-container">
       <div className=" md:flex max-w-5xl w-full">

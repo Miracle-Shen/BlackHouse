@@ -42,11 +42,11 @@ const Login = () => {
             if (!err?.response) {
                 setErrMsg('无服务器响应');
             } else if (err.response?.status === 400) {
-                setErrMsg('缺少用户名或密码');
+                setErrMsg(`${err.response?.data?.message || '缺少用户名或密码'}`);
             } else if (err.response?.status === 401) {
-                setErrMsg('未授权');
+                setErrMsg(`${err.response?.data?.message || '未授权'}`);
             } else {
-                setErrMsg('登录失败');
+                setErrMsg(`${err.response?.data?.message || '登录失败'}`);
             }
             errRef.current?.focus();
         }

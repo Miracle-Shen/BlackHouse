@@ -183,7 +183,7 @@ const Register = () => {
 
             <p>
                 已有账号？<br />
-                <span className="line">
+                <span className="text-blue-500">
                     <Link to="/login">登录</Link>
                 </span>
             </p>

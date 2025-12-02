@@ -67,7 +67,7 @@ const PostForm = ({ post, action, creatorId }: PostFormProps) => {
         toast({ title: `${action} post failed. Please try again.` });
         return;
       }
-      return navigate(`/posts/${newPost.id}`);
+      return navigate(`/posts/${newPost.$id}`);
     } catch (error) {
       console.error("Error submitting post:", error);
       toast({ title: "An unexpected error occurred. Please try again." });

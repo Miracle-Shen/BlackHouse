@@ -21,7 +21,7 @@ const GridPostList = ({ posts }: GridPostListProps) => {
                 <img
                   src={post.imageUrl || "/icons/default-image.svg"}
                   alt="post"
-                  className="h-40 w-full object-cover"
+                  className="w-full object-cover"
                 />
                 <div className="absolute bottom-0 left-0 w-full bg-gradient-to-t from-primary-100 to-transparent p-2">
                   <p className="text-black text-sm font-medium truncate">{post.title || "Untitled"}</p>
