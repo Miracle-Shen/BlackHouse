@@ -1,4 +1,4 @@
-import { useParams, Link, useNavigate } from "react-router-dom";
+import { useParams,  useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import {
   useGetPostById,
@@ -17,19 +17,38 @@ const PostDetails = () => {
   console.log('PostDetails userId:', userId);
   return (
     <div className="post_details-container">
-      <div className=" md:flex max-w-5xl w-full">
-        <Button
-          onClick={() => navigate(`/`)}
-          variant="ghost"
-          className="shad-button_ghost">
-          <img
-            src={"/icons/back.svg"}
-            alt="back"
-            width={24}
-            height={24}
-          />
-          <p className="small-medium lg:base-medium">Back</p>
-        </Button>
+      <div className="flex max-w-5xl w-full justify-between items-center">
+        <div className="flex">  
+          <Button
+            onClick={() => navigate(`/`)}
+            variant="ghost"
+            className="shad-button_ghost">
+            <img
+              src={"/icons/back.svg"}
+              alt="back"
+              width={24}
+              height={24}
+            />
+            <p className="small-medium lg:base-medium">Back</p>
+          </Button>
+        </div>
+        {userId === creatID && (
+          <div className="flex gap-4">
+            <Button
+              onClick={() => navigate(`/update-post/${post?.$id}`)}
+              variant="ghost"
+              className="shad-button_ghost"
+            >
+              <img
+                src={"/icons/edit.svg"}
+                alt="edit"
+                width={24}
+                height={24}
+              />
+              <p className="small-medium lg:base-medium">修改</p>
+            </Button>
+          </div>
+        )}
       </div>
 
       {isLoading || !post ? (
@@ -69,18 +88,6 @@ const PostDetails = () => {
                 </div>
               {/* </Link> */}
 
-              <div className="flex-center gap-4">
-                <Link
-                  to={`/publish/${post?.$id}`}
-                  className={`${userId !== creatID && "hidden"}`}>
-                  <img
-                    src={"/icons/edit.svg"}
-                    alt="edit"
-                    width={24}
-                    height={24}
-                  />
-                </Link>
-              </div>
             </div>
             <p className="text-lg font-bold">{post?.title}</p>
             <hr className="border w-full border-dark-4/80" />
