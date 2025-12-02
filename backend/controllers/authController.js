@@ -47,7 +47,7 @@ const handleLogin = async (req, res) => {
             JSON.stringify(usersDB.users)
         );
         console.log(usersDB.users);
-        res.cookie('jwt',refreshToken,{ httpOnly:true, maxAge:24*60*60*1000, sameSite: 'None' }); //secure:true 仅https
+        res.cookie('jwt',refreshToken,{ httpOnly:true, maxAge:24*60*60*1000, sameSite: 'None', secure: true }); //secure:true 仅https
         res.status(200).json({ accessToken, userId: foundUser.userId });
     } else {
         res.sendStatus(401);

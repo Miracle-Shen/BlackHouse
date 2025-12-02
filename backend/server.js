@@ -5,6 +5,7 @@ const path = require('path');
 
 const cors = require('cors');
 const corsOptions = require('./config/corsOptions');
+import credentials from './middleware/credentials';
 const verifyJWT = require('./middleware/verifyJWT');
 const cookieParser = require('cookie-parser');
 // const { logger } = require('./middleware/logEvents');
@@ -16,6 +17,7 @@ const PORT = process.env.PORT || 3500;
 // 使用自定义日志记录中间件
 // app.use(logger);
 
+app.use(credentials)
 // 启用跨域资源共享中间件
 app.use(cors(corsOptions));
 
