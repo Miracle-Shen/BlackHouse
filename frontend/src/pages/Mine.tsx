@@ -31,15 +31,15 @@ const Mine = () => {
          } catch (err: unknown) {
             console.error("Error fetching users:", err);
             if (err) {  // 如果请求失败（比如token过期），也导航到登录页
-               const error = err as { response?: { status?: number } };
-
-               if (error.response?.status === 401 || error.response?.status === 403) {
-                  navigate("/login", { state: { from: location.pathname }, replace: true });
-               }
-               else if(error.response?.status === 500){
-                   console.error("网络不好，请稍后！");
-                    navigate("/login", { state: { from: location.pathname }, replace: true });
-               }
+               //const error = err as { response?: { status?: number } };
+               navigate("/login", { state: { from: location.pathname }, replace: true });
+               // if (error.response?.status === 401 || error.response?.status === 403) {
+               //    navigate("/login", { state: { from: location.pathname }, replace: true });
+               // }
+               // else if(error.response?.status === 500){
+               //     console.error("网络不好，请稍后！");
+               //      navigate("/login", { state: { from: location.pathname }, replace: true });
+               // }
             }
          }finally {
             setIsLoading(false);
