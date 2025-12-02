@@ -18,7 +18,7 @@ import { useGetUserPosts, useUpdateUser } from "@/lib/react-query/queries";
 import GridPostList from "./common/GridPostList";
 import Loader from "./common/Loader";
 type UserProps = {
-  users: any; // 建议替换为具体用户类型
+  users: any; 
   setAuth: (auth: any) => void; // 明确 setAuth 类型
 };
 const User = ({ users, setAuth }: UserProps) => {
