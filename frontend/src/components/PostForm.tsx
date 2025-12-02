@@ -139,9 +139,14 @@ const PostForm = ({ post, action, creatorId }: PostFormProps) => {
           <button
             type="submit"
             disabled={isLoadingCreate || isLoadingUpdate}
+            className="relative"
           >
-            {(isLoadingCreate || isLoadingUpdate) && <Loader />} 
             提交
+            {(isLoadingCreate || isLoadingUpdate) && (
+              <span className="absolute inset-0 flex items-center justify-center">
+                <Loader />
+              </span>
+            )}
           </button>
         </div>
       </form>
