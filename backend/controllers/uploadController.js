@@ -26,7 +26,7 @@ const handleUpload = async (req, res) => {
     if(!foundUser) {
         return res.status(403).json({message: "No matching user found"}); //Forbidden 禁止访问
     }
-    const  fileURL  = req.file;
+    const fileURL  = req.file;
 
     console.log("fileURL:", fileURL);
     if (!fileURL) return res.status(400).json({ 'message': 'fileURL is required.' });
