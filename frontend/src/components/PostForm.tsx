@@ -124,7 +124,7 @@ const PostForm = ({ post, action, creatorId }: PostFormProps) => {
                   mediaUrl={post?.imageUrl || ""}
                 />
               </FormControl>
-              <FormMessage className="text-red-500" />
+               <FormMessage className="text-red-500" />
             </FormItem>
           )}
         />
@@ -138,7 +138,7 @@ const PostForm = ({ post, action, creatorId }: PostFormProps) => {
           </button>
           <button
             type="submit"
-            disabled={isLoadingCreate || isLoadingUpdate}
+            disabled={isLoadingCreate || isLoadingUpdate && post?.imageUrl===undefined}
             className="relative"
           >
             提交

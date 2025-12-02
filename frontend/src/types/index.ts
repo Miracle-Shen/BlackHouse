@@ -57,12 +57,12 @@ export type INewPost = {
 
 export type IUpdatePost = {
   creator?: string| IUser;
-  $id: string;
-  title: string;
-  caption: string;
+  $id?: string;
+  title?: string;
+  caption?: string;
   imageId?: string;
   imageUrl?: string;
-  file: File[];
+  file?: File[];
   tags?: string;
 };
 
@@ -104,9 +104,19 @@ export const ProfileValidation = z.object({
 // POST
 // ============================================================
 export const PostValidation = z.object({
-  caption: z.string().min(5, { message: "Minimum 5 characters." }).max(2200, { message: "Maximum 2,200 caracters" }),
-  file: z.custom<File[]>(),
-  tags: z.string() .optional(),
-  title: z.string(),
-  $id: z.string(),
+  caption: z.string().min(5, { message: "最少5个字符." }).max(2200, { message: "最多2200个字符." }),
+  file: z.custom<File[]>().refine((files) => files && files.length > 0, { message: "请上传至少一张图片" }),
+  tags: z.string().optional(),
+  title: z.string().min(1, { message: "标题不能为空" }),
+  $id: z.string().optional(),
 });
+
+export const UpdatePostValidation = PostValidation.refine(
+  (data) => {
+    // 已有图片ID且未上传新文件时通过验证
+    if (data.$id && !data.file.length) return true;
+    // 新上传了文件时通过验证
+    return data.file.length > 0;
+  },
+  { message: "请上传至少一张图片", path: ["file"] }
+);

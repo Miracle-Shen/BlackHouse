@@ -152,7 +152,7 @@ const FormMessage = React.forwardRef<
   if (!body) {
     return null
   }
-
+  //console.log("FormMessage body:", body);
   return (
     <p
       ref={ref}
