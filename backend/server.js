@@ -5,7 +5,7 @@ const path = require('path');
 
 const cors = require('cors');
 const corsOptions = require('./config/corsOptions');
-import credentials from './middleware/credentials';
+const credentials = require( './middleware/credentials');
 const verifyJWT = require('./middleware/verifyJWT');
 const cookieParser = require('cookie-parser');
 // const { logger } = require('./middleware/logEvents');
