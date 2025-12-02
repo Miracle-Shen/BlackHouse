@@ -317,7 +317,7 @@ export async function getRecentPosts(): Promise<INewPost[]> {
           return {
             $id: post.$id,
             creator: user || post.creator,
-            userId: post.userId,
+
             title: post.title,
             caption: post.caption,
             imageUrl: post.imageUrl,
@@ -330,7 +330,7 @@ export async function getRecentPosts(): Promise<INewPost[]> {
           return {
             $id: post.$id,
             creator: post.creator,
-            userId: post.userId,
+
             title: post.title,
             caption: post.caption,
             imageUrl: post.imageUrl,

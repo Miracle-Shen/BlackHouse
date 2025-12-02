@@ -23,7 +23,7 @@ const EditPage = () => {
 const userInfoStr = localStorage.getItem("user");
 const userInfo = userInfoStr ? JSON.parse(userInfoStr) : null; // 解析为对象
 // const userId = userInfo?.userId; // 可选链避免 null 错误
-const creatorId = userInfo?.userId || ''; // 如果 userInfo 或 userId 为 null，则使用空字符串
+const creatorId = userInfo?.$id || ''; // 如果 userInfo 或 userId 为 null，则使用空字符串
 console.log('User Info:', userInfo);
 console.log('Creator ID:', creatorId);
 

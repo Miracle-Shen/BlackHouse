@@ -9,14 +9,10 @@ const PostDetails = () => {
   const navigate = useNavigate();
   const { id } = useParams();
   const { auth } = useAuth();
-  const userId = auth?.id;     
+  const userId = auth?.$id;     
   const { data: post, isLoading } = useGetPostById(id);
-  // const { data: userPosts, isLoading: isUserPostLoading } = useGetUserPosts(
 
-  // const handleDeletePost = () => {
-  //   deletePost({ postId: id, imageId: post?.imageId });
-  //   navigate(-1);
-  // };
+  const creatID = post?.creator ? (typeof post.creator === 'object' && post.creator !== null && '$id' in post.creator ? post.creator.$id : '') : '';
 
   return (
     <div className="post_details-container">
@@ -47,9 +43,10 @@ const PostDetails = () => {
 
           <div className="post_details-info">
             <div className="flex-between w-full">
-              <Link
-                to={`/profile/${post?.userId}`}
-                className="flex items-center gap-3">
+              {/* <Link
+                to={`/profile/${creatID}`}
+                className="flex items-center gap-3"> */}
+                <div className="flex items-center gap-3">
                 <img
                   src={
                     post?.creator?.avatarUrl ||
@@ -68,12 +65,13 @@ const PostDetails = () => {
                     </p>
                   </div>
                 </div>
-              </Link>
+                </div>
+              {/* </Link> */}
 
               <div className="flex-center gap-4">
                 <Link
                   to={`/publish/${post?.$id}`}
-                  className={`${userId !== post?.userId && "hidden"}`}>
+                  className={`${userId !== creatID && "hidden"}`}>
                   <img
                     src={"/icons/edit.svg"}
                     alt="edit"

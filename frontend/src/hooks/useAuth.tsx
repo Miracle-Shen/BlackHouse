@@ -3,13 +3,13 @@ import AuthContext from "../context/AuthProvider";
 
 export type AuthContextType = {
     auth: {
-        id: string;
+        $id: string;
         userId: string;
         accessToken: string;
     } | null;
     setAuth: React.Dispatch<
         React.SetStateAction<{
-            id: string;
+            $id: string;
             userId: string;
             accessToken: string;
         } | null>

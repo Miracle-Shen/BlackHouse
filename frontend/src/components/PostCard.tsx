@@ -17,7 +17,7 @@ const PostCard = ({post}: {post: INewPost}) => {
             <img
               src={avatarUrl}
               alt="creator"
-              className="w-11 lg:h-11 rounded-full"
+              className="w-9 h-9 lg:w-12 lg:h-12 rounded-full"
             />
 
           <div className="flex flex-col">

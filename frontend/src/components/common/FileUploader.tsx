@@ -33,7 +33,7 @@ const FileUploader = ({ fieldChange, mediaUrl }: FileUploaderProps) => {
   return (
     <div
       {...getRootProps()}
-      className="flex flex-center flex-col bg-dark-3 rounded-xl cursor-pointer">
+      className="flex flex-center flex-col bg-dark-3 rounded-xl cursor-pointer border-gray-200 border-t-gray-300">
       <input {...getInputProps()} className="cursor-pointer" />
 
       {fileUrl ? (
@@ -41,10 +41,10 @@ const FileUploader = ({ fieldChange, mediaUrl }: FileUploaderProps) => {
           <div className="flex flex-1 justify-center w-full p-5 lg:p-10">
             <img src={fileUrl} alt="image" className="file_uploader-img" />
           </div>
-          <p className="file_uploader-label">Click or drag photo to replace</p>
+          <p className="text-light-4 text-center small-regular w-full p-4 border-gray-200 border-t-gray-300">点击或者拖拽图片进行替换</p>
         </>
       ) : (
-        <div className="file_uploader-box ">
+        <div className=" lg:h-[480px] w-full rounded-[24px] object-cover object-top">
           <img
             src="/icons/file-upload.svg"
             width={96}
@@ -57,8 +57,8 @@ const FileUploader = ({ fieldChange, mediaUrl }: FileUploaderProps) => {
           </h3>
           <p className="text-light-4 small-regular mb-6">SVG, PNG, JPG</p>
 
-          <Button type="button" className="shad-button_dark_4">
-            点击上传
+          <Button type="button">
+            点击选择图片上传
           </Button>
         </div>
       )}

@@ -88,11 +88,11 @@ const PostForm = ({ post, action, creatorId }: PostFormProps) => {
             <FormItem>
               <FormControl>
                 <Textarea
-                  className="shad-textarea custom-scrollbar"
+                  className="shad-textarea h-12"
                   {...field}
                 />
               </FormControl>
-              <FormMessage className="shad-form_message" />
+              <FormMessage className="text-red-500" />
             </FormItem>
           )}
         />
@@ -104,11 +104,11 @@ const PostForm = ({ post, action, creatorId }: PostFormProps) => {
             <FormItem>
               <FormControl>
                 <Textarea
-                  className="shad-textarea custom-scrollbar"
+                  className="shad-textarea h-52"
                   {...field}
                 />
               </FormControl>
-              <FormMessage className="shad-form_message" />
+              <FormMessage className="text-red-500" />
             </FormItem>
           )}
         />
@@ -124,7 +124,7 @@ const PostForm = ({ post, action, creatorId }: PostFormProps) => {
                   mediaUrl={post?.imageUrl || ""}
                 />
               </FormControl>
-              <FormMessage className="shad-form_message" />
+              <FormMessage className="text-red-500" />
             </FormItem>
           )}
         />
@@ -132,14 +132,12 @@ const PostForm = ({ post, action, creatorId }: PostFormProps) => {
         <div className="flex gap-4 items-center justify-end">
           <button
             type="button"
-            className="shad-button_dark_4"
             onClick={() => navigate(-1)}
           >
             取消
           </button>
           <button
             type="submit"
-            className="shad-button_primary whitespace-nowrap rounded-lg px-6 py-2"
             disabled={isLoadingCreate || isLoadingUpdate}
           >
             {(isLoadingCreate || isLoadingUpdate) && <Loader />} 

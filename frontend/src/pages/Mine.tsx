@@ -21,7 +21,7 @@ const Mine = () => {
             const response = await axiosPrivate.get('/user', {
                signal: controller.signal,
                params: {
-                  userId: auth?.id
+                  userId: auth?.$id
                }
             });
             if (!isIgnore) {
