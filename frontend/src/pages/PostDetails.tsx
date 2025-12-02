@@ -11,7 +11,7 @@ const PostDetails = () => {
   const { auth } = useAuth();
   const userId = auth?.$id;     
   const { data: post, isLoading } = useGetPostById(id);
-
+  console.log("PostDetails auth:", auth);
   const creatID = post?.creator ? (typeof post.creator === 'object' && post.creator !== null && '$id' in post.creator ? post.creator.$id : post.creator) : '';
   console.log('PostDetails creatID:', creatID);
   console.log('PostDetails userId:', userId);

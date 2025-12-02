@@ -57,12 +57,12 @@ export type INewPost = {
 
 export type IUpdatePost = {
   creator?: string| IUser;
-  $id?: string;
+  $id: string;
   title?: string;
   caption?: string;
   imageId?: string;
   imageUrl?: string;
-  file?: File[];
+  file: File[];
   tags?: string;
 };
 
