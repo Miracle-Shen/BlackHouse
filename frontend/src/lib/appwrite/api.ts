@@ -315,7 +315,7 @@ export async function getRecentPosts(): Promise<INewPost[]> {
           const user = await getUserById(post.creator);
           // 确保每个 post 都符合 INewPost 结构
           return {
-            id: post.$id,
+            $id: post.$id,
             creator: user || post.creator,
             userId: post.userId,
             title: post.title,
@@ -327,9 +327,8 @@ export async function getRecentPosts(): Promise<INewPost[]> {
             $createdAt: post.$createdAt
           } as INewPost;
         } catch (error) {
-          // 单个 post 处理失败时，仍返回基础结构
           return {
-            id: post.$id,
+            $id: post.$id,
             creator: post.creator,
             userId: post.userId,
             title: post.title,

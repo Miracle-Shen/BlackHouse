@@ -23,8 +23,9 @@ const EditPage = () => {
 const userInfoStr = localStorage.getItem("user");
 const userInfo = userInfoStr ? JSON.parse(userInfoStr) : null; // 解析为对象
 // const userId = userInfo?.userId; // 可选链避免 null 错误
-const creatorId = userInfo?.id;
-
+const creatorId = userInfo?.userId || ''; // 如果 userInfo 或 userId 为 null，则使用空字符串
+console.log('User Info:', userInfo);
+console.log('Creator ID:', creatorId);
 
   if (isLoad && id)
     return (
@@ -35,18 +36,18 @@ const creatorId = userInfo?.id;
 
   return (
     <>
-      {id ?
+      {creatorId ?
       (<>
         <div className="bg-gray-50 flex">
           <div className="common-container">
-            <div className="max-w-5xl justify-center  gap-3">
+            <div className="flex max-w-5xl justify-center items-center gap-3">
               <img
                 src="/icons/gallery-add.svg"
                 width={36}
                 height={36}
                 alt="add"
               />
-              <h2 className="h3-bold md:h2-bold  ">{id ? "Edit Post" : "Create Post"}</h2>
+              <h2 className="h3-bold md:h2-bold  ">{id ? "编辑 Post" : "创建 Post"}</h2>
             </div>
 
             <PostForm action={id ? "Update" : "Create"} post={post ? post : undefined}  creatorId={creatorId} />

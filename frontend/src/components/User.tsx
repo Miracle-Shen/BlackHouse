@@ -112,7 +112,7 @@ const User = ({ users, setAuth }: UserProps) => {
               <section className="w-full">
                 <div className="flex flex-col items-center gap-4 bg-gray-50 rounded-lg p-4">
                   <div className="text-center w-full">
-                    <h3 className="text-lg font-semibold mb-2">我的内容</h3>
+                    <h3 className="text-lg font-semibold mb-2">我的帖子</h3>
                     <GridPostList posts={userPosts?.documents || []} />
                   </div>
                 </div>

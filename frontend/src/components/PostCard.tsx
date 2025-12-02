@@ -6,7 +6,7 @@ const PostCard = ({post}: {post: INewPost}) => {
   const isUser = (creator: PostCreator): creator is IUser => {
     return typeof creator === 'object' && creator !== null && 'userName' in creator;
   };
-
+  console.log('PostCard post data:', post);
   const creator = post.creator as PostCreator;
   const avatarUrl = isUser(creator) ? creator.avatarUrl : "./icons/profile-placeholder.svg";
   const userName = isUser(creator) ? creator.userName : "Unknown User";

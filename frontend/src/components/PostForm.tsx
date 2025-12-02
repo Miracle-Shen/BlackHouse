@@ -139,11 +139,11 @@ const PostForm = ({ post, action, creatorId }: PostFormProps) => {
           </button>
           <button
             type="submit"
-            className="shad-button_primary whitespace-nowrap"
+            className="shad-button_primary whitespace-nowrap rounded-lg px-6 py-2"
             disabled={isLoadingCreate || isLoadingUpdate}
           >
             {(isLoadingCreate || isLoadingUpdate) && <Loader />} 
-            {action} Post
+            提交
           </button>
         </div>
       </form>
