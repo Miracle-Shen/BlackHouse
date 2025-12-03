@@ -22,8 +22,9 @@ const handleLogout = async (req, res) => {
         return res.sendStatus(204); //No Content 无内容
     }
     const foundUser = usersDB.users.find(person => person.refreshToken === cookie.jwt);
+    console.log(`foundUser: ${foundUser?.username} 退出了`);
     if(!foundUser) {
-        res.clearCookie('jwt',{ httpOnly:true, maxAge:24*60*60*1000 });
+        res.clearCookie('jwt',{ httpOnly:true, maxAge:24*60*60*1000, sameSite: 'None', secure: true });
         return res.sendStatus(204);
     }
 

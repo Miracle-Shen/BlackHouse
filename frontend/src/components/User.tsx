@@ -19,7 +19,7 @@ const User = ({ users, setUsers, setAuth }: UserProps) => {
 
   const logout = async () => {
     try {
-      await axios.post("/logout");
+     await axios.post("/logout", {}, { withCredentials: true });
     } catch (err) {
       console.error("Logout error:", err);
     } finally {

@@ -3,7 +3,7 @@ import useRefreshToken from "../hooks/useRefreshToken";
 import useAuth from "../hooks/useAuth";
 import { Outlet, useNavigate, useLocation } from "react-router-dom";
 import ShowModel from "./common/ShowModel";
-const TIME_LIMIT = 3000; // 最大等待 5 秒
+const TIME_LIMIT = 3000; // 最大等待
 
 const PersistLogin = () => {
   const [loading, setLoading] = useState(true);
