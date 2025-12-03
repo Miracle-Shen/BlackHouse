@@ -27,19 +27,6 @@ const getUserInfo = async (req, res) => {
     console.log("foundUser:", id);
     try {
         const user = await fetchUser(id); 
-        // console.log("userResponse:", userResponse);
-        // if (userResponse.total === 0) {
-        //     return res.status(404).json({ 'message': 'User not found.' });
-        // }
-        // const user = userResponse.rows[0];
-
-        // const tagsResponse = await fetchTags(id);
-        // let tags;
-        // if (tagsResponse.total !== 0) {
-        //     tags = tagsResponse.rows[0].map(doc => doc.interest_tags).flat();   
-        // }
-
-        // const avatarUrl = await fetchFile(user.profile_picture);
         console.log("user:", user);
         const userInfo = {
             id: user.$id,

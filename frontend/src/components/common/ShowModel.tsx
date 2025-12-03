@@ -13,7 +13,7 @@ const ShowModel: React.FC<TimeoutModalProps> = ({ onNavigate }) => {
             </svg>
           </div>
           <h3 className="text-lg font-semibold text-gray-900">会话已超时</h3>
-          <p className="text-gray-500 mt-2">您的登录状态已过期，请重新登录或返回首页</p>
+          <p className="text-gray-500 mt-2">该功能需要登录！登录状态已过期，请重新登录或返回首页</p>
         </div>
         <div className="flex gap-3">
           <button

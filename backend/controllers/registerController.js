@@ -23,7 +23,7 @@ const  handleNewUser = async (req, res) => {
         const userId = uuidv4();
       
 
-        const userInfo = await createUser(userId, user);
+        const userInfo = await createUser(userId, user, hashedPwd);
         const id = userInfo.$id;
 
         const newUser = {"id": id, "username": user,"userId": userId, "password": hashedPwd};
