@@ -29,7 +29,7 @@ const getUserInfo = async (req, res) => {
         const user = await fetchUser(id); 
         console.log("user:", user);
         const userInfo = {
-            id: user.$id,
+            $id: user.$id,
             userId: user.userId,
             userName: user.userName,
             interestTags: user.tags || " ",

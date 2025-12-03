@@ -35,7 +35,7 @@ const User = ({ users, setUsers, setAuth }: UserProps) => {
     }
   }, [users]);
 
-  const { data: userPosts } = useGetUserPosts(users.id);
+  const { data: userPosts } = useGetUserPosts(users.$id);
 
   return (
     <>
