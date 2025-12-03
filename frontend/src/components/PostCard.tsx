@@ -1,16 +1,12 @@
 import { multiFormatDateString } from "@/lib/utils";
 import { Link } from "react-router-dom";
 import type {INewPost,IUser} from '@/types'
-type PostCreator = IUser | string;
-const PostCard = ({post}: {post: INewPost}) => {
-  const isUser = (creator: PostCreator): creator is IUser => {
-    return typeof creator === 'object' && creator !== null && 'userName' in creator;
-  };
-  console.log('PostCard post data:', post);
-  const creator = post.creator as PostCreator;
- const avatarUrl = isUser(creator) && creator.avatarUrl ? creator.avatarUrl : "./icons/profile-placeholder.svg";
 
-  const userName = isUser(creator) ? creator.userName : "Unknown User";
+const PostCard = ({post}: {post: INewPost}) => {
+  console.log('PostCard post data:', post);
+  const creator = post.creator as IUser | undefined;
+  const avatarUrl = creator?.avatarUrl || "./icons/profile-placeholder.svg";
+  const userName = creator?.userName || "加载中...";
     return (
     <div className="post-card">
       <div className="flex-between">
@@ -27,7 +23,7 @@ const PostCard = ({post}: {post: INewPost}) => {
             </p>
             <div className="flex-center gap-2 text-light-3">
               <p className="subtle-semibold lg:small-regular ">
-                {multiFormatDateString(post.$createdAt)}
+               {post.$createdAt ? multiFormatDateString(post.$createdAt) : "日期加载中..."}
               </p>
             </div>
           </div>
@@ -36,7 +32,7 @@ const PostCard = ({post}: {post: INewPost}) => {
 
       <Link to={`/posts/${post.$id}`}>
         <div className="small-medium lg:base-medium py-5">
-          <p>{post.title}</p>
+           <p>{post.title || "标题加载中..."}</p>
          {/*  <p className="text-light-2">{post.caption}</p> */}
 {/*           {post?.tags ? (<ul className="flex gap-1 mt-2">
             {post.tags.map((tag: string, index: string) => (
