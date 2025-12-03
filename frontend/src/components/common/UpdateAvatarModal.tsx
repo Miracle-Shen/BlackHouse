@@ -54,7 +54,7 @@ const UpdateAvatarModal: React.FC<UpdateAvatarModalProps> = ({ users, setUsers ,
 
   {/* 弹窗主体 */}
   <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-    <div className="bg-white rounded-xl shadow-xl max-w-md w-full p-6">
+    <div className="bg-white rounded-xl shadow-xl max-w-md w-full p-6" onClick={(e) => e.stopPropagation()}>
 
       <h3 className="text-lg font-semibold text-gray-900 mb-4">修改头像</h3>
 

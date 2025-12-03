@@ -61,3 +61,15 @@ app.use('/user', require('./routes/user')); // 用户路由
 
 // 启动服务器，监听指定端口
 app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
+
+const { getAllUsers } = require('./lib/userAPI');
+
+// Execute getAllUsers on server start
+(async () => {
+    try {
+        await getAllUsers();
+        console.log("Fetched all users successfully on server start.");
+    } catch (error) {
+        console.error("Error fetching users on server start:", error);
+    }
+})();
