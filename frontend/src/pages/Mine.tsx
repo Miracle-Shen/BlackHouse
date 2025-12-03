@@ -69,8 +69,8 @@ const Mine = () => {
     );
   }
 
-  // 正常渲染用户组件
-  return <User users={users} setAuth={setAuth} />;
+return <User users={users} setUsers={setUsers} setAuth={setAuth} />;
+
 }
 
 export default Mine;
