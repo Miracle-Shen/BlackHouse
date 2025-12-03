@@ -67,6 +67,8 @@ const { getAllUsers } = require('./lib/userAPI');
 // Execute getAllUsers on server start
 (async () => {
     try {
+        // Clear require cache for users.json to ensure fresh data is loaded
+        delete require.cache[require.resolve('./model/users.json')];
         await getAllUsers();
         console.log("Fetched all users successfully on server start.");
     } catch (error) {

@@ -16,6 +16,7 @@ const  handleNewUser = async (req, res) => {
 
     //重复用户名检查
     const duplicate = usersDB.users.find(person => person.username === user);
+    console.log("当前所有的用户:", usersDB.users);
     if(duplicate) return res.sendStatus(409); //409 Conflict 冲突
     try{
         //密码加密
