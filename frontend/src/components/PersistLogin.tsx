@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import useRefreshToken from "../hooks/useRefreshToken";
 import useAuth from "../hooks/useAuth";
 import { Outlet, useNavigate, useLocation } from "react-router-dom";
-import ShowModel from "./common/showModel";
+import ShowModel from "./common/ShowModel";
 const TIME_LIMIT = 3000; // 最大等待 5 秒
 
 const PersistLogin = () => {
