@@ -1,10 +1,19 @@
+const fs = require('fs');
+const path = require('path');
+const fsPromises = require('fs').promises;
+
 
 const usersDB = {
-    users:require('../model/users.json'),
-    setUsers: function (data) { this.users = data; }
-}
-const fsPromises = require('fs').promises;
-const path = require('path');
+    get users() {
+        // 每次访问时实时读取文件，避免缓存问题
+        const data = fs.readFileSync(path.join(__dirname, '../model/users.json'), 'utf-8');
+        return JSON.parse(data);
+    },
+    setUsers: function (data) { 
+        fs.writeFileSync(path.join(__dirname, '../model/users.json'), JSON.stringify(data, null, 2));
+    }
+};
+
 
 const handleLogout = async (req, res) => {
     const cookie = req.cookies;

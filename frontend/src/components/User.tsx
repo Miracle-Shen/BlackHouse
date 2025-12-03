@@ -1,10 +1,10 @@
 import { useNavigate, Link } from "react-router-dom";
 import { useEffect, useState } from "react";
-import useAxiosPrivate from "../hooks/useAxiosPrivate";
 import { useGetUserPosts } from "@/lib/react-query/queries";
 import GridPostList from "./common/GridPostList";
 
 import UpdateAvatarModal from "./common/UpdateAvatarModal"; // 引入修改头像弹窗组件
+import axios from "@/api/axios";
 
 
 type UserProps = {
@@ -14,12 +14,12 @@ type UserProps = {
 };
 const User = ({ users, setUsers, setAuth }: UserProps) => {
   const navigate = useNavigate();
-  const axiosPrivate = useAxiosPrivate();
+
   const [isShow, setIsShow] =useState(false);
 
   const logout = async () => {
     try {
-      await axiosPrivate.post("/logout");
+      await axios.post("/logout");
     } catch (err) {
       console.error("Logout error:", err);
     } finally {
