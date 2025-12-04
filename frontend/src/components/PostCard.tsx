@@ -3,7 +3,6 @@ import { Link } from "react-router-dom";
 import type {INewPost,IUser} from '@/types'
 
 const PostCard = ({post}: {post: INewPost}) => {
-  console.log('PostCard post data:', post);
   const creator = post.creator as IUser | undefined;
   const avatarUrl = creator?.avatarUrl || "./icons/profile-placeholder.svg";
   const userName = creator?.userName || "加载中...";

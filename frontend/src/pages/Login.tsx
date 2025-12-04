@@ -33,7 +33,6 @@ const Login = () => {
             });
 
             const { accessToken, userId, $id } = response.data;
-            console.log(`用户 ${user} 登录， ${JSON.stringify(response.data)}`);
             setAuth({ $id, userId, accessToken });
             localStorage.setItem('user', JSON.stringify({ userId, $id, accessToken }));
             setUser('');

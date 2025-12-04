@@ -12,8 +12,6 @@ const Mine = () => {
    const [isLoading, setIsLoading] = useState(true);
    const axiosPrivate = useAxiosPrivate();
    useEffect(() => {
-      console.log("%c[Mine render]", "color:orange;font-weight:bold;");
-
       let isIgnore = false;
       const controller = new AbortController(); 
       const fetchUsers = async () => {

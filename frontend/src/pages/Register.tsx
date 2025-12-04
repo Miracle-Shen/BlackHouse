@@ -64,7 +64,6 @@ const Register = () => {
                     withCredentials: true
                 }
             );
-            console.log(JSON.stringify(response?.data));
             setSuccess(true);
             //清空输入框
             setUser('');
