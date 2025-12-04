@@ -223,25 +223,25 @@ export async function updatePost(post: IUpdatePost) {
 }
 
 // ============================== DELETE POST
-// export async function deletePost(postId?: string, imageId?: string) {
-//   if (!postId || !imageId) return;
+export async function deletePost(postId?: string, imageId?: string) {
+  if (!postId || !imageId) return;
 
-//   try {
-//     const statusCode = await databases.deleteDocument(
-//       appwriteConfig.databaseId,
-//       appwriteConfig.postCollectionId,
-//       postId
-//     );
+  try {
+    const statusCode = await databases.deleteDocument(
+      appwriteConfig.databaseId,
+      appwriteConfig.postCollectionId,
+      postId
+    );
 
-//     if (!statusCode) throw Error;
+    if (!statusCode) throw Error;
 
-//     await deleteFile(imageId);
+    await deleteFile(imageId);
 
-//     return { status: "Ok" };
-//   } catch (error) {
-//     console.log(error);
-//   }
-// }
+    return { status: "Ok" };
+  } catch (error) {
+    console.log(error);
+  }
+}
 
 
 

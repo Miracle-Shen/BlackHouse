@@ -18,15 +18,15 @@ const FeedPage = () => {
     <div className="bg-gray-50 min-h-screen">
       <h1 className="text-center py-4">动态</h1>
 
-      <div className="max-w-md mx-auto">
-        <ul className="flex flex-col">
-          {displayedPosts.map((post) => (
-            <li key={post.$id} className="border-b border-gray-200 p-4 bg-white mb-2">
-              <PostCard post={post} />
-            </li>
-          ))}
-        </ul>
-      </div>
+      <div className="max-w-4xl mx-auto">
+        <ul className="grid grid-cols-2 md:grid-cols-4 gap-1">
+            {displayedPosts.map((post) => (
+              <li key={post.$id} className="border-b border-gray-200 p-2 bg-white ">
+                <PostCard post={post} />
+              </li>
+            ))}
+          </ul>
+        </div>
     </div>
   );
 };

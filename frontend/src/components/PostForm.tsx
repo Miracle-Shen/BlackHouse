@@ -27,8 +27,6 @@ type PostFormProps = {
 const PostForm = ({ post, action, creatorId }: PostFormProps) => {
   const navigate = useNavigate();
   const { toast } = useToast();
-  console.log('Post :', post);
-  console.log('PostForm action :', action);
   const form = useForm<z.infer<typeof PostValidation>>({
     resolver: zodResolver(PostValidation),
     defaultValues: {
@@ -80,7 +78,7 @@ const PostForm = ({ post, action, creatorId }: PostFormProps) => {
     <Form {...form}>
       <form
         onSubmit={form.handleSubmit(handleSubmit)}
-        className="flex flex-col gap-9 w-full max-w-5xl"
+        className="flex flex-col gap-4 w-full max-w-5xl"
       >
         <p>输入标题</p>
         <FormField
@@ -114,7 +112,7 @@ const PostForm = ({ post, action, creatorId }: PostFormProps) => {
             </FormItem>
           )}
         />
-
+        <div className="shad-textarea px-4 py-4 shadow-sm rounded-lg ">
         <FormField
           control={form.control}
           name="file"
@@ -130,7 +128,7 @@ const PostForm = ({ post, action, creatorId }: PostFormProps) => {
             </FormItem>
           )}
         />
-
+        </div>
         <div className="flex gap-4 items-center justify-end">
           <button
             type="button"

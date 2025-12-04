@@ -2,21 +2,30 @@ import { useParams,  useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import {
   useGetPostById,
+  useDeletePost,
 } from "@/lib/react-query/queries";
 import { multiFormatDateString } from "@/lib/utils";
-// import useAuth from "@/hooks/useAuth";
+import { Loader } from "lucide-react";
 const PostDetails = () => {
   const navigate = useNavigate();
   const { id } = useParams();
-  // const { auth } = useAuth();
   const userInfoStr = localStorage.getItem("user");
-  const userInfo = userInfoStr ? JSON.parse(userInfoStr) : null; // 解析为对象
+  const userInfo = userInfoStr ? JSON.parse(userInfoStr) : null; 
   const userId = userInfo.$id;
   const { data: post, isLoading } = useGetPostById(id);
+  const { mutate: deletePost ,isPending: isDelete } = useDeletePost();
 
   const creatID = post?.creator ? (typeof post.creator === 'object' && post.creator !== null && '$id' in post.creator ? post.creator.$id : post.creator) : '';
-  console.log('PostDetails creatID:', creatID);
-  console.log('PostDetails userId:', userId);
+  const handleDeletePost = () => {
+    deletePost({ postId: id, imageId: post?.imageId });
+    if (isDelete) {
+      return<Loader />;
+    }
+    else{
+      
+      navigate('/');
+    }
+  };
   return (
     <div className="post_details-container">
       <div className="flex max-w-5xl w-full justify-between items-center">
@@ -31,7 +40,7 @@ const PostDetails = () => {
               width={24}
               height={24}
             />
-            <p className="small-medium lg:base-medium">Back</p>
+            <p className="small-medium lg:base-medium">返回</p>
           </Button>
         </div>
         {userId === creatID && (
@@ -48,6 +57,19 @@ const PostDetails = () => {
                 height={24}
               />
               <p className="small-medium lg:base-medium">修改</p>
+            </Button>
+             <Button
+              onClick={handleDeletePost}
+              variant="ghost"
+              className="shad-button_ghost"
+            >
+              <img
+                src={"/icons/delete.svg"}
+                alt="delete"
+                width={24}
+                height={24}
+              />
+              <p className="small-medium lg:base-medium">删除</p>
             </Button>
           </div>
         )}
