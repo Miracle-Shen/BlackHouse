@@ -49,7 +49,7 @@ const useAxiosPrivate = () => {
                     //     "color:orange;font-weight:bold;"
                     // );
                     const accessToken = await refresh();
-                    console.log("accessToken", accessToken );
+                    //console.log("accessToken", accessToken );
                     prevRequest.headers['authorization'] = `Bearer ${accessToken}`;
                     return axiosPrivate(prevRequest);
                 }

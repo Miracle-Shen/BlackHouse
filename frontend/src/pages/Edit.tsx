@@ -7,7 +7,7 @@ const EditPage = () => {
   const { id } = useParams();
   let post: INewPost | undefined;
   let isLoad= false;
-  if(!id){
+  if(id){
     const { data, isLoading } = useGetPostById(id);
     post ={
       $id: data ? data.$id : '',
@@ -24,8 +24,7 @@ const userInfoStr = localStorage.getItem("user");
 const userInfo = userInfoStr ? JSON.parse(userInfoStr) : null; // 解析为对象
 // const userId = userInfo?.userId; // 可选链避免 null 错误
 const creatorId = userInfo?.$id || ''; // 如果 userInfo 或 userId 为 null，则使用空字符串
-console.log('User Info:', userInfo);
-console.log('Creator ID:', creatorId);
+
 
   if (isLoad && id)
     return (

@@ -27,7 +27,8 @@ type PostFormProps = {
 const PostForm = ({ post, action, creatorId }: PostFormProps) => {
   const navigate = useNavigate();
   const { toast } = useToast();
-
+  console.log('Post :', post);
+  console.log('PostForm action :', action);
   const form = useForm<z.infer<typeof PostValidation>>({
     resolver: zodResolver(PostValidation),
     defaultValues: {

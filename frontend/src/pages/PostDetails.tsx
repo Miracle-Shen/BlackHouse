@@ -4,12 +4,14 @@ import {
   useGetPostById,
 } from "@/lib/react-query/queries";
 import { multiFormatDateString } from "@/lib/utils";
-import useAuth from "@/hooks/useAuth";
+// import useAuth from "@/hooks/useAuth";
 const PostDetails = () => {
   const navigate = useNavigate();
   const { id } = useParams();
-  const { auth } = useAuth();
-  const userId = auth?.$id;     
+  // const { auth } = useAuth();
+  const userInfoStr = localStorage.getItem("user");
+  const userInfo = userInfoStr ? JSON.parse(userInfoStr) : null; // 解析为对象
+  const userId = userInfo.$id;
   const { data: post, isLoading } = useGetPostById(id);
 
   const creatID = post?.creator ? (typeof post.creator === 'object' && post.creator !== null && '$id' in post.creator ? post.creator.$id : post.creator) : '';
@@ -35,7 +37,7 @@ const PostDetails = () => {
         {userId === creatID && (
           <div className="flex gap-4">
             <Button
-              onClick={() => navigate(`/update-post/${post?.$id}`)}
+              onClick={() => navigate(`/edit/${post?.$id}`)}
               variant="ghost"
               className="shad-button_ghost"
             >
