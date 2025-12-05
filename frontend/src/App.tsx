@@ -6,7 +6,6 @@ import { Routes, Route } from 'react-router-dom';
 import EditPage from './pages/Edit';
 import Mine from './pages/Mine';
 import PostDetails from './pages/PostDetails';
-// import PersistLogin from './components/PersistLogin';
 
 function App() {
   return (
@@ -23,7 +22,7 @@ function App() {
           </Route>
         {/* 需要登录的部分 */}
           {/* <Route element={<PersistLogin />}> */}
-            <Route path="/edit/:id?" element={<EditPage />} />
+            <Route path="/edit/:id?/tag=?" element={<EditPage />} />
             <Route path="/posts/:id" element={<PostDetails />} />
         {/* </Route> */}
     </Routes>

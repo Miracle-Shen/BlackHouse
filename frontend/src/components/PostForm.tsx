@@ -16,7 +16,7 @@ import { PostValidation } from "@/types/index";
 import { useCreatePost, useUpdatePost } from "@/lib/react-query/queries";
 import { useToast } from "@/hooks/use-toast";
 import type {INewPost, IUpdatePost} from '@/types'
-
+import { useGlobalModal } from "@/context/ModalProvider";
 type PostFormProps = {
   post?:INewPost;
   action: "Create" | "Update";
@@ -25,6 +25,7 @@ type PostFormProps = {
 };
 
 const PostForm = ({ post, action, creatorId }: PostFormProps) => {
+  const { showConfirm} = useGlobalModal()
   const navigate = useNavigate();
   const { toast } = useToast();
   const form = useForm<z.infer<typeof PostValidation>>({
@@ -33,7 +34,7 @@ const PostForm = ({ post, action, creatorId }: PostFormProps) => {
       caption: post?.caption || "",
       title: post?.title || "",
       file: [],
-      tags: post?.tags || "",
+      tags: [],
       $id: post?.$id || "",
     },
   });
@@ -49,25 +50,41 @@ const PostForm = ({ post, action, creatorId }: PostFormProps) => {
           $id: post.$id!,
           imageId: post.imageId,
           imageUrl: post.imageUrl,
+          tags: [],
         };
         const updatedPost = await updatePost(updateData);
         if (!updatedPost) {
           toast({ title: `${action} post failed. Please try again.` });
           return;
         }
-        return navigate(`/posts/${post.$id}`);
+        showConfirm({
+          title: "帖子更新成功！",
+          description: "你的帖子已成功更新。",  
+          confirmText: "去查看",      
+          onConfirm: () => {
+            navigate(`/posts/${updatedPost.$id}`);
+          },
+        }); 
       }
 
       const newPostData: INewPost = {
         ...value,
         creator: creatorId,
+        tags: [],
       };
       const newPost = await createPost(newPostData);
       if (!newPost) {
         toast({ title: `${action} post failed. Please try again.` });
         return;
       }
-      return navigate(`/posts/${newPost.$id}`);
+       showConfirm({
+          title: "帖子创建成功！",
+          description: "你的帖子已成功创建。",  
+          confirmText: "去查看",      
+          onConfirm: () => {
+            navigate(`/posts/${newPost.$id}`);
+          },
+        }); 
     } catch (error) {
       console.error("Error submitting post:", error);
       toast({ title: "An unexpected error occurred. Please try again." });

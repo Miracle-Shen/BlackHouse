@@ -1,74 +1,92 @@
-const { Client, ID, Storage, Models } = require( "appwrite");
+const { Client, Databases } = require( "appwrite");
 const dotenv = require('dotenv');
 dotenv.config();
 const client = new Client()
     .setEndpoint(process.env.APPWRITE_ENDPOINT) // Replace <REGION> with your Appwrite region
-    .setProject(process.env.APPWRITE_PROJECT_ID);
-
-const storage = new Storage(client);
+    .setProject(process.env.APPWRITE_PROJECT_ID); // BlackHouse Project ID
 
 
-exports.uploadFile = async (file,res) => {
-    console.log("Uploading file:", typeof(file));
-    try {
-        const appwriteFile = new File(
-            [file.buffer],          // 文件内容（ArrayBuffer 或 Buffer）
-            file.originalname,      // 文件名
-            { type: file.mimetype } // 文件类型
-        );
-        
-        console.log("是否为 File 实例:", appwriteFile instanceof File); // true
-        
-        // 使用对象参数形式上传
-        const response = await storage.createFile({
-            bucketId: process.env.STORAGE_BUCKET_ID,
-            fileId: ID.unique(),
-            file: appwriteFile,
-            contentType: file.mimetype
-        });
-
-        res.status(200).json(response);
-    } catch (error) {
-        console.log("Error uploading file:", error);
-        res.status(500).json({ message: "Error uploading file" });
-    }   
-}
+const databases = new Databases(client);
 
 const getPostById = async (postId) => {
-  if (!postId) throw Error;
+  if (!postId) {
+    throw new Error("getPostById: postId is required");
+  }
 
   try {
     const post = await databases.getDocument(
       process.env.DATABASE_ID,
-      'post',
+      "post",
       postId
     );
-    console.log("Fetched post:", post);
-    if (!post) throw Error;
+    console.log("============================================Fetched post:\n", post);
+    if (!post) {
+      throw new Error(`getPostById: post not found, postId=${postId}`);
+    }
+    return post;
   } catch (error) {
-    console.log(error);
+    console.error("============================================[DB/getPostById] error:", {
+      postId,
+      error,
+    });
+    throw error;
   }
-  return post
-}
+};
+
+// ✅ “先读再加 tag 再写回”的核心逻辑
+const addTagToPost = async (postId, tag) => {
+  if (!postId) {
+    throw new Error("addTagToPost: postId is required");
+  }
+  if (!tag) {
+    throw new Error("addTagToPost: tag is required");
+  }
+
+  const post = await getPostById(postId);
+
+  // 2. 把 tags 规范成数组（可能为空 / undefined）
+  const oldTags = Array.isArray(post.tags) ? post.tags : [];
+
+  // 3. 去重：已经有同样的 tag 就直接返回，不再写库
+  if (oldTags.includes(tag)) {
+    return post;
+  }
+
+  const newTags = [...oldTags, tag];
+
+  const updatedPost = await updatePostById(postId, { tags: newTags });
+
+  return updatedPost;
+};
+
 
 const updatePostById = async (postId, updateData) => {
-  if (!postId || !updateData) throw Error;
-    try {
-      const updatedPost = await databases.updateDocument(
-        process.env.DATABASE_ID,
-        'post',
-        postId,
-        updateData
-      );
-      console.log("Updated post:", updatedPost);
-      return updatedPost;
-    } catch (error) {
-      console.log(error);
-    }
+  if (!postId) {
+    throw new Error("updatePostById: postId is required");
+  }
+  if (!updateData || typeof updateData !== "object") {
+    throw new Error("updatePostById: updateData must be a non-empty object");
+  }
 
-}
+  try {
+    const updatedPost = await databases.updateDocument(
+      process.env.DATABASE_ID,
+      "post",
+      postId,
+      {
+        tags: updateData.tags,
+      }
+    );
+    console.log("============================================Updated post:\n", updatedPost);
+    return updatedPost;
+  } catch (error) {
+    console.error("============================================[DB/updatePostById] error:", {
+      postId,
+      updateData,
+      error,
+    });
+    throw error; // 一定要往上抛
+  }
+};
 
-module.exports = {
-  getPostById,
-  updatePostById
-}
+module.exports = { getPostById, updatePostById, addTagToPost };

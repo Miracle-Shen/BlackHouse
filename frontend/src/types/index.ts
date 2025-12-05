@@ -51,7 +51,7 @@ export type INewPost = {
   imageId?: string;
   imageUrl?: string;
   file?: File[];
-  tags?: string;
+  tags?: string[];
   $createdAt?: string;
 };
 
@@ -63,7 +63,7 @@ export type IUpdatePost = {
   imageId?: string;
   imageUrl?: string;
   file: File[];
-  tags?: string;
+  tags?: string[];
 };
 
 export type IUser = {
@@ -106,7 +106,7 @@ export const ProfileValidation = z.object({
 export const PostValidation = z.object({
   caption: z.string().min(5, { message: "最少5个字符." }).max(2200, { message: "最多2200个字符." }),
   file: z.custom<File[]>().refine((files) => files && files.length > 0, { message: "请上传至少一张图片" }),
-  tags: z.string().optional(),
+  tags: z.array(z.string()).optional(),
   title: z.string().min(1, { message: "标题不能为空" }),
   $id: z.string().optional(),
 });
