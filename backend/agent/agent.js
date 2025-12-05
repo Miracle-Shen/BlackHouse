@@ -12,6 +12,13 @@ const { AIMessage, HumanMessage } = require("@langchain/core/messages");
 
 require("dotenv").config({ path: "../.env" });
 
+import OpenAI from 'openai';
+
+const openai = new OpenAI({
+  apiKey: process.env['ARK_API_KEY'],
+  baseURL: 'https://ark.cn-beijing.volces.com/api/v3',
+});
+
 /**
  * ------------------------------------------------------------
  * callAgent()
@@ -94,7 +101,7 @@ async function callAgent(client, query, thread_id) {
    */
   console.log("[CALL_AGENT] Initializing ChatOpenAI model");
   const model = new ChatOpenAI({
-    modelName: "gpt-4o-mini",
+    modelName: "gpt-3.5-turbo",
     temperature: 0,
     openAIApiKey: process.env.OPENAI_API_KEY,
   }).bindTools(tools);
@@ -187,5 +194,7 @@ async function callAgent(client, query, thread_id) {
   console.log("[AGENT OUTPUT]", output);
   return output;
 }
+
+main();
 
 module.exports = { callAgent };
