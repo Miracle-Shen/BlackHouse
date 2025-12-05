@@ -9,7 +9,6 @@ import PostDetails from './pages/PostDetails';
 // import PersistLogin from './components/PersistLogin';
 
 function App() {
-
   return (
     <Routes>
       {/* 登录和注册页面不使用布局 */}

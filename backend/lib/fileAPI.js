@@ -1,4 +1,4 @@
-const { Client, ID, Storage } = require( "appwrite");
+const { Client, ID, Storage, Models } = require( "appwrite");
 const dotenv = require('dotenv');
 dotenv.config();
 const client = new Client()
@@ -34,16 +34,41 @@ exports.uploadFile = async (file,res) => {
     }   
 }
 
-// exports.fetchFile = async (req, res) => {
-//     const fileId = req.params.fileId;
-//     try{
-//         const file = await storage.getFileDownload({
-//             bucketId: process.env.STORAGE_BUCKET_ID,
-//             fileId: fileId
-//         });
-//         res.status(200).json(file);
-//     } catch(error){
-//         console.log("Error fetching file:", error);
-//         res.status(500).json({ message: "Error fetching file" });
-//     }
-// }
+const getPostById = async (postId) => {
+  if (!postId) throw Error;
+
+  try {
+    const post = await databases.getDocument(
+      process.env.DATABASE_ID,
+      'post',
+      postId
+    );
+    console.log("Fetched post:", post);
+    if (!post) throw Error;
+  } catch (error) {
+    console.log(error);
+  }
+  return post
+}
+
+const updatePostById = async (postId, updateData) => {
+  if (!postId || !updateData) throw Error;
+    try {
+      const updatedPost = await databases.updateDocument(
+        process.env.DATABASE_ID,
+        'post',
+        postId,
+        updateData
+      );
+      console.log("Updated post:", updatedPost);
+      return updatedPost;
+    } catch (error) {
+      console.log(error);
+    }
+
+}
+
+module.exports = {
+  getPostById,
+  updatePostById
+}

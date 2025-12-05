@@ -2,12 +2,9 @@ const usersDB = {
     users:require('../model/users.json'),
     setUsers: function (data) { this.users = data; }
 }
-
-
 const fsPromises = require('fs').promises;
 const path = require('path');
 const { v4: uuidv4 } = require('uuid');
-//hash password
 const bcrypt = require('bcrypt');
 const { createUser } = require('../lib/userAPI.js');
 const  handleNewUser = async (req, res) => {
@@ -29,7 +26,8 @@ const  handleNewUser = async (req, res) => {
 
         const newUser = {"id": id, "username": user,"userId": userId, "password": hashedPwd};
         usersDB.setUsers([...usersDB.users, newUser]);
-        await fsPromises.writeFile(
+        await fsPromises.writeFile(  
+            //miracle todo改成异步
             path.join(__dirname, '..', 'model', 'users.json'), 
             JSON.stringify(usersDB.users)
         );
