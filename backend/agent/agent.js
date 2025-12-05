@@ -1,198 +1,191 @@
-/* import { OpenAIEmbeddings } from "@langchain/openai";
-import { ChatAnthropic } from "@langchain/anthropic";
-import { AIMessage, BaseMessage, HumanMessage } from "@langchain/core/messages";
-import {
-  ChatPromptTemplate,
-  MessagesPlaceholder,
-} from "@langchain/core/prompts";
-import { StateGraph } from "@langchain/langgraph";
-import { Annotation } from "@langchain/langgraph";
-import { tool } from "@langchain/core/tools";
-import { ToolNode } from "@langchain/langgraph/prebuilt";
-import { MongoDBSaver } from "@langchain/langgraph-checkpoint-mongodb";
-import { MongoDBAtlasVectorSearch } from "@langchain/mongodb";
-import { MongoClient } from "mongodb"; */
-const {Annotation} = require( "@langchain/langgraph");
-const { tool } = require( "@langchain/core/tools");
-const { ToolNode } = require( "@langchain/langgraph/prebuilt");
-const { ChatPromptTemplate, MessagesPlaceholder } = require( "@langchain/core/prompts");
-const { StateGraph } = require( "@langchain/langgraph");
-const { Client } = require( "appwrite");
-const { getPostById,updatePostById } = require( "../lib/fileAPI"); 
-const { z } = require( "zod");
-const { ChatOpenAI, OpenAIEmbeddings } = require("@langchain/openai");
+const { Annotation } = require("@langchain/langgraph");
+const { tool } = require("@langchain/core/tools");
+const { ToolNode } = require("@langchain/langgraph/prebuilt");
+const { ChatPromptTemplate, MessagesPlaceholder } = require("@langchain/core/prompts");
+const { StateGraph } = require("@langchain/langgraph");
 
-/* const { ChatAnthropic } = require("@langchain/anthropic"); */
+const { getPostById, updatePostById } = require("../lib/fileAPI");
+const { z } = require("zod");
+const { ChatOpenAI } = require("@langchain/openai");
+
 const { AIMessage, HumanMessage } = require("@langchain/core/messages");
-const dotenv = require('dotenv');
-dotenv.config({path: '../.env' });
-const client = new Client()
-    .setEndpoint(process.env.APPWRITE_ENDPOINT) 
-    .setProject(process.env.APPWRITE_PROJECT_ID); 
 
-async function callAgent(client, query, thread_id) {
-  // Define the MongoDB database and collection
-/*   const dbName = "hr_database";
-  const db = client.db(dbName);
-  const collection = db.collection("employees");
+require("dotenv").config({ path: "../.env" });
+
+/**
+ * ------------------------------------------------------------
+ * callAgent()
+ * 一个使用 LangGraph 构建的自动化数据库智能代理:
+ * - 读取 post 数据
+ * - 自动生成标签
+ * - 使用工具调用写入 tag 到数据库
+ * ------------------------------------------------------------
  */
-  // Define the graph state
+async function callAgent(client, query, thread_id) {
+  console.log("[CALL_AGENT] Starting callAgent function");
+
+  /**
+   * 1️⃣ 定义 Graph 状态结构
+   * messages 是一个 BaseMessage[]，由 reducer 自动 append
+   */
+  console.log("[CALL_AGENT] Defining GraphState");
   const GraphState = Annotation.Root({
-    messages: Annotation({//<BaseMessage[]>
+    messages: Annotation({
       reducer: (x, y) => x.concat(y),
+      default: () => [],
     }),
   });
 
-  // Define the tools for the agent to use
-/*   const employeeLookupTool = tool(
-    async ({ query, n = 10 }) => {
-      console.log("Employee lookup tool called");
-
-      const dbConfig = {
-        collection: collection,
-        indexName: "vector_index",
-        textKey: "embedding_text",
-        embeddingKey: "embedding",
-      };
-
-      // Initialize vector store
-      const vectorStore = new MongoDBAtlasVectorSearch(
-        new OpenAIEmbeddings(),
-        dbConfig
-      );
-
-      const result = await vectorStore.similaritySearchWithScore(query, n);
+  /**
+   * 2️⃣ 定义工具：读取数据库
+   */
+  console.log("[CALL_AGENT] Defining readDatabaseTool");
+  const readDatabaseTool = tool(
+    async ({ query }) => {
+      console.log("[TOOL] read_database called with query:", query);
+      const result = await getPostById(query);
+      console.log("[TOOL] read_database result:", result);
       return JSON.stringify(result);
     },
     {
-      name: "employee_lookup",
-      description: "Gathers employee details from the HR database",
-      schema: z.object({
-        query: z.string().describe("The search query"),
-        n: z
-          .number()
-          .optional()
-          .default(10)
-          .describe("Number of results to return"),
-      }),
-    }
-  ); */
-
-  const readDatabaseTool = tool(
-    async ({ query }) => {
-      console.log("Read database tool called");
-
-      const filter = { $text: { $search: query } };
-      const projection = { score: { $meta: "textScore" } };
-
-      const results = await getPostById(query);
-
-      return JSON.stringify(results);
-    },
-    {
       name: "read_database",
-      description: "Reads post records from the post database",
+      description: "Query post content by post_id",
       schema: z.object({
-        query: z.string().describe("The search query"),
+        query: z.string(),
       }),
     }
   );
+
+  /**
+   * 3️⃣ 定义工具：写 tag 到数据库
+   */
+  console.log("[CALL_AGENT] Defining writeTagTool");
   const writeTagTool = tool(
     async ({ post_id, tag }) => {
-      console.log("Write tag tool called");
+      console.log("[TOOL] write_tag called with post_id:", post_id, "and tag:", tag);
 
-      const filter = { post_id: post_id };
-      const update = { $addToSet: { tags: tag } };
+      await updatePostById(post_id, {
+        $addToSet: { tags: tag },
+      });
 
-      //await collection.updateOne(filter, update);
-      await updatePostById(post_id, update);
-      return `Tag "${tag}" added to post with ID ${post_id}.`;
+      console.log("[TOOL] write_tag completed for post_id:", post_id);
+      return `Tag \"${tag}\" added to post ${post_id}`;
     },
     {
       name: "write_tag",
-      description: "Writes a tag to a post record in the post database",
+      description: "Save a new tag onto a post",
       schema: z.object({
-        post_id: z.string().describe("The ID of the post"),
-        tag: z.string().describe("The tag to add"),
+        post_id: z.string(),
+        tag: z.string(),
       }),
     }
   );
+
   const tools = [readDatabaseTool, writeTagTool];
 
-  // We can extract the state typing via `GraphState.State`
-  const toolNode = new ToolNode<typeof GraphState.State>(tools);
+  /**
+   * 4️⃣ ToolNode —— 自动根据 AIMessage 中的 tool_calls 调用工具
+   */
+  console.log("[CALL_AGENT] Initializing ToolNode");
+  const toolNode = new ToolNode(tools);
 
-/*   const model = new ChatDashScope({
-    model: "claude-3-5-sonnet-20240620",
-    temperature: 0,
-  }).bindTools(tools); */
+  /**
+   * 5️⃣ LLM 模型 + 绑定工具
+   */
+  console.log("[CALL_AGENT] Initializing ChatOpenAI model");
   const model = new ChatOpenAI({
-  modelName: "gpt-4o-mini",
-  temperature: 0.7,  //0is most deterministic
-  openAIApiKey: process.env.OPENAI_API_KEY,
-}).bindTools(tools);
-  // Define the function that determines whether to continue or not
-  function shouldContinue(state) { //: typeof GraphState.State
-    const messages = state.messages;
-    const lastMessage = messages[messages.length - 1]; //as AIMessage;
+    modelName: "gpt-4o-mini",
+    temperature: 0,
+    openAIApiKey: process.env.OPENAI_API_KEY,
+  }).bindTools(tools);
 
-    // If the LLM makes a tool call, then we route to the "tools" node
-    if (lastMessage.tool_calls?.length) {
-      return "tools";
-    }
-    // Otherwise, we stop (reply to the user)
-    return "__end__";
-  }
-
-  // Define the function that calls the model
-  async function callModel(state) {//: typeof GraphState.State
+  /**
+   * 6️⃣ Agent 节点：负责执行 LLM 推理
+   * - 根据过往 messages
+   * - 调用 LLM
+   * - 返回 AIMessage
+   */
+  async function callModel(state) {
+    console.log("[CALL_AGENT] callModel invoked with state:", state);
     const prompt = ChatPromptTemplate.fromMessages([
       [
         "system",
-        `You are a helpful AI assistant specializing in database interaction collaboration, working alongside other assistants. Use the provided \`writeDatabase\` and \`readDatabase\` tools to maintain continuous dialogue with the database: focus on generating tags for posts and updating these tags into the database to advance the task. If you cannot fully complete the task (e.g., failing to read existing post data from the database or encountering issues with tag update), that's OK—another assistant with different tool access or capabilities will take over from where you left off. Execute all operations you can (such as querying post content via \`readDatabase\` to draft tags, or initiating tag updates via \`writeDatabase\`) to make progress. If you or any of the other assistants have successfully generated post tags and completed the update to the database (i.e., achieved the final deliverable), prefix your response with **FINAL ANSWER** so the entire team knows to stop the workflow. You have access to the following tools: \`writeDatabase\`, \`readDatabase\`.\nYour core task is to maintain continuous dialogue with the database, specifically responsible for generating tags for posts and updating the generated tags into the database; during collaboration, prioritize using the provided tools to execute task steps and coordinate with other assistants to ensure task progression. \nCurrent time: {time}.`,
+        `You are a helpful AI assistant specializing in database interaction collaboration, working alongside other assistants. Use the provided \writeDatabase\ and \readDatabase\ tools to maintain continuous dialogue with the database: focus on generating tags for posts and updating these tags into the database to advance the task. If you cannot fully complete the task (e.g., failing to read existing post data from the database or encountering issues with tag update), that's OK—another assistant with different tool access or capabilities will take over from where you left off. Execute all operations you can (such as querying post content via \readDatabase\ to draft tags, or initiating tag updates via \writeDatabase\) to make progress. If you or any of the other assistants have successfully generated post tags and completed the update to the database (i.e., achieved the final deliverable), prefix your response with **FINAL ANSWER** so the entire team knows to stop the workflow. You have access to the following tools: \writeDatabase\, \readDatabase\.\nYour core task is to maintain continuous dialogue with the database, specifically responsible for generating tags for posts and updating the generated tags into the database; during collaboration, prioritize using the provided tools to execute task steps and coordinate with other assistants to ensure task progression. \nCurrent time: {time}.`,
       ],
       new MessagesPlaceholder("messages"),
     ]);
 
-    const formattedPrompt = await prompt.formatMessages({
-      system_message: "You are helpful Database Chatbot Agent.",
-      time: new Date().toISOString(),
-      tool_names: tools.map((tool) => tool.name).join(", "),
+    // 格式化 prompt
+    const formatted = await prompt.formatMessages({
       messages: state.messages,
+      time: new Date().toISOString(), // Pass the current timestamp as the `time` variable
     });
 
-    const result = await model.invoke(formattedPrompt);
+    console.log("[CALL_AGENT] Formatted prompt:", formatted);
 
-    return { messages: [result] };
+    // 调用 LLM
+    const aiMsg = await model.invoke(formatted);
+
+    console.log("[CALL_AGENT] AIMessage received:", aiMsg);
+    return { messages: [aiMsg] };
   }
 
-  // Define a new graph
+  /**
+   * 7️⃣ Router —— 判断下一步去 agent 还是 tools
+   */
+  function shouldContinue(state) {
+    console.log("[CALL_AGENT] shouldContinue invoked with state:", state);
+    const msgs = state.messages;
+    const last = msgs[msgs.length - 1];
+
+    // 如果 LLM 要调用工具，则跳到 tools 节点
+    if (last.tool_calls?.length) {
+      console.log("[CALL_AGENT] Routing to tools");
+      return "tools";
+    }
+
+    // 否则终止工作流
+    console.log("[CALL_AGENT] Workflow complete");
+    return "__end__";
+  }
+
+  /**
+   * 8️⃣ 创建完整 StateGraph
+   */
+  console.log("[CALL_AGENT] Creating StateGraph workflow");
   const workflow = new StateGraph(GraphState)
-    .addNode("agent", callModel)
-    .addNode("tools", toolNode.asRunnable ? toolNode.asRunnable() : toolNode.runnable)
-    .addEdge("__start__", "agent")
-    .addConditionalEdges("agent", shouldContinue)
-    .addEdge("tools", "agent");
+    .addNode("agent", callModel) // LLM node
+    .addNode("tools", toolNode)  // 工具节点
+    .addEdge("__start__", "agent") // 启动
+    .addConditionalEdges("agent", shouldContinue) // router
+    .addEdge("tools", "agent"); // 工具结束后回去继续 agent
 
-  // Initialize the MongoDB memory to persist state between graph runs
-  const checkpointer = new MongoDBSaver({ client, dbName });
+  /**
+   * 9️⃣ 编译 graph（必须要有）
+   */
+  console.log("[CALL_AGENT] Compiling workflow");
+  const app = workflow.compile();
 
-  // This compiles it into a LangChain Runnable.
-  // Note that we're passing the memory when compiling the graph
-  const app = workflow.compile({ checkpointer });
-
-  // Use the Runnable
+  /**
+   * 🔟 执行 agent → 返回结果
+   */
+  console.log("[CALL_AGENT] Invoking workflow with query:", query);
   const finalState = await app.invoke(
     {
       messages: [new HumanMessage(query)],
+      timetime: new Date().toISOString(),
     },
-    { recursionLimit: 15, configurable: { thread_id: thread_id } }
+    {
+      recursionLimit: 20,
+      configurable: { thread_id },
+    }
   );
 
-  // console.log(JSON.stringify(finalState.messages, null, 2));
-  console.log(finalState.messages[finalState.messages.length - 1].content);
+  console.log("[CALL_AGENT] Final state:", finalState);
+  const output = finalState.messages[finalState.messages.length - 1].content;
 
-  return finalState.messages[finalState.messages.length - 1].content;
+  console.log("[AGENT OUTPUT]", output);
+  return output;
 }
 
 module.exports = { callAgent };

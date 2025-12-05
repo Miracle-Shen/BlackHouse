@@ -22,6 +22,8 @@ async function startServer() {
     app.post('/chat', async (req, res) => {
       const initialMessage = req.body.message;
       const threadId = Date.now().toString(); // Simple thread ID generation
+
+      console.log('initialMessage', initialMessage);
       try {
         const response = await callAgent(client, initialMessage, threadId);
         res.json({ threadId, response });
