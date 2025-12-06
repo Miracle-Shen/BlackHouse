@@ -1,47 +1,66 @@
-import { Outlet, useNavigate } from "react-router-dom"
-import { useState } from "react"
+import { Outlet, useNavigate } from "react-router-dom";
+import { useState } from "react";
 
 const Layout = () => {
-    const navigate = useNavigate()
-    const [activeTab, setActiveTab] = useState('home')
+  const navigate = useNavigate();
+  const [activeTab, setActiveTab] = useState("home");
 
-    const handleTabClick = (tab: string, path: string) => {
-        setActiveTab(tab)
-        navigate(path)
-    }
+  const handleTabClick = (tab: string, path: string) => {
+    setActiveTab(tab);
+    navigate(path);
+  };
 
-    return (
-        <div className="min-h-screen pb-16">
-            <main>
-                <Outlet /> 
-            </main>
-            
-            <nav className="fixed bottom-0 left-0 right-0 bg-white border-t p-1">
-                <div className="flex justify-around max-w-md mx-auto">
-                    <button
-                        onClick={() => handleTabClick('home', '/')}
-                        className={`w-24 p-2 text-sm ${activeTab === 'home' ? 'text-red-600' : 'text-black'}`}
-                    >
-                        首页
-                    </button>
-                    
-                    <button
-                        onClick={() => handleTabClick('edit', '/edit')}
-                        className={`w-24 p-2 text-sm ${activeTab === 'edit' ? 'text-red-600' : 'text-black'}`}
-                    >
-                        +
-                    </button>
-                    
-                    <button
-                        onClick={() => handleTabClick('mine', '/mine')}
-                        className={`w-24 p-2 text-sm ${activeTab === 'mine' ? 'text-red-600' : 'text-black'}`}
-                    >
-                        我的
-                    </button>
-                </div>
-            </nav>
+  return (
+    <div className="min-h-screen to-slate-100 pb-16">
+      <main className="mx-auto w-full max-w-3xl px-4 pt-2 pb-20">
+        <Outlet />
+      </main>
+
+      {/* 底部导航 */}
+      <nav className="fixed inset-x-0 bottom-0 z-40">
+        <div className="mx-auto mb-2 w-full max-w-md px-3">
+          <div className="flex items-center justify-around rounded-2xl border border-slate-200 px-2 py-1.5 shadow-[0_8px_30px_rgba(15,23,42,0.12)] backdrop-blur-sm">
+            {/* 首页 */}
+            <button
+              onClick={() => handleTabClick("home", "/")}
+              className={`flex  text-white flex-1 flex-col items-center justify-center rounded-2xl px-3 py-1.5 text-[11px] font-medium transition ${
+                activeTab === "home"
+                  ? "bg-slate-900"
+                  : "bg-slate-500 "
+              }`}
+            >
+              <span className="leading-none">首页</span>
+            </button>
+
+            {/* 发布 */}
+            <button
+              onClick={() => handleTabClick("edit", "/edit")}
+              className={`-mt-6 text-white flex h-12 w-12 items-center justify-center rounded-full border-4 border-slate-50 text-xl font-bold shadow-lg transition ${
+                activeTab === "edit"
+                  ? "bg-blue-500 "
+                  : "bg-slate-900 "
+              }`}
+              aria-label="发布"
+            >
+              +
+            </button>
+
+            {/* 我的 */}
+            <button
+              onClick={() => handleTabClick("mine", "/mine")}
+              className={`flex text-white flex-1 flex-col items-center justify-center rounded-2xl px-3 py-1.5 text-[11px] font-medium transition ${
+                activeTab === "mine"
+                  ? "bg-slate-900 "
+                  : "bg-slate-500"
+              }`}
+            >
+              <span className="leading-none">我的</span>
+            </button>
+          </div>
         </div>
-    )
-}
+      </nav>
+    </div>
+  );
+};
 
-export default Layout
+export default Layout;

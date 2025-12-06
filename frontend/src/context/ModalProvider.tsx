@@ -1,12 +1,12 @@
 // src/context/ModalProvider.tsx
-import React, { createContext, useContext, useState} from "react";
+import React, { createContext, useContext, useState } from "react";
 import type { ReactNode } from "react";
+
 type ConfirmModalOptions = {
   title?: string;
   description?: string;
   confirmText?: string;
   cancelText?: string;
-  // 额外支持一个自定义图标节点
   icon?: ReactNode;
   onConfirm?: () => void;
   onCancel?: () => void;
@@ -27,13 +27,13 @@ export const useGlobalModal = () => {
   return ctx;
 };
 
-export const ModalProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
+export const ModalProvider: React.FC<{ children: ReactNode }> = ({
+  children,
+}) => {
   const [isOpen, setIsOpen] = useState(false);
   const [options, setOptions] = useState<ConfirmModalOptions>({});
 
-  const close = () => {
-    setIsOpen(false);
-  };
+  const close = () => setIsOpen(false);
 
   const showConfirm = (opts: ConfirmModalOptions) => {
     setOptions(opts);
@@ -54,34 +54,42 @@ export const ModalProvider: React.FC<{ children: ReactNode }> = ({ children }) =
     <ModalContext.Provider value={{ showConfirm, close }}>
       {children}
 
-      {/* 全局弹窗挂在最外层 */}
       {isOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
-          <div className="bg-white rounded-xl shadow-xl max-w-md w-full p-6 transform transition-all">
-            <div className="text-center mb-6">
-              <div className="w-16 h-16 bg-amber-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                {/* 默认图标，支持被自定义覆盖 */}
-                {options.icon ?? <img src="/icons/loader.svg" alt="提示" />}
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 px-4">
+          <div className="w-full max-w-sm rounded-2xl bg-white p-5 shadow-xl ring-1 ring-slate-100 sm:p-6">
+            {/* 图标 + 文案 */}
+            <div className="mb-5 text-center">
+              <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-full bg-amber-50">
+                {options.icon ?? (
+                  <img
+                    src="/icons/loader.svg"
+                    alt="提示"
+                    className="h-7 w-7"
+                  />
+                )}
               </div>
 
-              <h3 className="text-lg font-semibold text-gray-900">
+              <h3 className="text-base font-semibold text-slate-900 sm:text-lg">
                 {options.title ?? "提示"}
               </h3>
               {options.description && (
-                <p className="text-gray-500 mt-2">{options.description}</p>
+                <p className="mt-2 text-xs leading-relaxed text-slate-500 sm:text-sm">
+                  {options.description}
+                </p>
               )}
             </div>
 
-            <div className="flex gap-3">
+            {/* 按钮区域：小屏竖排，大屏横排 */}
+            <div className="flex flex-col gap-2 sm:flex-row">
               <button
                 onClick={handleCancel}
-                className="flex-1 px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 transition-colors"
+                className="h-9 flex-1 rounded-full border border-slate-200 text-sm font-medium text-slate-700 transition hover:bg-slate-50"
               >
                 {options.cancelText ?? "取消"}
               </button>
               <button
                 onClick={handleConfirm}
-                className="flex-1 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+                className="h-9 flex-1 rounded-full bg-blue-600 text-sm font-medium text-white transition hover:bg-blue-700"
               >
                 {options.confirmText ?? "确定"}
               </button>

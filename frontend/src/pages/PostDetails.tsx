@@ -1,4 +1,4 @@
-import { useParams,  useNavigate } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import {
   useGetPostById,
@@ -12,175 +12,211 @@ import { useGlobalModal } from "@/context/ModalProvider";
 const PostDetails = () => {
   const navigate = useNavigate();
   const { id } = useParams();
+
   const userInfoStr = localStorage.getItem("user");
-  const userInfo = userInfoStr ? JSON.parse(userInfoStr) : null; 
-  const userId = userInfo.$id;
-  const { data: post } = useGetPostById(id);
-  const { mutate: deletePost ,isPending: isDelete } = useDeletePost();
- const [activeTag, setActiveTag] = useState<string | null>(null);
-  const creatID = post?.creator ? (typeof post.creator === 'object' && post.creator !== null && '$id' in post.creator ? post.creator.$id : post.creator) : '';
+  const userInfo = userInfoStr ? JSON.parse(userInfoStr) : null;
+  const userId = userInfo?.$id || "";
+
+  const { data: post, isLoading } = useGetPostById(id);
+  const { mutate: deletePost, isPending: isDelete } = useDeletePost();
+  const [activeTag, setActiveTag] = useState<string | null>(null);
   const { showConfirm } = useGlobalModal();
+
+  const creatID = post?.creator
+    ? typeof post.creator === "object" &&
+      post.creator !== null &&
+      "$id" in post.creator
+      ? (post.creator as any).$id
+      : (post.creator as any)
+    : "";
+
   const handleTagClick = (tag: string) => {
     setActiveTag(tag);
-    
+
     showConfirm({
       title: "去发布！",
-      description: "你可以基于这个标签创建一个新的帖子",
-      cancelText: "取消",       
-      confirmText: "去发布",      
-      onCancel: () => {
-      },
+      description: "你可以基于这个标签创建一个新的帖子。",
+      cancelText: "取消",
+      confirmText: "去发布",
+      onCancel: () => {},
       onConfirm: () => {
-        // 确认时跳转到发布页面（可以带上 tag 信息做重定向）
         navigate(`/edit?tag=${tag}`);
       },
     });
   };
 
   const handleDeletePost = () => {
-     showConfirm({
+    showConfirm({
       title: "确定删除该帖子吗？",
       description: "删除后将无法恢复，请谨慎操作。",
-      cancelText: "取消",         
-      confirmText: "删除",       
-      onCancel: () => {
-      },
+      cancelText: "取消",
+      confirmText: "删除",
+      onCancel: () => {},
       onConfirm: () => {
         deletePost({ postId: id, imageId: post?.imageId });
-        navigate('/');
+        navigate("/");
       },
     });
-
   };
-   return (
-    <div className="post_details-container mx-auto w-full max-w-5xl px-4 pb-10 pt-4 md:px-6 lg:px-8">
-      {/* 顶部操作栏：返回 + 编辑 / 删除 */}
-      <div className="flex w-full items-center justify-between gap-3">
-        <Button
-          onClick={() => navigate(`/`)}
-          variant="ghost"
-          className="shad-button_ghost flex items-center gap-2 px-0"
-        >
-          <img src={"/icons/back.svg"} alt="back" width={22} height={22} />
-          <p className="small-medium lg:base-medium">返回</p>
-        </Button>
 
-        {userId === creatID && (
-          <div className="flex items-center gap-2">
-            <Button
-              onClick={() => navigate(`/edit/${post?.$id}`)}
-              variant="ghost"
-              className="shad-button_ghost flex items-center gap-1 px-2 py-1 md:px-3"
-            >
-              <img src={"/icons/edit.svg"} alt="edit" width={18} height={18} />
-              <p className="small-medium hidden xs:block lg:base-medium">
-                修改
-              </p>
-            </Button>
-
-            <Button
-              onClick={handleDeletePost}
-              variant="ghost"
-              disabled={isDelete}
-              className="shad-button_ghost flex items-center gap-1 px-2 py-1 md:px-3"
-            >
-              {isDelete ? (
-                <Loader className="w-4 h-4 animate-spin" />
-              ) : (
-                <img
-                  src={"/icons/delete.svg"}
-                  alt="delete"
-                  width={18}
-                  height={18}
-                />
-              )}
-              <p className="small-medium hidden xs:block lg:base-medium">
-                删除
-              </p>
-            </Button>
-          </div>
-        )}
-      </div>
-
-      {/* 主体卡片：移动端纵向，平板以上左右布局 */}
-      <div className="post_details-card mt-4 flex w-full flex-col gap-4 rounded-2xl bg-dark-2/80 p-3 shadow-lg md:mt-6 md:flex-row md:p-4 lg:p-6">
-        {/* 图片区域：移动端全宽，上下布局；大屏左侧 */}
-        <div className="w-full md:w-1/2">
-          <img
-            src={post?.imageUrl || "./icons/profile-placeholder.svg"}
-            alt="imageUrl"
-            className="post_details-img h-auto w-full max-h-[70vh] rounded-xl object-cover md:max-h-[65vh]"
-          />
+  // 加一个加载态，移动端全屏居中
+  if (isLoading || !post) {
+    return (
+      <div className="flex min-h-screen w-full items-center justify-center bg-gradient-to-b from-slate-50 to-slate-100">
+        <div className="flex flex-col items-center gap-3 rounded-2xl bg-white/80 px-4 py-3 shadow-sm">
+          <Loader className="h-5 w-5 animate-spin text-slate-500" />
+          <p className="text-xs text-slate-500">正在加载内容...</p>
         </div>
+      </div>
+    );
+  }
 
-        {/* 信息区域：标题、作者、时间、内容、tag */}
-        <div className="post_details-info flex w-full flex-1 flex-col gap-4 md:w-1/2 md:pl-2 lg:pl-4">
-          {/* 作者 + 时间 */}
-          <div className="flex-between w-full">
+  return (
+    <div className="min-h-screen bg-gradient-to-b from-slate-50 to-slate-100">
+      <div className="mx-auto w-full max-w-3xl px-4 pb-10 pt-4 sm:pt-6">
+        {/* 顶部操作栏：返回 + 编辑 / 删除 */}
+        <header className="flex items-center justify-between gap-3">
+          <button
+            onClick={() => navigate('/')}
+            className="inline-flex items-center gap-1 rounded-full border border-transparent px-2 py-1 text-xs text-slate-500 hover:border-slate-200 hover:bg-white hover:text-slate-700"
+          >
+            <img src={"/icons/back.svg"} alt="back" width={18} height={18} />
+            <span>返回</span>
+          </button>
+
+          {userId === creatID && (
+            <div className="flex items-center gap-1.5 sm:gap-2">
+              <Button
+                onClick={() => navigate(`/edit/${post.$id}`)}
+                variant="ghost"
+                className="flex items-center gap-1 rounded-full px-2 py-1 text-xs text-slate-600 hover:bg-white sm:px-3"
+              >
+                <img src={"/icons/edit.svg"} alt="edit" width={16} height={16} />
+                <span className="hidden xs:inline">修改</span>
+              </Button>
+
+              <Button
+                onClick={handleDeletePost}
+                variant="ghost"
+                disabled={isDelete}
+                className="flex items-center gap-1 rounded-full px-2 py-1 text-xs text-red-500 hover:bg-white sm:px-3"
+              >
+                {isDelete ? (
+                  <Loader className="h-4 w-4 animate-spin" />
+                ) : (
+                  <img
+                    src={"/icons/delete.svg"}
+                    alt="delete"
+                    width={16}
+                    height={16}
+                  />
+                )}
+                <span className="hidden xs:inline">删除</span>
+              </Button>
+            </div>
+          )}
+        </header>
+
+        {/* 主体卡片 */}
+        <section className="mt-4 rounded-2xl bg-white p-3 shadow-sm ring-1 ring-slate-100 sm:mt-6 sm:p-5">
+          {/* 标题 + 简要信息 */}
+          <div className="mb-3 flex flex-col gap-2 sm:mb-4">
             <div className="flex items-center gap-3">
-              <img
-                src={
-                  (post?.creator as any)?.avatarUrl ||
-                  "/icons/profile-placeholder.svg"
-                }
-                alt="creator"
-                className="h-10 w-10 rounded-full object-cover lg:h-12 lg:w-12"
-              />
-              <div className="flex flex-col gap-1">
-                <p className="base-medium lg:body-bold text-light-1">
-                  {(post?.creator as any)?.userName}
-                </p>
-                <div className="flex-center gap-2 text-light-3">
-                  <p className="subtle-semibold lg:small-regular">
-                    {multiFormatDateString(post?.$createdAt)}
-                  </p>
+              <div className="flex items-center gap-2">
+                <img
+                  src={
+                    (post.creator as any)?.avatarUrl ||
+                    "/icons/profile-placeholder.svg"
+                  }
+                  alt="creator"
+                  className="h-9 w-9 rounded-full object-cover sm:h-10 sm:w-10"
+                />
+                <div className="flex flex-col">
+                  <span className="text-xs font-medium text-slate-800 sm:text-sm">
+                    {(post.creator as any)?.userName || "匿名用户"}
+                  </span>
+                  <span className="text-[11px] text-slate-400">
+                    {multiFormatDateString(post.$createdAt)}
+                  </span>
                 </div>
               </div>
             </div>
           </div>
 
-          {/* 标题 */}
-          <p className="text-base font-semibold text-light-1 md:text-lg lg:text-xl mt-2">
-            {post?.title}
-          </p>
+          {/* 图片 + 文本区域：移动端上下，平板开始左右 */}
+          <div className="grid gap-4 sm:gap-5 md:grid-cols-[minmax(0,1.1fr)_minmax(0,1fr)] md:items-start">
+            {/* 图片区域 */}
+            <div className="relative overflow-hidden rounded-2xl bg-slate-100">
+              <img
+                src={post.imageUrl || "./icons/profile-placeholder.svg"}
+                alt="post-image"
+                className="h-full w-full max-h-[70vh] object-cover"
+              />
+            </div>
 
-          <hr className="border border-primary-50" />
+            {/* 文本 + 标签区域 */}
+            <div className="flex flex-col gap-3 md:gap-4">
+              <h1 className="text-base font-semibold text-slate-900 sm:text-lg">
+                {post.title}
+              </h1>
+              <div className="rounded-2xl bg-slate-50/80 px-3 py-3 sm:px-4 sm:py-4">
+                <p className="text-sm leading-relaxed text-slate-800 whitespace-pre-wrap">
+                  {post.caption}
+                </p>
+              </div>
 
-          {/* 文本 + 标签 */}
-          <div className="flex w-full flex-1 flex-col gap-3 small-regular md:small-medium lg:base-regular">
-            <p className="leading-relaxed text-light-2">{post?.caption}</p>
-
-            {post?.tags && post.tags.length > 0 && (
-              <ul className="mt-2 flex flex-wrap gap-2">
-                {post.tags.map((tag: string, index: number) => {
-                  const isActive = activeTag === tag;
-                  return (
-                    <button
-                      type="button"
-                      key={`${tag}-${index}`}
-                      onClick={() => handleTagClick(tag)}
-                      className={`tag-chip ${
-                        isActive ? "tag-chip--active" : ""
-                      }`}
-                    >
-                      #{tag}
-                    </button>
-                  );
-                })}
-              </ul>
-            )}
+              {post.tags && post.tags.length > 0 && (
+                <div className="mt-1">
+                  <p className="mb-2 text-xs font-medium text-slate-500">
+                    相关标签
+                  </p>
+                  <ul className="flex flex-wrap gap-2">
+                    {post.tags.map((tag: string, index: number) => {
+                      const isActive = activeTag === tag;
+                      return (
+                        <button
+                          type="button"
+                          key={`${tag}-${index}`}
+                          onClick={() => handleTagClick(tag)}
+                          className={[
+                            "inline-flex items-center rounded-full border px-3 py-1 text-xs",
+                            "transition-colors",
+                            isActive
+                              ? "border-blue-500 bg-blue-50 text-blue-600"
+                              : "border-slate-200 bg-white text-slate-600 hover:border-slate-300 hover:bg-slate-50",
+                          ].join(" ")}
+                        >
+                          #{tag}
+                        </button>
+                      );
+                    })}
+                  </ul>
+                  <p className="mt-1 text-[11px] text-slate-400">
+                    点击标签，可以用相同话题快速发一条新内容。
+                  </p>
+                </div>
+              )}
+            </div>
           </div>
-        </div>
-      </div>
+        </section>
 
-      {/* 推荐区域 */}
-      <div className="mt-8 w-full max-w-5xl">
-        <hr className="border border-dark-4/80" />
-        <h3 className="body-bold md:h3-bold my-6 w-full text-light-1">
-          更多推荐
-        </h3>
-        {/* 相关内容列表 */}
-        {/* <GridPostList posts={relatedPosts} /> */}
+        {/* 推荐区域 */}
+        <section className="mt-8 w-full">
+          <hr className="border-slate-200" />
+          <div className="mt-6 flex items-center justify-between">
+            <h3 className="text-sm font-semibold text-slate-900 sm:text-base">
+              更多推荐
+            </h3>
+            <span className="text-[11px] text-slate-400">
+              根据你当前浏览内容推荐
+            </span>
+          </div>
+          {/* 这里放你的推荐列表组件，比如： */}
+          {/* <GridPostList posts={relatedPosts} /> */}
+          <div className="mt-3 rounded-2xl border border-dashed border-slate-200 bg-slate-50/70 px-4 py-6 text-center text-[12px] text-slate-400">
+            推荐列表区域预留，你可以在这里渲染相关帖子卡片。
+          </div>
+        </section>
       </div>
     </div>
   );

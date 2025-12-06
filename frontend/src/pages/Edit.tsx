@@ -4,13 +4,14 @@ import { useGetPostById } from "@/lib/react-query/queries";
 import Loader from "@/components/common/Loader";
 import { Link, useParams, useSearchParams } from "react-router-dom";
 import type { INewPost } from "@/types";
+import axios from "@/api/axios";
 
 const EditPage = () => {
   const { id } = useParams();
   const [searchParams] = useSearchParams();
   const tag = searchParams.get("tag") || "";
 
-  // ===== 原来用于获取 post 的逻辑（保持你的结构） =====
+  // ===== 获取 post 的逻辑 =====
   let post: INewPost | undefined;
   let isLoad = false;
   if (id) {
@@ -31,12 +32,10 @@ const EditPage = () => {
   const userInfo = userInfoStr ? JSON.parse(userInfoStr) : null;
   const creatorId = userInfo?.$id || "";
 
-  // ===== 新增：AI 相关状态 =====
-  const [aiLoading, setAiLoading] = useState(false);        // 是否正在向模型请求
-  const [aiFullContent, setAiFullContent] = useState("");   // 模型完整返回的内容
-  const [aiTypingContent, setAiTypingContent] = useState(""); // 打字机展示内容
-  const [showAiConfirm, setShowAiConfirm] = useState(false);  // 是否展示“接受推荐内容？”弹窗
-  const [aiAcceptedCaption, setAiAcceptedCaption] = useState<string | undefined>(undefined); // 用户确认后真正用于表单的 caption
+  // ===== AI 相关状态 =====
+  const [aiLoading, setAiLoading] = useState(false);
+  const [aiTypingContent, setAiTypingContent] = useState("");
+  const [showAiConfirm, setShowAiConfirm] = useState(false);
 
   const typingTimerRef = useRef<number | null>(null);
 
@@ -49,20 +48,21 @@ const EditPage = () => {
     let index = 0;
     const timer = window.setInterval(() => {
       index += 1;
-      setAiTypingContent(text.slice(0, index));
+      const current = text.slice(0, index);
+      setAiTypingContent(current);
+
       if (index >= text.length) {
         window.clearInterval(timer);
         typingTimerRef.current = null;
         setAiLoading(false);
         setShowAiConfirm(true);
       }
-    }, 30); // 30ms 一个字符
+    }, 30);
     typingTimerRef.current = timer;
   };
 
   // 当 URL 中存在 ?tag=xxx 时，进入页面自动请求模型
   useEffect(() => {
-    // 没 tag 就不调模型
     if (!tag) return;
 
     let cancelled = false;
@@ -70,22 +70,20 @@ const EditPage = () => {
     const fetchContent = async () => {
       try {
         setAiLoading(true);
-        setAiFullContent("");
         setAiTypingContent("");
         setShowAiConfirm(false);
-        setAiAcceptedCaption(undefined);
 
-        const resp = await fetch("/chat", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ tag }),
-        });
+        const resp = await axios.post<{
+          ok: boolean;
+          data: { content: string };
+          error?: { message: string };
+        }>("/chat", { tag });
 
-        if (!resp.ok) {
+        if (!resp.data.ok) {
           throw new Error("network error");
         }
 
-        const data = await resp.json();
+        const data = resp.data;
         if (!data.ok) {
           throw new Error(data.error?.message || "model error");
         }
@@ -93,8 +91,6 @@ const EditPage = () => {
         const text: string = data.data.content;
         if (cancelled) return;
 
-        setAiFullContent(text);
-        // 非流式：拿到完整文本后再本地打字机
         startTyping(text);
       } catch (e) {
         console.error("[EditPage AI]", e);
@@ -114,44 +110,21 @@ const EditPage = () => {
     };
   }, [tag]);
 
-  // 用户点击“接受推荐内容”
   const handleAcceptAi = () => {
-    setAiAcceptedCaption(aiFullContent);
     setShowAiConfirm(false);
-  };
-
-  // 用户点击“重新自己写”
-  const handleRejectAi = () => {
-    setAiAcceptedCaption(undefined);
-    setShowAiConfirm(false);
-    setAiFullContent("");
     setAiTypingContent("");
   };
 
-  // 把 AI 生成的 caption 合并进传给 PostForm 的 post 对象
-  // - 有 id（编辑）：覆盖原 caption
-  // - 无 id（创建）：构造一个仅有 caption 的对象也可以，PostForm 内部如果只按需取字段就不会报错
-  let finalPost: INewPost | undefined = post;
-  if (aiAcceptedCaption) {
-    if (post) {
-      finalPost = { ...post, caption: aiAcceptedCaption };
-    } else {
-      finalPost = {
-        $id: "",
-        title: "",
-        creator: undefined,
-        imageUrl: "",
-        imageId: "",
-        caption: aiAcceptedCaption,
-        tags: [],
-      };
-    }
-  }
+  const handleRejectAi = () => {
+    setShowAiConfirm(false);
+    setAiTypingContent("");
+  };
 
-  // ===== 原来的 loading 判断（保持不动） =====
+  const aiCaptionForForm = aiTypingContent || undefined;
+
   if (isLoad && id)
     return (
-      <div className="flex-center w-full h-full">
+      <div className="flex h-screen w-full items-center justify-center bg-slate-50">
         <Loader />
       </div>
     );
@@ -159,93 +132,108 @@ const EditPage = () => {
   return (
     <>
       {creatorId ? (
-        <>
-          <div className="bg-gray-50 flex">
-            <div className="common-container relative">
-              {/* 顶部标题区域：保持原结构 */}
-              <div className="flex max-w-5xl justify-center items-center gap-3">
-                <img
-                  src="/icons/gallery-add.svg"
-                  width={36}
-                  height={36}
-                  alt="add"
-                />
-                <h2 className="h3-bold md:h2-bold">
-                  {id ? "编辑 Post" : "创建 Post"}
-                </h2>
+        <div className="min-h-screen bg-gradient-to-b from-slate-50 to-slate-100">
+          <div className="mx-auto flex w-full max-w-2xl flex-col px-4 pb-8 pt-4 sm:pt-8">
+            {/* 顶部栏：返回 + 标题 */}
+            <header className="mb-4 flex items-center justify-between gap-3">
+              <Link
+                to={-1 as unknown as string}
+                className="rounded-full border border-transparent px-3 py-1 text-sm text-slate-500 hover:border-slate-200 hover:bg-white hover:text-slate-700"
+              >
+                ← 返回
+              </Link>
+
+              <span className="text-[11px] tracking-wide text-slate-400">
+                {id ? "编辑内容" : "发布新内容"}
+              </span>
+            </header>
+
+            {/* 卡片主体 */}
+            <section className="rounded-2xl bg-white px-4 py-5 shadow-sm ring-1 ring-slate-100 sm:px-6 sm:py-6">
+              <div className="mb-4 flex items-center gap-3">
+                <div className="flex h-10 w-10 items-center justify-center rounded-full bg-slate-100">
+                  <img
+                    src="/icons/gallery-add.svg"
+                    width={22}
+                    height={22}
+                    alt="add"
+                  />
+                </div>
+                <div className="flex flex-col">
+                  <h2 className="text-lg font-semibold text-slate-900">
+                    {id ? "编辑 Post" : "创建 Post"}
+                  </h2>
+                  <p className="mt-0.5 text-xs text-slate-500">
+                    {tag
+                      ? `当前话题 #${tag}，试着用一段文字记录你的想法吧。`
+                      : "简单几步，分享你的图片和文字。"}
+                  </p>
+                </div>
               </div>
 
-              {/* 如果有 tag，显示一下当前话题提示 */}
-              {tag && (
-                <div className="mt-3 text-sm text-gray-600 text-center">
-                  当前基于话题 <span className="font-semibold text-blue-500">#{tag}</span> 生成推荐内容
-                </div>
-              )}
-
-              {/* 遮罩蒙层：AI 正在生成时 */}
-              {aiLoading && tag && (
-                <div className="fixed inset-0 z-30 flex items-center justify-center bg-black/40">
-                  <div className="bg-white rounded-lg px-6 py-4 shadow-md">
-                    <p className="text-gray-700 text-sm">
-                      正在为你根据话题 <span className="font-semibold text-blue-500">#{tag}</span> 生成推荐内容…
-                    </p>
-                  </div>
-                </div>
-              )}
-
-              {/* 打字机预览区域 */}
-              {aiTypingContent && tag && (
-                <div className="mt-6 max-w-5xl mx-auto bg-white rounded-lg shadow-sm p-4 border border-gray-200">
-                  <div className="text-xs text-gray-500 mb-2">
-                    AI 推荐内容预览（可稍后选择是否填入表单）
-                  </div>
-                  <pre className="whitespace-pre-wrap text-sm leading-relaxed">
-                    {aiTypingContent}
-                    {aiLoading && <span className="animate-pulse">▍</span>}
-                  </pre>
-                </div>
-              )}
-
-              {/* 原来的 PostForm：只是在这里把 post 换成 finalPost */}
+              {/* 表单主体 */}
               <PostForm
                 action={id ? "Update" : "Create"}
-                post={finalPost ? finalPost : undefined}
+                post={post}
                 creatorId={creatorId}
+                aiCaption={aiCaptionForForm}
               />
-            </div>
+            </section>
           </div>
 
-          {/* 模型输出完毕后的确认弹窗 */}
-          {showAiConfirm && tag && (
-            <div className="fixed inset-0 z-40 flex items-center justify-center bg-black/40">
-              <div className="bg-white rounded-lg shadow-lg max-w-sm w-full p-6">
-                <h3 className="text-lg font-semibold mb-2">使用推荐内容？</h3>
-                <p className="text-sm text-gray-700 mb-4">
-                  已为你生成一段基于话题 <span className="font-semibold text-blue-500">#{tag}</span> 的推荐内容。
-                  需要将这段内容填入表单吗？
+          {/* AI 生成中的提示：更适合移动端的“底部气泡” */}
+          {aiLoading && tag && (
+            <div className="pointer-events-none fixed inset-0 z-30 flex items-end justify-center bg-black/30 sm:items-center">
+              <div className="pointer-events-auto mb-6 w-full max-w-xs rounded-2xl bg-white px-4 py-3 text-center text-sm text-slate-700 shadow-lg sm:mb-0">
+                <p className="mb-1">
+                  正在为你根据话题{" "}
+                  <span className="font-semibold text-blue-500">#{tag}</span>{" "}
+                  生成推荐内容…
                 </p>
-                <div className="flex justify-end gap-3">
+                <p className="text-[11px] text-slate-400">
+                  请耐心等待几秒钟。
+                </p>
+              </div>
+            </div>
+          )}
+
+          {/* 模型输出完毕后的确认弹窗：移动端居中弹出 */}
+          {showAiConfirm && tag && (
+            <div className="fixed inset-0 z-40 flex items-center justify-center bg-black/40 px-4">
+              <div className="w-full max-w-sm rounded-2xl bg-white p-5 shadow-xl">
+                <h3 className="mb-2 text-base font-semibold text-slate-900">
+                  使用推荐内容？
+                </h3>
+                <p className="mb-4 text-sm leading-relaxed text-slate-700">
+                  已为你生成一段基于话题{" "}
+                  <span className="font-semibold text-blue-500">#{tag}</span>{" "}
+                  的推荐内容，是否保留这段文字？
+                </p>
+                <div className="flex flex-col gap-2 sm:flex-row sm:justify-end">
                   <button
                     onClick={handleRejectAi}
-                    className="px-3 py-1.5 text-sm rounded border border-gray-300 text-gray-700"
+                    className="h-9 w-full rounded-full border border-slate-200 text-sm text-slate-700 hover:bg-slate-50 sm:w-auto"
                   >
                     重新自己写
                   </button>
                   <button
                     onClick={handleAcceptAi}
-                    className="px-3 py-1.5 text-sm rounded bg-blue-500 text-white"
+                    className="h-9 w-full rounded-full bg-blue-500 text-sm font-medium text-white hover:bg-blue-600 sm:w-auto"
                   >
-                    接受并填充表单
+                    保留这段内容
                   </button>
                 </div>
               </div>
             </div>
           )}
-        </>
+        </div>
       ) : (
-        <div>
-          <p className="text-center text-blue-500">
-            <Link to="/login">点击这里登录</Link>
+        <div className="flex min-h-screen items-center justify-center bg-slate-50 px-4">
+          <p className="rounded-full bg-white px-4 py-2 text-sm text-blue-500 shadow-sm">
+            请先登录，
+            <Link to="/login" className="font-medium underline underline-offset-4">
+              点击这里
+            </Link>
           </p>
         </div>
       )}

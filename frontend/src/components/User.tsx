@@ -2,30 +2,28 @@ import { useNavigate, Link } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { useGetUserPosts } from "@/lib/react-query/queries";
 import GridPostList from "./common/GridPostList";
-
-import UpdateAvatarModal from "./common/UpdateAvatarModal"; // 引入修改头像弹窗组件
+import UpdateAvatarModal from "./common/UpdateAvatarModal";
 import axios from "@/api/axios";
-
 
 type UserProps = {
   users: any;
-  setUsers: (u: any) => void;   // 新增
+  setUsers: (u: any) => void;
   setAuth: (auth: any) => void;
 };
+
 const User = ({ users, setUsers, setAuth }: UserProps) => {
   const navigate = useNavigate();
-
-  const [isShow, setIsShow] =useState(false);
+  const [isShow, setIsShow] = useState(false);
 
   const logout = async () => {
     try {
-     await axios.post("/logout", {}, { withCredentials: true });
+      await axios.post("/logout", {}, { withCredentials: true });
     } catch (err) {
       console.error("Logout error:", err);
     } finally {
       setAuth({});
       localStorage.removeItem("user");
-      navigate("/login", { replace: true }); // 确保退出后跳转到登录页
+      navigate("/login", { replace: true });
     }
   };
 
@@ -36,54 +34,106 @@ const User = ({ users, setUsers, setAuth }: UserProps) => {
   }, [users]);
 
   const { data: userPosts } = useGetUserPosts(users.$id);
+  const posts = userPosts?.documents || [];
+
+  if (!users) {
+    return (
+      <div className="flex min-h-[60vh] flex-col items-center justify-center text-sm text-slate-500">
+        <p>未找到用户信息</p>
+        <Link
+          to="/login"
+          className="mt-3 rounded-full bg-blue-500 px-4 py-2 text-xs font-medium text-white hover:bg-blue-600"
+        >
+          返回登录页
+        </Link>
+      </div>
+    );
+  }
 
   return (
     <>
-      {users ? (
-        <div className="flex flex-col items-center gap-8 w-full max-w-2xl mx-auto p-6 bg-white rounded-xl shadow-md">
-          <section className="w-full">
-            <div className="flex flex-col items-center gap-6">
-              <div className="text-center w-full">
-                <h3 className="text-xl font-bold mb-1">{users.userName}</h3>
-              </div>
-              <button onClick={() => setIsShow(true)} className="text-blue-500 underline">
-                  <img
-                    src={users?.avatarUrl || "./icons/profile-placeholder.svg"}
-                    alt="image"
-                    className="h-24 w-24 rounded-full object-cover object-top"
-                  />
-                点击修改头像
-               {isShow && (
-              <UpdateAvatarModal
-                users={users}
-                setUsers={setUsers}
-                onClose={() => setIsShow(false)}
+      <div className="w-full max-w-2xl mx-auto flex flex-col gap-6 sm:gap-8">
+        {/* 个人信息卡片 */}
+        <section className="w-full rounded-2xl bg-white p-5 shadow-sm ring-1 ring-slate-100 sm:p-6">
+          <div className="flex flex-col items-center gap-4">
+            {/* 头像 */}
+            <div className="relative">
+              <img
+                src={users?.avatarUrl || "./icons/profile-placeholder.svg"}
+                alt="avatar"
+                className="h-24 w-24 rounded-full object-cover object-top shadow-sm sm:h-28 sm:w-28"
               />
-            )}
-
+              <button
+                onClick={() => setIsShow(true)}
+                className="mt-3 inline-flex items-center justify-center rounded-full bg-slate-100 px-3 py-1 text-xs text-slate-700 hover:bg-slate-200"
+              >
+                点击修改头像
               </button>
-              <p className="text-base text-gray-600">兴趣tag：{users.interestTags}</p>
             </div>
-          </section>
-          <section className="w-full">
-            <div className="flex flex-col items-center gap-4 bg-gray-50 rounded-lg p-4">
-              <div className="text-center w-full">
-                <h3 className="text-lg font-semibold mb-2">我的帖子</h3>
-                <GridPostList posts={userPosts?.documents || []} />
-              </div>
+
+            {/* 名称 & tag */}
+            <div className="text-center">
+              <h3 className="text-lg font-semibold text-slate-900 sm:text-xl">
+                {users.userName}
+              </h3>
+              <p className="mt-1 text-xs text-slate-500 sm:text-sm">
+                兴趣标签：
+                <span className="text-slate-700">
+                  {users.interestTags || "暂未设置"}
+                </span>
+              </p>
             </div>
-          </section>
-          <div className="w-full flex justify-center mt-4">
-            <button
-              className="px-6 py-2 bg-red-500 text-white rounded-lg shadow hover:bg-red-600 transition"
-              onClick={logout}
-            >
-              退出登录
-            </button>
           </div>
+        </section>
+
+        {/* 我的帖子 */}
+        <section className="w-full rounded-2xl bg-white p-4 shadow-sm ring-1 ring-slate-100 sm:p-5">
+          <div className="mb-3 flex items-center justify-between">
+            <h3 className="text-sm font-semibold text-slate-900 sm:text-base">
+              我的帖子
+            </h3>
+            {posts.length > 0 && (
+              <span className="text-[11px] text-slate-400">
+                共 {posts.length} 条
+              </span>
+            )}
+          </div>
+
+          {posts.length === 0 ? (
+            <div className="flex min-h-[120px] flex-col items-center justify-center rounded-xl bg-slate-50 text-xs text-slate-400">
+              <p>你还没有发布过任何帖子</p>
+              <button
+                onClick={() => navigate("/edit")}
+                className="mt-3 inline-flex h-8 items-center justify-center rounded-full bg-blue-500 px-4 text-xs font-medium text-white hover:bg-blue-600"
+              >
+                去发布一条
+              </button>
+            </div>
+          ) : (
+            <div className="w-full">
+              <GridPostList posts={posts} />
+            </div>
+          )}
+        </section>
+
+        {/* 退出登录 */}
+        <div className="w-full flex justify-center">
+          <button
+            className="inline-flex h-9 items-center justify-center rounded-full bg-red-500 px-6 text-sm font-medium text-white shadow-sm hover:bg-red-600"
+            onClick={logout}
+          >
+            退出登录
+          </button>
         </div>
-      ) : (
-        <Link to="/">返回登录页</Link>
+      </div>
+
+      {/* 修改头像弹窗 */}
+      {isShow && (
+        <UpdateAvatarModal
+          users={users}
+          setUsers={setUsers}
+          onClose={() => setIsShow(false)}
+        />
       )}
     </>
   );
