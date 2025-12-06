@@ -50,6 +50,7 @@ export type INewPost = {
   caption?: string;
   imageId?: string;
   imageUrl?: string;
+  thumbnailUrl?: string;
   file?: File[];
   tags?: string[];
   $createdAt?: string;
@@ -62,6 +63,7 @@ export type IUpdatePost = {
   caption?: string;
   imageId?: string;
   imageUrl?: string;
+  thumbnailUrl?: string;
   file: File[];
   tags?: string[];
 };

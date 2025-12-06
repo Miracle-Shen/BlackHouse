@@ -10,7 +10,6 @@ const EditPage = () => {
   const { id } = useParams();
   const [searchParams] = useSearchParams();
   const tag = searchParams.get("tag") || "";
-
   // ===== 获取 post 的逻辑 =====
   let post: INewPost | undefined;
   let isLoad = false;

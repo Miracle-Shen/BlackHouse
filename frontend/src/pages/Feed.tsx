@@ -13,7 +13,7 @@ const FeedPage = () => {
   const skeletonPosts = Array.from({ length: 4 }).map((_, i) => ({
     $id: `skeleton-${i}`,
     title: "",
-    imageUrl: "",
+    thumbnailUrl: "",
     creator: undefined,
     $createdAt: "",
   }));

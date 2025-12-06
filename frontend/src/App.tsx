@@ -6,6 +6,7 @@ import { Routes, Route } from 'react-router-dom';
 import EditPage from './pages/Edit';
 import Mine from './pages/Mine';
 import PostDetails from './pages/PostDetails';
+import ProtectedRoute from './components/common/ProtectedRoute';
 
 function App() {
   return (
@@ -16,15 +17,26 @@ function App() {
           {/* 其他页面使用布局 */}
           <Route path="/" element={<Layout />}>
             <Route index element={<FeedPage />} />
-              {/* <Route element={<PersistLogin />}> */}
-                <Route path="mine" element={<Mine />} />
-              {/* </Route> */}
+              <Route
+                path="mine"
+                element={
+                  <ProtectedRoute>
+                    <Mine />
+                  </ProtectedRoute>
+                }
+              />
+
           </Route>
-        {/* 需要登录的部分 */}
-          {/* <Route element={<PersistLogin />}> */}
-            <Route path="/edit/:id?/tag=?" element={<EditPage />} />
+          <Route
+              path="/edit/:id?/tag=?"
+              element={
+                <ProtectedRoute>
+                  <EditPage />
+                </ProtectedRoute>
+              }
+            />
             <Route path="/posts/:id" element={<PostDetails />} />
-        {/* </Route> */}
+
     </Routes>
   );
 }

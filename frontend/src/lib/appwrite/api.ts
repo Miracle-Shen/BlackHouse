@@ -5,8 +5,84 @@ import type { IUpdatePost, INewPost, IUpdateUser } from "@/types";
 // ============================================================
 // POSTS
 // ============================================================
+// ============================== GET FILE URL
+export async function createThumbnailFile(
+  file: File,
+  maxWidth = 400,
+  maxHeight = 400,
+  quality = 0.7
+): Promise<File> {
+  return new Promise((resolve, reject) => {
+    // 不是图片就直接返回原文件
+    if (!file.type.startsWith("image/")) {
+      resolve(file);
+      return;
+    }
 
+    const img = new Image();
+    const reader = new FileReader();
+
+    reader.onload = (e) => {
+      if (!e.target?.result) {
+        reject(new Error("无法读取图片数据"));
+        return;
+      }
+
+      img.onload = () => {
+        let { width, height } = img;
+
+        // 计算缩放比例，保证不超过 maxWidth / maxHeight
+        const ratio = Math.min(
+          maxWidth / width,
+          maxHeight / height,
+          1 // 不放大，只缩小
+        );
+
+        const targetWidth = width * ratio;
+        const targetHeight = height * ratio;
+
+        const canvas = document.createElement("canvas");
+        canvas.width = targetWidth;
+        canvas.height = targetHeight;
+
+        const ctx = canvas.getContext("2d");
+        if (!ctx) {
+          reject(new Error("Canvas 2D context 不可用"));
+          return;
+        }
+
+        ctx.drawImage(img, 0, 0, targetWidth, targetHeight);
+
+        // 统一导出为 jpeg（体积更小）
+        canvas.toBlob(
+          (blob) => {
+            if (!blob) {
+              reject(new Error("生成缩略图失败"));
+              return;
+            }
+
+            const thumbFile = new File([blob], `thumb_${file.name}`, {
+              type: "image/jpeg",
+              lastModified: Date.now(),
+            });
+
+            resolve(thumbFile);
+          },
+          "image/jpeg",
+          quality // 0~1，越小越省流量
+        );
+      };
+
+      img.onerror = () => reject(new Error("图片加载失败"));
+      img.src = e.target.result as string;
+    };
+
+    reader.onerror = () => reject(new Error("读取文件失败"));
+    reader.readAsDataURL(file);
+  });
+}
 // ============================== CREATE POST
+
 export async function createPost(post: INewPost) {
   try {
     // Upload file to appwrite storage
@@ -23,7 +99,12 @@ export async function createPost(post: INewPost) {
       await deleteFile(uploadedFile.$id);
       throw Error;
     }
-
+    const thumbFile = await createThumbnailFile(post?.file ? post.file[0] : new File([], ""), 400, 400, 0.7);
+    const uploadedThumb = await uploadFile(thumbFile);
+     if (!uploadedThumb) throw Error;
+    const thumbnailUrl = uploadedThumb.$id
+      ? `https://nyc.cloud.appwrite.io/v1/storage/buckets/${appwriteConfig.storageId}/files/${uploadedThumb.$id}/view?project=${appwriteConfig.projectId}&mode=admin`
+      : '';
     // Convert tags into array
     //const tags = post.tags?.replace(/ /g, "").split(",") || [];
 
@@ -38,6 +119,7 @@ export async function createPost(post: INewPost) {
         imageUrl: fileUrl,
         imageId: uploadedFile.$id,
         title: post.title,
+        thumbnailUrl: thumbnailUrl,
       }
     );
 
@@ -67,25 +149,7 @@ export async function uploadFile(file: File) {
   }
 }
 
-// ============================== GET FILE URL
-// export function getFilePreview(fileId: string) {
-//   try {
-//     const fileUrl = storage.getFilePreview(
-//       appwriteConfig.storageId,
-//       fileId,
-//       2000,
-//       2000,
-//       "top",
-//       100
-//     );
 
-//     if (!fileUrl) throw Error;
-
-//     return fileUrl;
-//   } catch (error) {
-//     console.log(error);
-//   }
-// }
 
 // ============================== DELETE FILE
 export async function deleteFile(fileId: string) {
@@ -170,6 +234,7 @@ export async function updatePost(post: IUpdatePost) {
     let image = {
       imageUrl: post.imageUrl,
       imageId: post.imageId,
+      thumbnailUrl: post.thumbnailUrl,
     };
     if (hasFileToUpdate) {
       // Upload new file to appwrite storage
@@ -183,8 +248,13 @@ export async function updatePost(post: IUpdatePost) {
         await deleteFile(uploadedFile.$id);
         throw Error;
       }
-
-      image = { ...image, imageUrl: fileUrl, imageId: uploadedFile.$id };
+      const thumbFile = await createThumbnailFile(post?.file ? post.file[0] : new File([], ""), 400, 400, 0.7);
+      const uploadedThumb = await uploadFile(thumbFile);
+      if (!uploadedThumb) throw Error;
+      const thumbnailUrl = uploadedThumb.$id
+        ? `https://nyc.cloud.appwrite.io/v1/storage/buckets/${appwriteConfig.storageId}/files/${uploadedThumb.$id}/view?project=${appwriteConfig.projectId}&mode=admin`
+        : '';
+      image = { ...image,thumbnailUrl: thumbnailUrl, imageUrl: fileUrl, imageId: uploadedFile.$id };
     }
 
     // Convert tags into arrays
@@ -202,6 +272,7 @@ export async function updatePost(post: IUpdatePost) {
       {
         creator: creatorId,
         imageUrl: image.imageUrl,
+        thumbnailUrl: image.thumbnailUrl,
         imageId: image.imageId,
         title: post.title,
         caption: post.caption,
@@ -266,7 +337,7 @@ export async function getUserPosts(userId?: string) {
   }
 }
 
-// ============================== GET POPULAR POSTS (BY HIGHEST LIKE COUNT)
+
 // type PostWithCreator = Models.Document & {
 //   creator: INewPost | undefined; // creator 可能是用户文档或 undefined
 // };
@@ -320,7 +391,7 @@ export async function getRecentPosts(): Promise<INewPost[]> {
           return {
             $id: post.$id,
             creator: user || post.creator,
-
+            thumbnailUrl: post.thumbnailUrl,
             title: post.title,
             caption: post.caption,
             imageUrl: post.imageUrl,
@@ -333,7 +404,7 @@ export async function getRecentPosts(): Promise<INewPost[]> {
           return {
             $id: post.$id,
             creator: post.creator,
-
+            thumbnailUrl: post.thumbnailUrl,
             title: post.title,
             caption: post.caption,
             imageUrl: post.imageUrl,

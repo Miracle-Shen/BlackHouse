@@ -15,7 +15,6 @@ import { Textarea } from "./ui/Textarea";
 import FileUploader from "./common/FileUploader";
 import { PostValidation } from "@/types/index";
 import { useCreatePost, useUpdatePost } from "@/lib/react-query/queries";
-import { useToast } from "@/hooks/use-toast";
 import type { INewPost, IUpdatePost } from "@/types";
 import { useGlobalModal } from "@/context/ModalProvider";
 
@@ -30,7 +29,7 @@ type PostFormProps = {
 const PostForm = ({ post, action, creatorId, aiCaption }: PostFormProps) => {
   const { showConfirm } = useGlobalModal();
   const navigate = useNavigate();
-  const { toast } = useToast();
+
 
   const form = useForm<z.infer<typeof PostValidation>>({
     resolver: zodResolver(PostValidation),
@@ -81,7 +80,6 @@ const PostForm = ({ post, action, creatorId, aiCaption }: PostFormProps) => {
         };
         const updatedPost = await updatePost(updateData);
         if (!updatedPost) {
-          toast({ title: `${action} post failed. Please try again.` });
           return;
         }
         showConfirm({
@@ -102,7 +100,6 @@ const PostForm = ({ post, action, creatorId, aiCaption }: PostFormProps) => {
       };
       const newPost = await createPost(newPostData);
       if (!newPost) {
-        toast({ title: `${action} post failed. Please try again.` });
         return;
       }
       showConfirm({
@@ -115,7 +112,6 @@ const PostForm = ({ post, action, creatorId, aiCaption }: PostFormProps) => {
       });
     } catch (error) {
       console.error("Error submitting post:", error);
-      toast({ title: "An unexpected error occurred. Please try again." });
     }
   };
 

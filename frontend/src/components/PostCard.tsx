@@ -6,7 +6,7 @@ const PostCard = ({ post }: { post: INewPost }) => {
   const creator = post.creator as IUser | undefined;
   const avatarUrl = creator?.avatarUrl || "./icons/profile-placeholder.svg";
   const userName = creator?.userName || "加载中...";
-
+  const imgUrl = post.thumbnailUrl || post.imageUrl;
   return (
     <article className="w-full max-w-screen-sm">
       <Link
@@ -16,7 +16,7 @@ const PostCard = ({ post }: { post: INewPost }) => {
         {/* 图片 */}
         <div className="relative mb-3 overflow-hidden rounded-2xl bg-slate-100">
           <img
-            src={post?.imageUrl || "./icons/posts.svg"}
+            src={imgUrl || "./icons/posts.svg"}
             alt={post.title || "post image"}
             className="h-40 w-full object-cover transition duration-300 group-hover:scale-[1.02] sm:h-52"
           />
