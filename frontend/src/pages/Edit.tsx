@@ -9,7 +9,7 @@ import axios from "@/api/axios";
 const EditPage = () => {
   const { id } = useParams();
   const [searchParams] = useSearchParams();
-  const tag = searchParams.get("tag") || "";
+  const urlTag = searchParams.get("tag") || "";
   // ===== 获取 post 的逻辑 =====
   let post: INewPost | undefined;
   let isLoad = false;
@@ -62,7 +62,7 @@ const EditPage = () => {
 
   // 当 URL 中存在 ?tag=xxx 时，进入页面自动请求模型
   useEffect(() => {
-    if (!tag) return;
+    if (!urlTag) return;
 
     let cancelled = false;
 
@@ -76,7 +76,7 @@ const EditPage = () => {
           ok: boolean;
           data: { content: string };
           error?: { message: string };
-        }>("/chat", { tag });
+        }>("/chat", { urlTag });
 
         if (!resp.data.ok) {
           throw new Error("network error");
@@ -107,7 +107,7 @@ const EditPage = () => {
         window.clearInterval(typingTimerRef.current);
       }
     };
-  }, [tag]);
+  }, [urlTag]);
 
   const handleAcceptAi = () => {
     setShowAiConfirm(false);
@@ -163,8 +163,8 @@ const EditPage = () => {
                     {id ? "编辑 Post" : "创建 Post"}
                   </h2>
                   <p className="mt-0.5 text-xs text-slate-500">
-                    {tag
-                      ? `当前话题 #${tag}，试着用一段文字记录你的想法吧。`
+                    {urlTag
+                      ? `当前话题 #${urlTag}，试着用一段文字记录你的想法吧。`
                       : "简单几步，分享你的图片和文字。"}
                   </p>
                 </div>
@@ -176,17 +176,18 @@ const EditPage = () => {
                 post={post}
                 creatorId={creatorId}
                 aiCaption={aiCaptionForForm}
+                tags={urlTag?[urlTag]:post?.tags}
               />
             </section>
           </div>
 
           {/* AI 生成中的提示：更适合移动端的“底部气泡” */}
-          {aiLoading && tag && (
+          {aiLoading && urlTag && (
             <div className="pointer-events-none fixed inset-0 z-30 flex items-end justify-center bg-black/30 sm:items-center">
               <div className="pointer-events-auto mb-6 w-full max-w-xs rounded-2xl bg-white px-4 py-3 text-center text-sm text-slate-700 shadow-lg sm:mb-0">
                 <p className="mb-1">
                   正在为你根据话题{" "}
-                  <span className="font-semibold text-blue-500">#{tag}</span>{" "}
+                  <span className="font-semibold text-blue-500">#{urlTag}</span>{" "}
                   生成推荐内容…
                 </p>
                 <p className="text-[11px] text-slate-400">
@@ -197,7 +198,7 @@ const EditPage = () => {
           )}
 
           {/* 模型输出完毕后的确认弹窗：移动端居中弹出 */}
-          {showAiConfirm && tag && (
+          {showAiConfirm && urlTag && (
             <div className="fixed inset-0 z-40 flex items-center justify-center bg-black/40 px-4">
               <div className="w-full max-w-sm rounded-2xl bg-white p-5 shadow-xl">
                 <h3 className="mb-2 text-base font-semibold text-slate-900">
@@ -205,7 +206,7 @@ const EditPage = () => {
                 </h3>
                 <p className="mb-4 text-sm leading-relaxed text-slate-700">
                   已为你生成一段基于话题{" "}
-                  <span className="font-semibold text-blue-500">#{tag}</span>{" "}
+                  <span className="font-semibold text-blue-500">#{urlTag}</span>{" "}
                   的推荐内容，是否保留这段文字？
                 </p>
                 <div className="flex flex-col gap-2 sm:flex-row sm:justify-end">

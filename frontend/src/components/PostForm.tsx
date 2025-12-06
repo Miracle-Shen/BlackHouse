@@ -22,11 +22,12 @@ type PostFormProps = {
   post?: INewPost;
   action: "Create" | "Update";
   userId?: string;
+  tags?: string[];
   creatorId: string;
   aiCaption?: string;
 };
 
-const PostForm = ({ post, action, creatorId, aiCaption }: PostFormProps) => {
+const PostForm = ({ post, action, creatorId, aiCaption,tags }: PostFormProps) => {
   const { showConfirm } = useGlobalModal();
   const navigate = useNavigate();
 
@@ -37,7 +38,7 @@ const PostForm = ({ post, action, creatorId, aiCaption }: PostFormProps) => {
       caption: post?.caption || "",
       title: post?.title || "",
       file: [],
-      tags: [],
+      tags: tags || post?.tags || [], 
       $id: post?.$id || "",
     },
   });
@@ -76,7 +77,7 @@ const PostForm = ({ post, action, creatorId, aiCaption }: PostFormProps) => {
           $id: post.$id!,
           imageId: post.imageId,
           imageUrl: post.imageUrl,
-          tags: [],
+          tags: value.tags || [],
         };
         const updatedPost = await updatePost(updateData);
         if (!updatedPost) {
@@ -96,7 +97,7 @@ const PostForm = ({ post, action, creatorId, aiCaption }: PostFormProps) => {
       const newPostData: INewPost = {
         ...value,
         creator: creatorId,
-        tags: [],
+        tags: value.tags || [],
       };
       const newPost = await createPost(newPostData);
       if (!newPost) {
@@ -168,6 +169,39 @@ const PostForm = ({ post, action, creatorId, aiCaption }: PostFormProps) => {
           />
         </div>
 
+          {/* 标签（可选） */}
+        <div className="space-y-1.5">
+          <p className="text-xs font-medium text-slate-500">
+            标签（可选）
+          </p>
+          <FormField
+            control={form.control}
+            name="tags"
+            render={({ field }) => (
+              <FormItem>
+                <FormControl>
+                  <Textarea
+                    className="shad-textarea h-8 text-sm leading-relaxed text-slate-900"
+                    value={field.value?.join(", ") ?? ""}   // 将数组显示为字符串
+                    onChange={(e) => {
+                      const raw = e.target.value;
+                      const tags = raw
+                        .split(",")
+                        .map((tag) => tag.trim())
+                        .filter(Boolean); // 过滤空字符串
+                      field.onChange(tags);
+                    }}
+                  />
+                </FormControl>
+                <FormMessage className="text-xs text-red-500" />
+              </FormItem>
+            )}
+          />
+          <p className="text-[11px] text-slate-400">
+            可以不填；若填写，请用逗号分隔多个标签。
+          </p>
+        </div>
+
         {/* 图片上传块 */}
         <div className="rounded-2xl border border-dashed border-slate-200 bg-slate-50/70 px-4 py-4">
           <p className="mb-2 text-xs font-medium text-slate-500">
@@ -193,7 +227,7 @@ const PostForm = ({ post, action, creatorId, aiCaption }: PostFormProps) => {
           </p>
         </div>
 
-        {/* 底部按钮：移动端优先布局 */}
+        {/* 底部按钮*/}
         <div className="mt-2 flex flex-col-reverse gap-3 sm:flex-row sm:justify-end">
           <button
             type="button"

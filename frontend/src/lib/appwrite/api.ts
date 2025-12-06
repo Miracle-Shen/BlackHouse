@@ -82,6 +82,20 @@ export async function createThumbnailFile(
   });
 }
 // ============================== CREATE POST
+function normalizeTags(input: string | string[] | undefined | null): string[] {
+  if (!input) return [];
+
+  // 情况 1：数组，直接清洗
+  if (Array.isArray(input)) {
+    return input.map(t => t.trim()).filter(Boolean);
+  }
+
+  // 情况 2：字符串，可能包含多个逗号（中英文）、空格
+  return input
+    .split(/,|，/)            // 用正则匹配 英文逗号 或 中文逗号
+    .map(t => t.trim())       // 去掉空格
+    .filter(Boolean);         // 过滤空值
+}
 
 export async function createPost(post: INewPost) {
   try {
@@ -106,7 +120,8 @@ export async function createPost(post: INewPost) {
       ? `https://nyc.cloud.appwrite.io/v1/storage/buckets/${appwriteConfig.storageId}/files/${uploadedThumb.$id}/view?project=${appwriteConfig.projectId}&mode=admin`
       : '';
     // Convert tags into array
-    //const tags = post.tags?.replace(/ /g, "").split(",") || [];
+    const tags = normalizeTags(post.tags);
+
 
     // Create post
     const newPost = await databases.createDocument(
@@ -120,6 +135,7 @@ export async function createPost(post: INewPost) {
         imageId: uploadedFile.$id,
         title: post.title,
         thumbnailUrl: thumbnailUrl,
+        tags: tags,
       }
     );
 
@@ -258,10 +274,7 @@ export async function updatePost(post: IUpdatePost) {
     }
 
     // Convert tags into arrays
-    // const tags = post.tags?.replace(/ /g, "").split(",") || [];
-    // console.log("tags",tags);
-    // const tags = typeof post.tags === "string" ? post.tags.replace(/ /g, "").split(",") : post.tags || [];
-    // console.log("tags", tags);
+    const tags = normalizeTags(post.tags);
 
     // Update post
    const creatorId = typeof post.creator === "object" && post.creator !== null ? post.creator.$id : post.creator;
@@ -276,6 +289,7 @@ export async function updatePost(post: IUpdatePost) {
         imageId: image.imageId,
         title: post.title,
         caption: post.caption,
+        tags: tags,
       }
     );
 
