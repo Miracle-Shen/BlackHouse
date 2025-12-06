@@ -188,8 +188,11 @@ export async function updatePost(post: IUpdatePost) {
     }
 
     // Convert tags into arrays
-    const tags = post.tags?.replace(/ /g, "").split(",") || [];
-    console.log("tags",tags);
+    // const tags = post.tags?.replace(/ /g, "").split(",") || [];
+    // console.log("tags",tags);
+    // const tags = typeof post.tags === "string" ? post.tags.replace(/ /g, "").split(",") : post.tags || [];
+    // console.log("tags", tags);
+
     // Update post
    const creatorId = typeof post.creator === "object" && post.creator !== null ? post.creator.$id : post.creator;
     const updatedPost = await databases.updateDocument(
