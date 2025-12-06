@@ -15,7 +15,7 @@ const PostDetails = () => {
   const userInfoStr = localStorage.getItem("user");
   const userInfo = userInfoStr ? JSON.parse(userInfoStr) : null; 
   const userId = userInfo.$id;
-  const { data: post, isLoading } = useGetPostById(id);
+  const { data: post } = useGetPostById(id);
   const { mutate: deletePost ,isPending: isDelete } = useDeletePost();
  const [activeTag, setActiveTag] = useState<string | null>(null);
   const creatID = post?.creator ? (typeof post.creator === 'object' && post.creator !== null && '$id' in post.creator ? post.creator.$id : post.creator) : '';
