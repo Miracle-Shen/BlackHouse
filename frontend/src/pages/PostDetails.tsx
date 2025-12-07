@@ -8,14 +8,13 @@ import { multiFormatDateString } from "@/lib/utils";
 import { Loader } from "lucide-react";
 import { useState } from "react";
 import { useGlobalModal } from "@/context/ModalProvider";
-
+import useAuth from "../hooks/useAuth";
 const PostDetails = () => {
   const navigate = useNavigate();
   const { id } = useParams();
 
-  const userInfoStr = localStorage.getItem("user");
-  const userInfo = userInfoStr ? JSON.parse(userInfoStr) : null;
-  const userId = userInfo?.$id || "";
+const { auth } = useAuth();
+  const userId = auth?.$id || "";
 
   const { data: post, isLoading } = useGetPostById(id);
   const { mutate: deletePost, isPending: isDelete } = useDeletePost();
