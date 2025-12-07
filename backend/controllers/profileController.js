@@ -2,8 +2,7 @@ const { fetchInterestById } = require("../lib/fileAPI");
 const { fetchUser } = require("../lib/userAPI");
 
 const handleProfile = async (req, res) => {
-
-  const userId = req.body.userId;
+ const userId = req.query.userId;
   console.log("userID",userId);
   try {
     const [user, interestDoc] = await Promise.all([
