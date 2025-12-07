@@ -24,7 +24,7 @@ const handleProfile = async (req, res) => {
       },
     });
   } catch (err) {
-    console.error("[GET /users/:id/profile] error:", err);
+    console.error("[GET /profile] error:", err);
     res.status(500).json({ ok: false, error: "INTERNAL_ERROR" });
   }
 };

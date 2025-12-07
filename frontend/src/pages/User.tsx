@@ -6,7 +6,7 @@ import useAuth from "../hooks/useAuth";
 
 const UserPage = () => {
   const { id } = useParams();        // 路由里的 :id
-  const {auth, setAuth } = useAuth();
+  const { setAuth } = useAuth();
   const axiosPrivate = useAxiosPrivate();
   const navigate = useNavigate();
 
@@ -32,13 +32,7 @@ const UserPage = () => {
         setInterests(interests);
         setUser(profileUser); // 不管是不是自己，先把当前要显示的用户存起来
 
-        // if (id === currentUserId) {
-        //   setAuth((prev: any) => ({
-        //     ...prev,
-        //     $id: profileUser.$id,
-        //     userId: profileUser.userId
-        //   }));
-        // }
+
       } catch (err) {
         console.error("fetchUser error:", err);
         navigate("/login", { replace: true });

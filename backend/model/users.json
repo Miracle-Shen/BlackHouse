@@ -1,5 +1,12 @@
 [
   {
+    "id": "693585d600133f5ca422",
+    "username": "redpanda",
+    "userId": "1a4d4a2f-3c6d-4269-8ab9-38b72a622e63",
+    "password": "$2b$10$4hotuOsMLTaIFssSCNIi8.QK8cSwiEMTDaV/yakDuEO9KBx/1DTra",
+    "refreshToken": ""
+  },
+  {
     "id": "69311959003b20fdab86",
     "username": "mumu",
     "userId": "302e0ee1-c58d-4c79-ac97-ce41eab3ead1",
