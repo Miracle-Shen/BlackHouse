@@ -1,6 +1,7 @@
 const { Client, ID, Databases,Query } = require( "appwrite");
-const dotenv = require('dotenv');
-dotenv.config();
+require("dotenv").config({ path: "../.env" });
+const fs = require('fs');
+const path = require('path');
 const client = new Client()
     .setEndpoint(process.env.APPWRITE_ENDPOINT) // Replace <REGION> with your Appwrite region
     .setProject(process.env.APPWRITE_PROJECT_ID); // BlackHouse Project ID
@@ -28,21 +29,6 @@ const createUser = async (userId, userName, hashedPwd) => {
 };
 
 
-// const fetchUser =  async (userId) => {
-//     try {
-//         const response = await tablesDB.listRows({
-//             databaseId: process.env.DATABASE_ID,
-//             tableId: 'user',
-//             queries: [
-//                 Query.equal('userId', userId)
-//             ]
-//         });
-//         return response;
-//     } catch (error) {
-//         console.error("Error fetching user:", error);
-//         throw error;
-//     }
-// };
 // ============================== GET USER BY ID
 async function fetchUser(userId) {
   try {
@@ -60,8 +46,7 @@ async function fetchUser(userId) {
   }
 }
 // ============================== GET USER write in users.json
-const fs = require('fs');
-const path = require('path');
+
 async function getAllUsers() {
   try {
     const allUsers = await databases.listDocuments(
@@ -90,23 +75,25 @@ async function getAllUsers() {
   }
 }
 
-// const fetchTags =  async (userId) => {
-//     try {
-//         const response = await databases.listRows({
-//             databaseId:  process.env.DATABASE_ID,
-//             tableId: 'user_tag',
-//             queries: [
-//                 Query.equal('userId', userId)
-//             ]
-//         });
-//         return response;
-//     } catch (error) {
-//         console.error("Error fetching user:", error);
-//         throw error;
-//     }
-// };
+async function getAllUsersId() {
+  const queries = [Query.orderDesc("$createdAt")];
 
-module.exports = { createUser, fetchUser, getAllUsers };
+  try {
+    const users = await databases.listDocuments(
+      process.env.DATABASE_ID,
+      'user',
+      queries
+    );
+
+    if (!users) throw Error;
+    //list the user IDs only
+    const userIds = users.documents.map(user => user.$id);
+    return userIds;
+  } catch (error) {
+    console.log(error);
+  }
+}
+module.exports = { createUser, fetchUser, getAllUsers, getAllUsersId };
 
 
 

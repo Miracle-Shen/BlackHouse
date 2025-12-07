@@ -18,11 +18,7 @@ const cookieParser = require('cookie-parser');
 
 // Appwrite
 const { Client } = require('appwrite');
-
-// LangGraph Agent
 const { callAgent } = require('./agent/agent');
-
-// 业务相关
 const { getAllUsers } = require('./lib/userAPI');
 
 // const { logger } = require('./middleware/logEvents');
@@ -58,7 +54,7 @@ app.get('/', (req, res) => {
 
 /* ========== LangGraph /genTag 接口 ========== */
 // 新建会话
-// curl -X POST -H "Content-Type: application/json" -d '{"message": "Build a team to make an iOS app, and tell me the talent gaps."}' http://localhost:3500/genTag
+// curl -X POST -H "Content-Type: application/json" -d '{"message": "this is the postID:69312d0900102939c737"}' http://localhost:3500/genTag
 app.post('/genTag', async (req, res) => {
   const initialMessage = req.body.message;
   const threadId = Date.now().toString(); // 简单生成一个 threadId
@@ -74,7 +70,7 @@ app.post('/genTag', async (req, res) => {
 });
 
 // 已有会话里继续聊天
-// curl -X POST -H "Content-Type: application/json" -d '{"message": "What team members did you recommend?"}' http://localhost:3500/genTag/123456789
+// curl -X POST -H "Content-Type: application/json" -d '{"message": "this is the postID:69312d0900102939c737"}' http://localhost:3500/genTag/123456789
 app.post('/genTag/:threadId', async (req, res) => {
   const { threadId } = req.params;
   const { message } = req.body;
@@ -87,7 +83,6 @@ app.post('/genTag/:threadId', async (req, res) => {
     res.status(500).json({ error: 'Internal server error' });
   }
 });
-
 app.use("/chat",  require("./routes/chat"));
 /* ========== 认证 & 业务路由 ========== */
 // 这些也通常不需要 JWT 的放在前面
@@ -95,10 +90,11 @@ app.use('/register', require('./routes/register')); // 注册
 app.use('/logout', require('./routes/logout'));     // 注销
 app.use('/auth', require('./routes/auth'));         // 登录认证
 app.use('/refresh', require('./routes/refresh'));   // 刷新 token
-
+app.use('/profile', require('./routes/profile')); // 用户资料 //合并查表
 // 下面的路由统一走 JWT 保护
 app.use(verifyJWT);
-app.use('/user', require('./routes/user'));         // 用户相关
+app.use('/user', require('./routes/user'));         // 用户个人信息接口，单一功能
+
 
 /* ========== 404 处理（可选） ========== */
 // app.all('*', (req, res) => {
@@ -114,17 +110,20 @@ app.use('/user', require('./routes/user'));         // 用户相关
 
 /* ========== 自定义错误中间件（可选） ========== */
 // app.use(errorHandler);
-
-/* ========== 启动前的初始化逻辑（比如 getAllUsers） ========== */
+const { registerUserInterestCron } = require("./job/userInterestCron");
+/* ========== 启动前的初始化逻辑（ getAllUsers ，callInterestAgent ） ========== */
 (async () => {
   try {
     // 启动前预加载用户数据
     delete require.cache[require.resolve('./model/users.json')];
     await getAllUsers();
-    console.log('Fetched all users successfully on server start.');
 
-    // 启动服务器
-    app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
+    // 启动 HTTP 服务
+    app.listen(PORT, () => {
+      console.log(`Server running on port ${PORT}`);
+      // 注册定时任务
+      registerUserInterestCron();
+    });
   } catch (error) {
     console.error('Error during server start:', error);
     process.exit(1);

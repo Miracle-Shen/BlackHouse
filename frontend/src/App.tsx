@@ -7,7 +7,7 @@ import EditPage from './pages/Edit';
 import Mine from './pages/Mine';
 import PostDetails from './pages/PostDetails';
 import ProtectedRoute from './components/common/ProtectedRoute';
-
+import UserPage from './pages/User';
 function App() {
   return (
     <Routes>
@@ -16,15 +16,9 @@ function App() {
       <Route path="/register" element={<Register />} />
           {/* 其他页面使用布局 */}
           <Route path="/" element={<Layout />}>
-            <Route index element={<FeedPage />} />
-              <Route
-                path="mine"
-                element={
-                  <ProtectedRoute>
-                    <Mine />
-                  </ProtectedRoute>
-                }
-              />
+          <Route index element={<FeedPage />} />
+          <Route path="/mine" element={<Mine />} />
+          <Route path="/user/:id" element={<UserPage />} />
 
           </Route>
           <Route

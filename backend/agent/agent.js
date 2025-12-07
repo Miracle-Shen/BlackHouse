@@ -6,8 +6,7 @@ const { ChatOpenAI } = require("@langchain/openai");
 const { getPostById, addTagToPost } = require("../lib/fileAPI");
 const { z } = require("zod");
 const { HumanMessage } = require("@langchain/core/messages");
-
-
+const { logInfo, logError, ok, err } = require("../lib/commonfunc");
 require("dotenv").config({ path: "../.env" });
 
 // 原生 Ark OpenAI 客户端（目前在这个文件里其实没用到，保留给后续扩展）
@@ -15,28 +14,7 @@ require("dotenv").config({ path: "../.env" });
 //   apiKey: process.env.ARK_API_KEY,
 //   baseURL: "https://ark.cn-beijing.volces.com/api/v3",
 // });
-function ok(data) {
-  return { ok: true, data };
-}
 
-function err(code, message, extra = {}) {
-  return {
-    ok: false,
-    error: {
-      code,
-      message,
-      ...extra,
-    },
-  };
-}
-
-function logInfo(tag, ...args) {
-  console.log(`[${tag}]`, ...args);
-}
-
-function logError(tag, ...args) {
-  console.error(`[${tag}]`, ...args);
-}
 /**
  * callAgent
  * LangGraph 构建的“打 tag”代理：

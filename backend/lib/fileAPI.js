@@ -1,12 +1,28 @@
-const { Client, Databases } = require( "appwrite");
-const dotenv = require('dotenv');
-dotenv.config();
+const { Client, Databases,ID, Query  } = require( "appwrite");
+
+require("dotenv").config({ path: "../.env" });
 const client = new Client()
     .setEndpoint(process.env.APPWRITE_ENDPOINT) // Replace <REGION> with your Appwrite region
     .setProject(process.env.APPWRITE_PROJECT_ID); // BlackHouse Project ID
 
 
 const databases = new Databases(client);
+const getPostsByUserId = async (userId) => {
+    if (!userId) return;
+    try {
+      const posts = await databases.listDocuments(
+        process.env.DATABASE_ID,
+        "post",
+        [Query.equal("creator", userId), Query.orderDesc("$createdAt")]
+      );
+      if(!posts || Array.isArray(posts.documents) === false) return []; 
+  
+      return posts.documents; 
+    } catch (error) {
+      console.log(error);
+    }
+}
+
 
 const getPostById = async (postId) => {
   if (!postId) {
@@ -59,6 +75,43 @@ const addTagToPost = async (postId, tag) => {
   return updatedPost;
 };
 
+const addUserInterest = async (userId,data) => {
+  if (!data || !userId || typeof data !== "object") {
+    throw new Error("updatePostById: updateData must be a non-empty object");
+  }
+
+  try {
+    const old = await databases.listDocuments(
+      process.env.DATABASE_ID,
+      "user_tag",
+      [Query.equal("userId", userId)]
+    );
+    for (const doc of old.documents) {
+      await databases.deleteDocument(
+        process.env.DATABASE_ID,
+        "user_tag",
+        doc.$id
+      );
+    }
+    for (const item of data) {
+      await databases.createDocument(
+        process.env.DATABASE_ID,
+        "user_tag",
+        ID.unique(),
+        {
+          userId,
+          interest: item.interest,                // 中文兴趣名
+          relevanceScore: item.relevant_score,    // 0~1
+
+        }
+      );
+    }
+
+    return { userId, count: data.length };
+  } catch (error) {
+    throw error; // 一定要往上抛
+  }
+};
 
 const updatePostById = async (postId, updateData) => {
   if (!postId) {
@@ -89,4 +142,20 @@ const updatePostById = async (postId, updateData) => {
   }
 };
 
-module.exports = { getPostById, updatePostById, addTagToPost };
+async function fetchInterestById(userId) {
+  try {
+    const info = await databases.listDocuments(
+      process.env.DATABASE_ID,
+      'user_tag',
+      [Query.equal("userId", userId)] 
+    );
+
+    if (!info) throw Error;
+
+    return info;
+  } catch (error) {
+    console.log(error);
+  }
+}
+
+module.exports = { getPostById, updatePostById, addTagToPost, getPostsByUserId,addUserInterest, fetchInterestById };

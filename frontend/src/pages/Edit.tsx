@@ -9,12 +9,13 @@ import axios from "@/api/axios";
 const EditPage = () => {
   const { id } = useParams();
   const [searchParams] = useSearchParams();
-  const urlTag = searchParams.get("tag") || "";
+  const urlTag = searchParams.get("tag") || ""; 
+ 
   // ===== 获取 post 的逻辑 =====
   let post: INewPost | undefined;
   let isLoad = false;
-  if (id) {
-    const { data, isLoading } = useGetPostById(id);
+  if (id) { 
+    const { data, isLoading } = useGetPostById(id);//在if里面最好不要使用hook
     post = {
       $id: data ? data.$id : "",
       title: data?.title,
@@ -72,11 +73,12 @@ const EditPage = () => {
         setAiTypingContent("");
         setShowAiConfirm(false);
 
-        const resp = await axios.post<{
-          ok: boolean;
-          data: { content: string };
-          error?: { message: string };
-        }>("/chat", { urlTag });
+       const resp = await axios.post<{ 
+        ok: boolean; 
+        data: { content: string }; 
+        error?: { message: string }; 
+      }>("/chat", { tag: urlTag });
+
 
         if (!resp.data.ok) {
           throw new Error("network error");
@@ -181,7 +183,7 @@ const EditPage = () => {
             </section>
           </div>
 
-          {/* AI 生成中的提示：更适合移动端的“底部气泡” */}
+          {/* AI 生成中的提示：底部气泡*/}
           {aiLoading && urlTag && (
             <div className="pointer-events-none fixed inset-0 z-30 flex items-end justify-center bg-black/30 sm:items-center">
               <div className="pointer-events-auto mb-6 w-full max-w-xs rounded-2xl bg-white px-4 py-3 text-center text-sm text-slate-700 shadow-lg sm:mb-0">

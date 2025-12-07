@@ -1,6 +1,7 @@
 import { ID, Query } from "appwrite";
 import { appwriteConfig, databases, storage } from "./config";
 import type { IUpdatePost, INewPost, IUpdateUser } from "@/types";
+import axios from "@/api/axios";
 
 // ============================================================
 // POSTS
@@ -81,74 +82,7 @@ export async function createThumbnailFile(
     reader.readAsDataURL(file);
   });
 }
-// ============================== CREATE POST
-function normalizeTags(input: string | string[] | undefined | null): string[] {
-  if (!input) return [];
 
-  // 情况 1：数组，直接清洗
-  if (Array.isArray(input)) {
-    return input.map(t => t.trim()).filter(Boolean);
-  }
-
-  // 情况 2：字符串，可能包含多个逗号（中英文）、空格
-  return input
-    .split(/,|，/)            // 用正则匹配 英文逗号 或 中文逗号
-    .map(t => t.trim())       // 去掉空格
-    .filter(Boolean);         // 过滤空值
-}
-
-export async function createPost(post: INewPost) {
-  try {
-    // Upload file to appwrite storage
-    const uploadedFile = await uploadFile(post?.file ? post.file[0] : new File([], ""));
-
-    if (!uploadedFile) throw Error;
-
-    // Get file url
-    // const fileUrl = getFilePreview(uploadedFile.$id);
-    const fileUrl = uploadedFile.$id 
-      ? `https://nyc.cloud.appwrite.io/v1/storage/buckets/${appwriteConfig.storageId}/files/${uploadedFile.$id}/view?project=${appwriteConfig.projectId}&mode=admin`
-      : '';
-   if (!fileUrl) {
-      await deleteFile(uploadedFile.$id);
-      throw Error;
-    }
-    const thumbFile = await createThumbnailFile(post?.file ? post.file[0] : new File([], ""), 400, 400, 0.7);
-    const uploadedThumb = await uploadFile(thumbFile);
-     if (!uploadedThumb) throw Error;
-    const thumbnailUrl = uploadedThumb.$id
-      ? `https://nyc.cloud.appwrite.io/v1/storage/buckets/${appwriteConfig.storageId}/files/${uploadedThumb.$id}/view?project=${appwriteConfig.projectId}&mode=admin`
-      : '';
-    // Convert tags into array
-    const tags = normalizeTags(post.tags);
-
-
-    // Create post
-    const newPost = await databases.createDocument(
-      appwriteConfig.databaseId,
-      appwriteConfig.postCollectionId,
-      ID.unique(),
-      {
-        creator: post.creator,
-        caption: post.caption,
-        imageUrl: fileUrl,
-        imageId: uploadedFile.$id,
-        title: post.title,
-        thumbnailUrl: thumbnailUrl,
-        tags: tags,
-      }
-    );
-
-    if (!newPost) {
-      await deleteFile(uploadedFile.$id);
-      throw Error;
-    }
-
-    return newPost;
-  } catch (error) {
-    console.log(error);
-  }
-}
 
 // ============================== UPLOAD FILE
 export async function uploadFile(file: File) {
@@ -242,6 +176,81 @@ export async function getPostById(postId?: string) {
   }
 }
 
+// ============================== CREATE POST
+function normalizeTags(input: string | string[] | undefined | null): string[] {
+  if (!input) return [];
+
+  // 情况 1：数组，直接清洗
+  if (Array.isArray(input)) {
+    return input.map(t => t.trim()).filter(Boolean);
+  }
+
+  // 情况 2：字符串，可能包含多个逗号（中英文）、空格
+  return input
+    .split(/,|，/)            // 用正则匹配 英文逗号 或 中文逗号
+    .map(t => t.trim())       // 去掉空格
+    .filter(Boolean);         // 过滤空值
+}
+
+export async function createPost(post: INewPost) {
+  try {
+    // Upload file to appwrite storage
+    const uploadedFile = await uploadFile(post?.file ? post.file[0] : new File([], ""));
+
+    if (!uploadedFile) throw Error;
+
+    // Get file url
+    // const fileUrl = getFilePreview(uploadedFile.$id);
+    const fileUrl = uploadedFile.$id 
+      ? `https://nyc.cloud.appwrite.io/v1/storage/buckets/${appwriteConfig.storageId}/files/${uploadedFile.$id}/view?project=${appwriteConfig.projectId}&mode=admin`
+      : '';
+   if (!fileUrl) {
+      await deleteFile(uploadedFile.$id);
+      throw Error;
+    }
+    const thumbFile = await createThumbnailFile(post?.file ? post.file[0] : new File([], ""), 400, 400, 0.7);
+    const uploadedThumb = await uploadFile(thumbFile);
+     if (!uploadedThumb) throw Error;
+    const thumbnailUrl = uploadedThumb.$id
+      ? `https://nyc.cloud.appwrite.io/v1/storage/buckets/${appwriteConfig.storageId}/files/${uploadedThumb.$id}/view?project=${appwriteConfig.projectId}&mode=admin`
+      : '';
+    // Convert tags into array
+    const tags = normalizeTags(post.tags);
+
+
+    // Create post
+    const newPost = await databases.createDocument(
+      appwriteConfig.databaseId,
+      appwriteConfig.postCollectionId,
+      ID.unique(),
+      {
+        creator: post.creator,
+        caption: post.caption,
+        imageUrl: fileUrl,
+        imageId: uploadedFile.$id,
+        title: post.title,
+        thumbnailUrl: thumbnailUrl,
+        tags: tags,
+      }
+    );
+
+    if (!newPost) {
+      await deleteFile(uploadedFile.$id);
+      throw Error;
+    }
+
+    void axios.post("/genTag", {
+        message: `this is the postID:${newPost.$id}`,
+      })
+      .catch((err) => {
+        console.error("[createPost] start genTag failed", err);
+      });
+    return newPost;
+  } catch (error) {
+    console.log(error);
+  }
+}
+
 // ============================== UPDATE POST
 export async function updatePost(post: IUpdatePost) {
   const hasFileToUpdate = post?.file.length > 0;
@@ -303,7 +312,12 @@ export async function updatePost(post: IUpdatePost) {
       // If no new file uploaded, just throw error
       throw Error;
     }
-
+     void axios.post("/genTag", {
+        message: `this is the postID:${updatedPost.$id}`,
+      })
+      .catch((err) => {
+        console.error("[createPost] start genTag failed", err);
+      });
     return updatedPost;
   } catch (error) {
     console.log(error);
@@ -431,10 +445,10 @@ export async function getRecentPosts(): Promise<INewPost[]> {
       })
     );
 
-    return postsWithUserDetails; // 确保返回 INewPost[]
+    return postsWithUserDetails; 
   } catch (error) {
     console.log(error);
-    return []; // 错误时返回空数组（避免 undefined）
+    return []; 
   }
 }
 // ============================================================
