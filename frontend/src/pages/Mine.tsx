@@ -7,22 +7,23 @@ const Mine = () => {
   const navigate = useNavigate();
   const location = useLocation();
 
-  useEffect(() => {
-    // auth 还没初始化好：啥都别干，等下一轮 render
-    if (auth === undefined || auth === null) return;
+ useEffect(() => {
+  // 只有一种情况可以“等一下”：Context 还没挂上（一般很少）
+  if (auth === undefined) return;
 
-    // 没登录 → 去登录
-    if (!auth.$id) {
-      navigate("/login", {
-        state: { from: location.pathname },
-        replace: true,
-      });
-      return;
-    }
+  // 没登录（null 或者没有 $id）→ 去登录
+  if (!auth || !auth.$id) {
+    navigate("/login", {
+      state: { from: location.pathname },
+      replace: true,
+    });
+    return;
+  }
 
-    // 已登录 → 跳到 user/:id
-    navigate(`/user/${auth.$id}`, { replace: true });
-  }, [auth, navigate, location.pathname]);
+  // 已登录 → 跳到 user/:id
+  navigate(`/user/${auth.$id}`, { replace: true });
+}, [auth, navigate, location.pathname]);
+
 
   // 过渡态：给个轻量 loading
   return (

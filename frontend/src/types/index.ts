@@ -1,3 +1,16 @@
+
+// types/auth.ts
+export type AuthData = {
+  $id: string;
+  userId: string;
+  accessToken: string;   // 如果你现在就想这么用，先保留
+};
+
+export type AuthContextType = {
+  auth: AuthData | null;
+  setAuth: React.Dispatch<React.SetStateAction<AuthData | null>>;
+};
+
 // ============================================================
 //RESPONSE TYPES
 // ============================================================

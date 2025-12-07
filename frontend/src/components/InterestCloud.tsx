@@ -2,7 +2,7 @@ import React from "react";
 
 type Interest = {
   interest: string;
-  score: number;
+  relevanceScore: number;
 };
 
 type InterestCloudProps = {
@@ -26,12 +26,9 @@ const InterestCloud: React.FC<InterestCloudProps> = ({ interests }) => {
 
   return (
     <div className="mt-2 w-full">
-      {/* 标题 */}
       <div className="flex items-center justify-between text-xs text-slate-500">
         <span>兴趣画像</span>
       </div>
-
-      {/* 主体 */}
       <div className="mt-2 min-h-[56px] rounded-xl bg-slate-50/80 px-3 py-2">
         {interests.length === 0 ? (
           <p className="text-[11px] text-slate-400">
@@ -44,7 +41,7 @@ const InterestCloud: React.FC<InterestCloudProps> = ({ interests }) => {
                 key={item.interest}
                 type="button"
                 className="rounded-full text-white shadow-sm transition-transform hover:-translate-y-0.5"
-                style={getBubbleStyle(item.score)}
+                style={getBubbleStyle(item.relevanceScore)}
               >
                 {item.interest}
               </button>

@@ -1,5 +1,5 @@
 import { useRef, useState, useEffect, useContext } from "react";
-import AuthContext from "../context/AuthProvider";
+import {AuthContext} from "../context/AuthProvider";
 import { Link, useNavigate } from "react-router-dom";
 import axios from "../api/axios";
 import type { ILoginResponse } from "../types/index";

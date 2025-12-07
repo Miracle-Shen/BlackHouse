@@ -6,7 +6,10 @@ import useAuth from "../hooks/useAuth";
 
 const UserPage = () => {
   const { id } = useParams();        // 路由里的 :id
-  const { setAuth } = useAuth();
+  const { auth,setAuth } = useAuth();
+  const currentUserId = auth?.$id;
+  const isOwner = currentUserId === id;
+
   const axiosPrivate = useAxiosPrivate();
   const navigate = useNavigate();
 
@@ -25,10 +28,11 @@ const UserPage = () => {
           signal: controller.signal,
           params: { userId: id },
         });
+        console.log("fetchUser res:", res.data);
         if (!res.data?.ok) return;
 
-        const profileUser = res.data.user;
-        const interests = res.data.interest || [];
+        const profileUser = res.data.data.user;
+        const interests = res.data.data.interest.documents || [];
         setInterests(interests);
         setUser(profileUser); // 不管是不是自己，先把当前要显示的用户存起来
 
@@ -86,7 +90,7 @@ const UserPage = () => {
   return (
     <div className="min-h-screen bg-gradient-to-b from-slate-50 to-slate-100">
       <div className="mx-auto w-full max-w-3xl px-4 py-6">
-        <Profile users={user} interests={interests} setUsers={setUser} />
+        <Profile users={user} interests={interests} setUsers={setUser} isOwner={isOwner} />
       </div>
     </div>
   );

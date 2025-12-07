@@ -10,9 +10,10 @@ type UserProps = {
   users: any;
   setUsers: (u: any) => void;
   interests: any[];
+  isOwner: boolean;
 };
 
-const Profile = ({ users, interests,setUsers }: UserProps) => {
+const Profile = ({ users, interests,setUsers,isOwner }: UserProps) => {
   const navigate = useNavigate();
   const [isShow, setIsShow] = useState(false);
     const { setAuth } = useAuth();  
@@ -61,12 +62,14 @@ const Profile = ({ users, interests,setUsers }: UserProps) => {
                 alt="avatar"
                 className="h-24 w-24 rounded-full object-cover object-top shadow-sm sm:h-28 sm:w-28"
               />
-              <button
-                onClick={() => setIsShow(true)}
-                className="mt-3 inline-flex items-center justify-center rounded-full bg-slate-100 px-3 py-1 text-xs text-slate-700 hover:bg-slate-200"
-              >
-                点击修改头像
-              </button>
+              {isOwner && (                      
+                <button
+                  onClick={() => setIsShow(true)}
+                  className="mt-3 inline-flex items-center justify-center rounded-full bg-slate-100 px-3 py-1 text-xs text-slate-700 hover:bg-slate-200"
+                >
+                  点击修改头像
+                </button>
+              )}
             </div>
 
              {/* 🌈 兴趣圈：异步加载 + 异步拉数据 */}
@@ -125,16 +128,18 @@ const Profile = ({ users, interests,setUsers }: UserProps) => {
           )}
         </section>
 
-        {/* 退出登录 */}
-        <div className="w-full flex justify-center">
-          <button
-            className="inline-flex h-9 items-center justify-center rounded-full bg-red-500 px-6 text-sm font-medium text-white shadow-sm hover:bg-red-600"
-            onClick={logout}
-          >
-            退出登录
-          </button>
+          {isOwner && (                      
+            <div className="w-full flex justify-center">
+              <button
+                className="inline-flex h-9 items-center justify-center rounded-full bg-red-500 px-6 text-sm font-medium text-white shadow-sm hover:bg-red-600"
+                onClick={logout}
+              >
+                退出登录
+              </button>
+            </div>
+          )}
+
         </div>
-      </div>
 
       {/* 修改头像弹窗 */}
       {isShow && (
