@@ -1,5 +1,5 @@
 import { useNavigate, Link } from "react-router-dom";
-import { Suspense, useState } from "react";
+import { useState } from "react";
 import { useGetUserPosts } from "@/lib/react-query/queries";
 import GridPostList from "./common/GridPostList";
 import UpdateAvatarModal from "./common/UpdateAvatarModal";
