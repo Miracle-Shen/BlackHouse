@@ -25,7 +25,7 @@ const Profile = ({ users, interests,setUsers,isOwner }: UserProps) => {
       console.error("Logout error:", err);
     } finally {
       setAuth(null);
-      localStorage.removeItem("user");
+      localStorage.removeItem("auth");
       navigate("/login", { replace: true });
     }
   };
@@ -73,29 +73,11 @@ const Profile = ({ users, interests,setUsers,isOwner }: UserProps) => {
             </div>
 
              {/* 🌈 兴趣圈：异步加载 + 异步拉数据 */}
-            <Suspense
-              fallback={
-                <div className="mt-2 w-full">
-                  <div className="flex items-center justify-between text-xs text-slate-500">
-                    <span>兴趣画像</span>
-                  </div>
-                  <div className="mt-2 animate-pulse rounded-xl bg-slate-50/80 px-3 py-4">
-                    <div className="mb-2 h-3 w-24 rounded-full bg-slate-200"></div>
-                    <div className="flex flex-wrap gap-2">
-                      <span className="h-6 w-16 rounded-full bg-slate-200" />
-                      <span className="h-6 w-20 rounded-full bg-slate-200" />
-                      <span className="h-6 w-12 rounded-full bg-slate-200" />
-                    </div>
-                  </div>
-                </div>
-              }
-            >
+            <div>
               <InterestCloud interests={interests} />
-            </Suspense>
+            </div>
           </div>
         </section>
-
-        
 
         
         {/* 我的帖子 */}

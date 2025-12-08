@@ -346,7 +346,6 @@ export async function deletePost(postId?: string, imageId?: string) {
 }
 
 
-
 // ============================== GET USER'S POST
 export async function getUserPosts(userId?: string) {
   if (!userId) return;
@@ -365,40 +364,6 @@ export async function getUserPosts(userId?: string) {
   }
 }
 
-
-// type PostWithCreator = Models.Document & {
-//   creator: INewPost | undefined; // creator 可能是用户文档或 undefined
-// };
-
-// 显式指定返回类型为 Promise<PostWithCreator[] | undefined>
-// export async function getRecentPosts(): Promise<PostWithCreator[] | undefined> {
-//   try {
-//     const posts = await databases.listDocuments(
-//       appwriteConfig.databaseId,
-//       appwriteConfig.postCollectionId,
-//       [Query.orderDesc("$createdAt"), Query.limit(20)]
-//     );
-
-//     if (!posts) throw Error;
-
-//     const postsWithUserDetails = await Promise.all(
-//       posts.documents.map(async (post) => {
-//         try {
-//           const user = await getUserById(post.creator);
-//           return { ...post, creator: user } as PostWithCreator; // 断言为定义的类型
-//         } catch (error) {
-//           return { ...post, creator: undefined } as PostWithCreator; // 处理用户获取失败的情况
-//         }
-//       })
-//     );
-
-//     return postsWithUserDetails;
-//   } catch (error) {
-//     console.log(error);
-//     return undefined; // 显式返回 undefined，符合返回类型定义
-//   }
-// }
-// 修改 getRecentPosts 函数的返回处理
 // 导入 INewPost 类型
 export async function getRecentPosts(): Promise<INewPost[]> {
   try {

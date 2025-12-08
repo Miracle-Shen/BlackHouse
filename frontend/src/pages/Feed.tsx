@@ -10,7 +10,7 @@ const FeedPage = () => {
   } = useGetRecentPosts();
 
   // skeleton 数据
-  const skeletonPosts = Array.from({ length: 4 }).map((_, i) => ({
+  const skeletonPosts = Array.from({ length: 6 }).map((_, i) => ({
     $id: `skeleton-${i}`,
     title: "",
     thumbnailUrl: "",

@@ -10,8 +10,9 @@ type InterestCloudProps = {
   interests: Interest[];
 };
 
+// react.memo使用考虑：这里的兴趣圈是一个纯展示型的组件，因此不需要频繁重新渲染
 const InterestCloud: React.FC<InterestCloudProps> = ({ interests }) => {
-  // 按相关度由高到低排序，视觉上更舒服
+  // 按相关度由高到低排序
   const sortedInterests = useMemo(
     () => [...interests].sort((a, b) => b.relevanceScore - a.relevanceScore),
     [interests]
