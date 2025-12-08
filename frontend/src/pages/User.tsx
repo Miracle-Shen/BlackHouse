@@ -38,6 +38,10 @@ const UserPage = () => {
 
 
       } catch (err) {
+        if(err) {
+          console.log("fetchUser aborted",err);
+          return;
+        }
         console.error("fetchUser error:", err);
         navigate("/login", { replace: true });
       } finally {
@@ -69,23 +73,16 @@ const UserPage = () => {
     );
   }
 
-  if (!user) {
-    return (
-      <div className="min-h-screen bg-gradient-to-b from-slate-50 to-slate-100 flex items-center justify-center px-4">
-        <div className="w-full max-w-sm rounded-2xl bg-white px-5 py-6 shadow-sm text-center">
-          <p className="text-sm font-semibold text-slate-900">
-            未获取到用户信息
-          </p>
-          <button
-            onClick={() => navigate("/", { replace: true })}
-            className="mt-4 inline-flex h-9 w-full items-center justify-center rounded-full bg-blue-500 text-sm font-medium text-white hover:bg-blue-600"
-          >
-            返回首页
-          </button>
-        </div>
-      </div>
-    );
-  }
+  // // 如果没有用户，直接渲染一个占位（或者 return null）
+  // console.log("UserPage user:", user);
+  // if (!user) {
+  //   return (
+  //     <div className="w-full max-w-2xl mx-auto py-10 text-center text-sm text-slate-500">
+  //       正在处理用户状态out...
+  //     </div>
+  //   );
+  //   // 也可以直接：return null
+  // }
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-slate-50 to-slate-100">

@@ -6,6 +6,7 @@ export default function ProtectedRoute({ children }: { children: React.ReactNode
   const { auth } = useAuth();
   const { showConfirm } = useGlobalModal();
   const navigate = useNavigate();
+  console.log("ProtectedRoute auth:", auth);
   if (!auth || !auth.$id) {
     showConfirm({  
         title: "请先登录",

@@ -1,11 +1,12 @@
-import { useNavigate, Link } from "react-router-dom";
-import { useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { useState, useEffect} from "react";
 import { useGetUserPosts } from "@/lib/react-query/queries";
 import GridPostList from "./common/GridPostList";
 import UpdateAvatarModal from "./common/UpdateAvatarModal";
 import axios from "@/api/axios";
 import useAuth from "../hooks/useAuth";
 import InterestCloud from "./InterestCloud";
+import { useGlobalModal } from "@/context/ModalProvider";
 type UserProps = {
   users: any;
   setUsers: (u: any) => void;
@@ -16,8 +17,8 @@ type UserProps = {
 const Profile = ({ users, interests,setUsers,isOwner }: UserProps) => {
   const navigate = useNavigate();
   const [isShow, setIsShow] = useState(false);
-    const { setAuth } = useAuth();  
-
+  const { setAuth } = useAuth();  
+  const {showConfirm} = useGlobalModal();
   const logout = async () => {
     try {
       await axios.post("/logout", {}, { withCredentials: true });
@@ -30,24 +31,35 @@ const Profile = ({ users, interests,setUsers,isOwner }: UserProps) => {
     }
   };
 
+      
 
-
-  const { data: userPosts } = useGetUserPosts(users.$id);
-  const posts = userPosts?.documents || [];
-
-  if (!users) {
+  useEffect(() => {
+    if (!users) {
+      showConfirm({
+        title: "请先登录",
+        description: "未获取到用户信息",
+        confirmText: "去登录",
+        onConfirm: () => {
+          navigate("/login", { replace: true });
+        },
+        cancelText: "返回首页",
+        onCancel: () => {
+          navigate("/");
+        },
+      });
+    }
+  }, [users]);
+   if (!users) {
     return (
-      <div className="flex min-h-[60vh] flex-col items-center justify-center text-sm text-slate-500">
-        <p>未找到用户信息</p>
-        <Link
-          to="/login"
-          className="mt-3 rounded-full bg-blue-500 px-4 py-2 text-xs font-medium text-white hover:bg-blue-600"
-        >
-          返回登录页
-        </Link>
+      <div className="w-full max-w-2xl mx-auto py-10 text-center text-sm text-slate-500">
+        正在处理用户状态...
       </div>
     );
+    // 或者直接 return null;
   }
+  
+  const { data: userPosts } = useGetUserPosts(users.$id);
+  const posts = userPosts?.documents || [];
 
   return (
     <>
