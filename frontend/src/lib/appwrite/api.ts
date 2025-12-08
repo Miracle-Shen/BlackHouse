@@ -129,25 +129,77 @@ export async function searchPosts(searchTerm: string) {
   }
 }
 
-export async function getInfinitePosts({ pageParam }: { pageParam: number }) {
-  const queries: any[] = [Query.orderDesc("$updatedAt"), Query.limit(9)];
+export async function getInfinitePosts({
+  pageParam,
+}: {
+  pageParam?: string | null;
+}) {
+  // 1. 组装 Appwrite 查询条件
+  const queries: string[] = [
+    Query.orderDesc("$updatedAt"),
+    Query.limit(9),
+  ];
 
+  // 有游标才加 cursorAfter
   if (pageParam) {
-    queries.push(Query.cursorAfter(pageParam.toString()));
+    queries.push(Query.cursorAfter(pageParam));
   }
 
   try {
-    const posts = await databases.listDocuments(
+    // 2. 向 Appwrite 拉一页数据
+    const postList = await databases.listDocuments(
       appwriteConfig.databaseId,
       appwriteConfig.postCollectionId,
       queries
     );
 
-    if (!posts) throw Error;
+    const posts = postList.documents ?? [];
 
-    return posts;
+    // 3. 给每个 post 补充用户信息，并映射成 INewPost
+    const postsWithUserDetails: INewPost[] = await Promise.all(
+      posts.map(async (post: any) => {
+        try {
+          const user = await getUserById(post.creator);
+
+          return {
+            $id: post.$id,
+            creator: user || post.creator,
+            thumbnailUrl: post.thumbnailUrl,
+            title: post.title,
+            caption: post.caption,
+            imageUrl: post.imageUrl,
+            imageId: post.imageId,
+            file: [], // 适配 INewPost
+            tags: post.tags,
+            $createdAt: post.$createdAt,
+          } as INewPost;
+        } catch (error) {
+          // 拉用户失败就退回原始 creator
+          return {
+            $id: post.$id,
+            creator: post.creator,
+            thumbnailUrl: post.thumbnailUrl,
+            title: post.title,
+            caption: post.caption,
+            imageUrl: post.imageUrl,
+            imageId: post.imageId,
+            file: [],
+            tags: post.tags,
+            $createdAt: post.$createdAt,
+          } as INewPost;
+        }
+      })
+    );
+
+  
+    return {
+      ...postList,
+      documents: postsWithUserDetails,
+    };
   } catch (error) {
-    console.log(error);
+    console.error("getInfinitePosts error:", error);
+    // 抛出去，让 react-query 能走 onError / error 状态
+    throw error;
   }
 }
 

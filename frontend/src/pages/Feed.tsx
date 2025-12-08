@@ -28,7 +28,7 @@ const FeedPage = () => {
    const posts =
     postsData?.pages.flatMap((page: any) => page.documents) ?? [];
   const displayedPosts = isLoading ? skeletonPosts : posts;
-
+  console.log("posts", posts);
   const loadMoreRef = useRef<HTMLDivElement | null>(null);
   useEffect(() => {
     const el = loadMoreRef.current;
