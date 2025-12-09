@@ -103,7 +103,8 @@ const EditPage = () => {
         thread_id: threadId,
       });
 
-      es = new EventSource(`/api/chat?${query.toString()}`);
+      // es = new EventSource(`/chat?${query.toString()}`);
+      es = new EventSource(`http://localhost:3500/chat?${query.toString()}`);
 
       // 第一次建立连接时，启动打字机
       es.onopen = () => {

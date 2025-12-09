@@ -68,7 +68,9 @@ const PostDetails = () => {
       try {
         setIsLoadingRelated(true);
         const res = await axios.get("/recommand", {
-          params: { tags: post.tags },
+          params: { 
+            tags: post.tags, 
+            postId:post.$id },
         });
         if(res.data.ok !== true) {
           console.error("获取推荐帖子失败：", res.data);
