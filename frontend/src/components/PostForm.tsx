@@ -12,8 +12,10 @@ import {
   FormMessage,
 } from "./ui/Form";
 import { Textarea } from "./ui/Textarea";
-import FileUploader from "./common/FileUploader";
+
 import { PostValidation } from "@/types/index";
+import { lazy, Suspense } from "react";
+const FileUploader = lazy(() => import("./common/FileUploader"));
 import { useCreatePost, useUpdatePost } from "@/lib/react-query/queries";
 import type { INewPost, IUpdatePost } from "@/types";
 import { useGlobalModal } from "@/context/ModalProvider";
@@ -120,6 +122,7 @@ const PostForm = ({ post, action, creatorId, aiCaption,tags }: PostFormProps) =>
     isLoadingCreate || (isLoadingUpdate && post?.imageUrl === undefined);
 
   return (
+    <>
     <Form {...form}>
       <form
         onSubmit={form.handleSubmit(handleSubmit)}
@@ -213,10 +216,12 @@ const PostForm = ({ post, action, creatorId, aiCaption,tags }: PostFormProps) =>
             render={({ field }) => (
               <FormItem>
                 <FormControl>
-                  <FileUploader
-                    fieldChange={field.onChange}
-                    mediaUrl={post?.imageUrl || ""}
-                  />
+                  <Suspense fallback={<div>Loading...</div>}>
+                    <FileUploader
+                      fieldChange={field.onChange}
+                      mediaUrl={post?.imageUrl || ""}
+                    />
+                  </Suspense>
                 </FormControl>
                 <FormMessage className="mt-1 text-xs text-red-500" />
               </FormItem>
@@ -253,6 +258,7 @@ const PostForm = ({ post, action, creatorId, aiCaption,tags }: PostFormProps) =>
         </div>
       </form>
     </Form>
+    </>
   );
 };
 

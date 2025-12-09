@@ -1,17 +1,60 @@
 import { useRef, useState, useEffect } from "react";
 import axios from "../api/axios";
 import type { IRegisterResponse } from "../types/index";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import {
-  faCheck,
-  faTimes,
-  faInfoCircle,
-} from "@fortawesome/free-solid-svg-icons";
 import { Link } from "react-router-dom";
 
 const USER_REGEX = /^[A-z][A-z0-9-_]{3,23}$/;
 const PWD_REGEX = /^\S{8,24}$/;
 const REGISTER_URL = "/register";
+
+/** === 轻量级图标组件（替代 Font Awesome） === */
+
+const CheckIcon = ({ className = "" }: { className?: string }) => (
+  <svg
+    aria-hidden="true"
+    viewBox="0 0 16 16"
+    className={className}
+    fill="none"
+    stroke="currentColor"
+    strokeWidth="2"
+    strokeLinecap="round"
+    strokeLinejoin="round"
+  >
+    <path d="M3 8.5 6.5 12 13 4" />
+  </svg>
+);
+
+const TimesIcon = ({ className = "" }: { className?: string }) => (
+  <svg
+    aria-hidden="true"
+    viewBox="0 0 16 16"
+    className={className}
+    fill="none"
+    stroke="currentColor"
+    strokeWidth="2"
+    strokeLinecap="round"
+  >
+    <path d="M4 4l8 8M12 4l-8 8" />
+  </svg>
+);
+
+const InfoIcon = ({ className = "" }: { className?: string }) => (
+  <svg
+    aria-hidden="true"
+    viewBox="0 0 16 16"
+    className={className}
+    fill="none"
+    stroke="currentColor"
+    strokeWidth="1.8"
+    strokeLinecap="round"
+    strokeLinejoin="round"
+  >
+    <circle cx="8" cy="8" r="6" />
+    <path d="M8 6.2v0.4M8 7.8V11" />
+  </svg>
+);
+
+/** === 组件本体 === */
 
 const Register = () => {
   const userRef = useRef<HTMLInputElement>(null);
@@ -150,14 +193,14 @@ const Register = () => {
             >
               用户名称
               <span className={validName ? "text-green-500" : "hidden"}>
-                <FontAwesomeIcon icon={faCheck} />
+                <CheckIcon className="h-3 w-3 sm:h-3.5 sm:w-3.5" />
               </span>
               <span
                 className={
                   validName || !user ? "hidden" : "text-red-500 text-[11px]"
                 }
               >
-                <FontAwesomeIcon icon={faTimes} />
+                <TimesIcon className="h-3 w-3" />
               </span>
             </label>
             <input
@@ -183,7 +226,7 @@ const Register = () => {
                   : "sr-only"
               }
             >
-              <FontAwesomeIcon icon={faInfoCircle} className="mt-[2px]" />
+              <InfoIcon className="mt-[2px] h-3.5 w-3.5" />
               <span>
                 4-24 位字符，必须以字母开头，允许字母、数字、下划线、连字符。
               </span>
@@ -198,14 +241,14 @@ const Register = () => {
             >
               密码
               <span className={validPwd ? "text-green-500" : "hidden"}>
-                <FontAwesomeIcon icon={faCheck} />
+                <CheckIcon className="h-3 w-3 sm:h-3.5 sm:w-3.5" />
               </span>
               <span
                 className={
                   validPwd || !pwd ? "hidden" : "text-red-500 text-[11px]"
                 }
               >
-                <FontAwesomeIcon icon={faTimes} />
+                <TimesIcon className="h-3 w-3" />
               </span>
             </label>
             <input
@@ -229,7 +272,7 @@ const Register = () => {
                   : "sr-only"
               }
             >
-              <FontAwesomeIcon icon={faInfoCircle} className="mt-[2px]" />
+              <InfoIcon className="mt-[2px] h-3.5 w-3.5" />
               <span>8-24 位非空字符，允许字母、数字及可见符号。</span>
             </p>
           </div>
@@ -246,7 +289,7 @@ const Register = () => {
                   validMatch && matchPwd ? "text-green-500" : "hidden"
                 }
               >
-                <FontAwesomeIcon icon={faCheck} />
+                <CheckIcon className="h-3 w-3 sm:h-3.5 sm:w-3.5" />
               </span>
               <span
                 className={
@@ -255,7 +298,7 @@ const Register = () => {
                     : "text-red-500 text-[11px]"
                 }
               >
-                <FontAwesomeIcon icon={faTimes} />
+                <TimesIcon className="h-3 w-3" />
               </span>
             </label>
             <input
@@ -279,7 +322,7 @@ const Register = () => {
                   : "sr-only"
               }
             >
-              <FontAwesomeIcon icon={faInfoCircle} className="mt-[2px]" />
+              <InfoIcon className="mt-[2px] h-3.5 w-3.5" />
               <span>必须与上面输入的密码保持一致。</span>
             </p>
           </div>

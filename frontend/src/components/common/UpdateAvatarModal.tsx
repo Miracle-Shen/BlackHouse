@@ -1,4 +1,4 @@
-import React from "react";
+import React, { Suspense } from "react";
 import {
   Form,
   FormControl,
@@ -10,7 +10,9 @@ import * as z from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { ProfileValidation } from "@/types";
-import ProfileUploader from "./ProfileUploader";
+//lazy load ProfileUploader
+import { lazy } from "react";
+const ProfileUploader = lazy(() => import("./ProfileUploader"));
 import { Button } from "../ui/button";
 import { useUpdateUser } from "@/lib/react-query/queries";
 import Loader from "./Loader";
@@ -64,10 +66,12 @@ const UpdateAvatarModal: React.FC<UpdateAvatarModalProps> = ({ users, setUsers ,
                 render={({ field }) => (
                   <FormItem className="flex flex-col items-center gap-2">
                     <FormControl>
-                      <ProfileUploader
-                        fieldChange={field.onChange}
-                        mediaUrl={users?.avatarUrl || "./icons/profile-placeholder.svg"}
-                      />
+                      <Suspense fallback={<div>Loading...</div>}>
+                        <ProfileUploader
+                          fieldChange={field.onChange}
+                          mediaUrl={users?.avatarUrl || "./icons/profile-placeholder.svg"}
+                        />
+                      </Suspense>
                     </FormControl>
                     <FormMessage className="shad-form_message" />
                   </FormItem>
