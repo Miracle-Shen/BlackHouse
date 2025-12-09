@@ -14,7 +14,6 @@ export async function createThumbnailFile(
   quality = 0.7
 ): Promise<File> {
   return new Promise((resolve, reject) => {
-    // 不是图片就直接返回原文件
     if (!file.type.startsWith("image/")) {
       resolve(file);
       return;
@@ -32,11 +31,10 @@ export async function createThumbnailFile(
       img.onload = () => {
         let { width, height } = img;
 
-        // 计算缩放比例，保证不超过 maxWidth / maxHeight
         const ratio = Math.min(
           maxWidth / width,
           maxHeight / height,
-          1 // 不放大，只缩小
+          1
         );
 
         const targetWidth = width * ratio;
@@ -54,23 +52,27 @@ export async function createThumbnailFile(
 
         ctx.drawImage(img, 0, 0, targetWidth, targetHeight);
 
-        // 统一导出为 jpeg（体积更小）
+        // 导出 WebP
         canvas.toBlob(
           (blob) => {
             if (!blob) {
-              reject(new Error("生成缩略图失败"));
+              reject(new Error("生成 WebP 缩略图失败"));
               return;
             }
 
-            const thumbFile = new File([blob], `thumb_${file.name}`, {
-              type: "image/jpeg",
-              lastModified: Date.now(),
-            });
+            const thumbFile = new File(
+              [blob],
+              `thumb_${file.name.replace(/\.[^.]+$/, "")}.webp`,
+              {
+                type: "image/webp",
+                lastModified: Date.now(),
+              }
+            );
 
             resolve(thumbFile);
           },
-          "image/jpeg",
-          quality // 0~1，越小越省流量
+          "image/webp",
+          quality
         );
       };
 
@@ -82,6 +84,7 @@ export async function createThumbnailFile(
     reader.readAsDataURL(file);
   });
 }
+
 
 
 // ============================== UPLOAD FILE
@@ -538,6 +541,12 @@ export async function updateUser(user: IUpdateUser) {
       image = { ...image, avatarUrl: avatarUrl, avatarId: uploadedFile.$id };
     }
 
+    const webpAvatarFile =await createThumbnailFile(user.file[0], 400, 400, 0.7);
+    const webpAvatarUrl = await uploadFile(webpAvatarFile);
+     if (!webpAvatarUrl) throw Error;
+    const thumbnailUrl = webpAvatarUrl.$id
+      ? `https://nyc.cloud.appwrite.io/v1/storage/buckets/${appwriteConfig.storageId}/files/${webpAvatarUrl.$id}/view?project=${appwriteConfig.projectId}&mode=admin`
+      : '';
     //  Update user
     const updatedUser = await databases.updateDocument(
       appwriteConfig.databaseId,
@@ -546,6 +555,8 @@ export async function updateUser(user: IUpdateUser) {
       {
         avatarUrl: image.avatarUrl,
         avatarId: image.avatarId,
+        thumbnailUrl:thumbnailUrl,
+        thumbnailId: webpAvatarUrl.$id,
       }
     );
 

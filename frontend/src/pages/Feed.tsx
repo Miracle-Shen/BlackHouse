@@ -3,11 +3,6 @@ import { useGetPosts } from "@/lib/react-query/queries";
 import PullToRefresh from "@/components/common/PullToRefresh";
 import { useEffect, useRef } from "react";
 const FeedPage = () => {
-  // const {
-  //   data: posts = [],
-  //   isPending: isLoading,
-  //   refetch,
-  // } = useGetRecentPosts();
   const {
   data: postsData,
   isLoading,
@@ -28,7 +23,6 @@ const FeedPage = () => {
    const posts =
     postsData?.pages.flatMap((page: any) => page.documents) ?? [];
   const displayedPosts = isLoading ? skeletonPosts : posts;
-  console.log("posts", posts);
   const loadMoreRef = useRef<HTMLDivElement | null>(null);
   useEffect(() => {
     const el = loadMoreRef.current;

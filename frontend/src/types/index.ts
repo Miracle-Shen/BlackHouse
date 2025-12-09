@@ -87,6 +87,8 @@ export type IUser = {
   avatarId:string;
   userName: string;
   avatarUrl?: string;
+  thumbnailUrl?: string;
+  thumbnailId?:string;
 };
 
 export type INewUser = {

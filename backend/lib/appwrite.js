@@ -1,23 +1,3 @@
-import { Client, ID, TablesDB } from "appwrite";
-
-// const client = new Client()
-//     .setEndpoint('https://<REGION>.cloud.appwrite.io/v1')
-//     .setProject('<PROJECT_ID>');
-
-// const tablesDB = new TablesDB(client);
-
-// const promise = tablesDB.createRow({
-//     databaseId: '<DATABASE_ID>',
-//     tableId: '<TABLE_ID>',
-//     rowId: ID.unique(),
-//     data: { title: "Hamlet" }
-// });
-
-// promise.then(function (response) {
-//     console.log(response);
-// }, function (error) {
-//     console.log(error);
-// });
 
 //post 
 export const createPost = async (req, res) => {
