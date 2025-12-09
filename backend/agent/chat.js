@@ -82,18 +82,15 @@ const chatHandlerStream = async (req, res) => {
 
     const text = result.data.content;
 
-    // === 模拟模型“逐段推送”：这里简单按固定长度分片，你也可以按 token 来 ===
-    const chunkSize = 20; // 每次推 20 个字符
+    // === 模拟模型“逐段推送”：这里简单按固定长度分片， ===
+    const chunkSize = 5; // 每次推 20 个字符
     for (let i = 0; i < text.length; i += chunkSize) {
       const chunk = text.slice(i, i + chunkSize);
 
       // SSE 标准格式：data: xxx\n\n
       res.write(`data: ${chunk}\n\n`);
 
-      // 模拟一点点停顿，像模型在思考
-      /* eslint-disable no-await-in-loop */
       await new Promise((resolve) => setTimeout(resolve, 40));
-      /* eslint-enable no-await-in-loop */
     }
 
     // 告诉前端“全部结束了”

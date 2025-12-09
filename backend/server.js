@@ -21,9 +21,6 @@ const { Client } = require('appwrite');
 const { callAgent } = require('./agent/agent');
 const { getAllUsers } = require('./lib/userAPI');
 
-// const { logger } = require('./middleware/logEvents');
-// const errorHandler = require('./middleware/errorHandler');
-
 // 端口：统一用一个
 const PORT = process.env.PORT || 3500;
 
@@ -78,7 +75,6 @@ app.post('/genTag/:threadId', async (req, res) => {
 });
 app.use("/chat",  require("./routes/chat"));
 /* ========== 认证 & 业务路由 ========== */
-// 这些也通常不需要 JWT 的放在前面
 app.use('/register', require('./routes/register')); // 注册
 app.use('/logout', require('./routes/logout'));     // 注销
 app.use('/auth', require('./routes/auth'));         // 登录认证
@@ -89,10 +85,8 @@ app.use(verifyJWT);
 app.use('/user', require('./routes/user'));         // 用户个人信息接口，单一功能
 app.use('/profile', require('./routes/profile')); // 用户资料 //合并查表
 
-
-/* ========== 自定义错误中间件（可选） ========== */
-// app.use(errorHandler);
 const { registerUserInterestCron } = require("./job/userInterestCron");
+
 /* ========== 启动前的初始化逻辑（ getAllUsers ，callInterestAgent ） ========== */
 (async () => {
   try {

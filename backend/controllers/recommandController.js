@@ -7,14 +7,12 @@ const handleRecommand = async (req, res) => {
   try {
     // 同时兼容 tags / tag / tags[]
     let raw = req.query.tags ?? req.query.tag ?? req.query["tags[]"];
-
-    let tagList = [];
+    let postId = req.query.postId;
+    let tagList = []; 
 
     if (Array.isArray(raw)) {
-      // 多个：?tags[]=a&tags[]=b
       tagList = raw;
     } else if (typeof raw === "string") {
-      // 单个：?tags[]=AI 或 ?tags=AI,情绪
       tagList = raw
         .split(",")
         .map((t) => t.trim())
@@ -32,7 +30,11 @@ const handleRecommand = async (req, res) => {
     }
 
     const posts = await recommandPostByTags(tagList, 4);
-
+    for (let i = posts.length - 1; i >= 0; i--) {
+      if (posts[i].$id === postId) {
+        posts.splice(i, 1);
+      }
+    }
     return res.status(200).json({
       ok: true,
       data: posts,
