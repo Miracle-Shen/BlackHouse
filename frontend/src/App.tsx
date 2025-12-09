@@ -10,9 +10,10 @@ const Register = lazy(() => import('./pages/Register'));
 const PostDetails = lazy(() => import('./pages/PostDetails'));
 const Mine = lazy(() => import('./pages/Mine'));
 const UserPage = lazy(()=> import('./pages/User'));
-import ProtectedRoute from './components/common/ProtectedRoute';
+const ProtectedRoute = lazy(() => import('./components/common/ProtectedRoute'));
 
-function App() {
+
+function App() {  
   return (
     <Suspense
       fallback={
