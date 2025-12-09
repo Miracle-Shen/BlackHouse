@@ -1,18 +1,17 @@
+
+import { Routes, Route } from 'react-router-dom';
+import { lazy, Suspense } from 'react';
 import Layout from './components/Layout';
 
 import FeedPage from './pages/Feed';
-import { Routes, Route } from 'react-router-dom';
-//lazy load EditPage
-// import EditPage from './pages/Edit';
-import { lazy, Suspense } from 'react';
 const EditPage = lazy(() => import('./pages/Edit'));
 const Login = lazy(() => import('./pages/Login'));
 const Register = lazy(() => import('./pages/Register'));
 const PostDetails = lazy(() => import('./pages/PostDetails'));
-import Mine from './pages/Mine';
-
+const Mine = lazy(() => import('./pages/Mine'));
+const UserPage = lazy(()=> import('./pages/User'));
 import ProtectedRoute from './components/common/ProtectedRoute';
-import UserPage from './pages/User';
+
 function App() {
   return (
     <Suspense

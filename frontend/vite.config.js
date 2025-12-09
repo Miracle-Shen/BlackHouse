@@ -24,8 +24,32 @@ export default defineConfig({
         rollupOptions: {
             output: {
                 manualChunks(id) {
-                    if (id.includes('node_modules')) {
-                        return id.toString().split('node_modules/')[1].split('/')[0].toString();
+                   if (
+                        id.includes('/src/pages/Login') ||
+                        id.includes('/src/pages/Register')
+                    ) {
+                        return 'auth-module'
+                    }
+
+                    // post 模块：帖子相关页面 
+                    if (
+                        id.includes('/src/pages/PostDetails') ||
+                        id.includes('/src/pages/Edit')
+                    ) {
+                        return 'post-module'
+                    }
+
+                    if(
+                        id.includes('/src/pages/Feed') 
+                    )
+                    {
+                        return 'index-module'
+                    }
+                    // 可选：用户相关
+                    if (
+                        id.includes('/src/pages/User') ||  
+                        id.includes('/src/pages/Mine') ) {
+                     return 'user-module'
                     }
                 },
             },
