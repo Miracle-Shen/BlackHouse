@@ -2,20 +2,24 @@ import { useEffect, useRef, useState } from "react";
 import PostForm from "@/components/PostForm";
 import { useGetPostById } from "@/lib/react-query/queries";
 import Loader from "@/components/common/Loader";
-import { Link, useParams, useSearchParams } from "react-router-dom";
+import { useNavigate, useParams, useSearchParams } from "react-router-dom";
 import type { INewPost } from "@/types";
-import axios from "@/api/axios";
 import useAuth from "@/hooks/useAuth";
+
 const EditPage = () => {
   const { id } = useParams();
   const [searchParams] = useSearchParams();
-  const urlTag = searchParams.get("tag") || ""; 
+  const navigate = useNavigate();
+  const urlTag = searchParams.get("tag") || "";
+
   const { data, isLoading } = useGetPostById(id || "");
   const { auth } = useAuth();
+
   // ===== 获取 post 的逻辑 =====
   let post: INewPost | undefined;
   let isLoad = false;
-  if (id) { 
+
+  if (id) {
     post = {
       $id: data ? data.$id : "",
       title: data?.title,
@@ -35,98 +39,145 @@ const EditPage = () => {
   const [aiTypingContent, setAiTypingContent] = useState("");
   const [showAiConfirm, setShowAiConfirm] = useState(false);
 
+  // 用来做打字机计时器
   const typingTimerRef = useRef<number | null>(null);
 
-  // 打字机效果
-  const startTyping = (text: string) => {
+  // 流式完整文本缓冲区
+  const fullTextRef = useRef<string>("");
+  // 标记后端是否已经完成推流
+  const streamDoneRef = useRef<boolean>(false);
+
+  // === 打字机：从 fullTextRef 中“边流边打字” ===
+  const startStreamingTyping = () => {
     setAiTypingContent("");
     if (typingTimerRef.current) {
       window.clearInterval(typingTimerRef.current);
     }
-    let index = 0;
-    const timer = window.setInterval(() => {
-      index += 1;
-      const current = text.slice(0, index);
-      setAiTypingContent(current);
 
-      if (index >= text.length) {
-        window.clearInterval(timer);
-        typingTimerRef.current = null;
-        setAiLoading(false);
-        setShowAiConfirm(true);
+    let index = 0;
+
+    const timer = window.setInterval(() => {
+      const fullText = fullTextRef.current;
+
+      // 如果还有没打出来的字符，就多打一个
+      if (index < fullText.length) {
+        index += 1;
+        const current = fullText.slice(0, index);
+        setAiTypingContent(current);
+        return;
       }
+
+      // 已经把当前缓冲区打完了，但流还没完全结束，就先等下一轮
+      if (!streamDoneRef.current) {
+        return;
+      }
+
+      // 文本打完 & 流结束 -> 收尾
+      window.clearInterval(timer);
+      typingTimerRef.current = null;
+      setAiLoading(false);
+      setShowAiConfirm(true);
     }, 30);
+
     typingTimerRef.current = timer;
   };
 
-  // 当 URL 中存在 ?tag=xxx 时，进入页面自动请求模型
+  // 当 URL 中存在 ?tag=xxx 时，进入页面自动请求模型（SSE 流式）
   useEffect(() => {
     if (!urlTag) return;
 
     let cancelled = false;
+    let es: EventSource | null = null;
 
-    const fetchContent = async () => {
-      try {
-        setAiLoading(true);
-        setAiTypingContent("");
-        setShowAiConfirm(false);
+    const startStream = () => {
+      setAiLoading(true);
+      setAiTypingContent("");
+      setShowAiConfirm(false);
 
-       const resp = await axios.post<{ 
-        ok: boolean; 
-        data: { content: string }; 
-        error?: { message: string }; 
-      }>("/chat", { tag: urlTag });
+      fullTextRef.current = "";
+      streamDoneRef.current = false;
+      const threadId = "";
 
+      const query = new URLSearchParams({
+        tag: urlTag,
+        thread_id: threadId,
+      });
 
-        if (!resp.data.ok) {
-          throw new Error("network error");
-        }
+      es = new EventSource(`/api/chat?${query.toString()}`);
 
-        const data = resp.data;
-        if (!data.ok) {
-          throw new Error(data.error?.message || "model error");
-        }
+      // 第一次建立连接时，启动打字机
+      es.onopen = () => {
+        if (cancelled) return;
+        startStreamingTyping();
+      };
 
-        const text: string = data.data.content;
+      // 每个 message 是一小段文本 chunk
+      es.onmessage = (event) => {
+        if (cancelled) return;
+        const chunk = event.data;
+        if (!chunk) return;
+
+        // 累加到完整文本缓冲区
+        fullTextRef.current += chunk;
+      };
+
+      // 服务端主动发的 `event: done`
+      es.addEventListener("done", () => {
+        if (cancelled) return;
+        streamDoneRef.current = true;
+        es?.close();
+        es = null;
+      });
+
+      // 服务端主动发的 `event: error` 或网络错误
+      es.addEventListener("error", (event) => {
+        console.error("[EditPage AI] SSE error event", event);
         if (cancelled) return;
 
-        startTyping(text);
-      } catch (e) {
-        console.error("[EditPage AI]", e);
-        if (!cancelled) {
-          setAiLoading(false);
-        }
-      }
+        streamDoneRef.current = true; // 停止打字机
+        setAiLoading(false);
+
+        es?.close();
+        es = null;
+      });
     };
 
-    fetchContent();
+    startStream();
 
+    // 清理函数：路由切换 / 组件卸载时关闭 SSE + timer
     return () => {
       cancelled = true;
+      if (es) {
+        es.close();
+      }
       if (typingTimerRef.current) {
         window.clearInterval(typingTimerRef.current);
+        typingTimerRef.current = null;
       }
     };
   }, [urlTag]);
 
+  // ===== AI 弹窗的交互 =====
   const handleAcceptAi = () => {
     setShowAiConfirm(false);
-    setAiTypingContent("");
+    // 保留 aiTypingContent -> PostForm 继续使用
   };
 
   const handleRejectAi = () => {
     setShowAiConfirm(false);
     setAiTypingContent("");
+    fullTextRef.current = "";
   };
 
   const aiCaptionForForm = aiTypingContent || undefined;
 
-  if (isLoad && id)
+  if (isLoad && id) {
     return (
       <div className="flex h-screen w-full items-center justify-center bg-slate-50">
         <Loader />
       </div>
     );
+  }
 
   return (
     <>
@@ -134,12 +185,13 @@ const EditPage = () => {
         <div className="mx-auto flex w-full max-w-2xl flex-col px-4 pb-8 pt-4 sm:pt-8">
           {/* 顶部栏：返回 + 标题 */}
           <header className="mb-4 flex items-center justify-between gap-3">
-            <Link
-              to={-1 as unknown as string}
+            <button
+              type="button"
+              onClick={() => navigate(-1)}
               className="rounded-full border border-transparent px-3 py-1 text-sm text-slate-500 hover:border-slate-200 hover:bg-white hover:text-slate-700"
             >
               ← 返回
-            </Link>
+            </button>
 
             <span className="text-[11px] tracking-wide text-slate-400">
               {id ? "编辑内容" : "发布新内容"}
@@ -175,12 +227,12 @@ const EditPage = () => {
               post={post}
               creatorId={creatorId}
               aiCaption={aiCaptionForForm}
-              tags={urlTag?[urlTag]:post?.tags}
+              tags={urlTag ? [urlTag] : post?.tags}
             />
           </section>
         </div>
 
-        {/* AI 生成中的提示：底部气泡*/}
+        {/* AI 生成中的提示：底部气泡 */}
         {aiLoading && urlTag && (
           <div className="pointer-events-none fixed inset-0 z-30 flex items-end justify-center bg-black/30 sm:items-center">
             <div className="pointer-events-auto mb-6 w-full max-w-xs rounded-2xl bg-white px-4 py-3 text-center text-sm text-slate-700 shadow-lg sm:mb-0">
@@ -189,14 +241,12 @@ const EditPage = () => {
                 <span className="font-semibold text-blue-500">#{urlTag}</span>{" "}
                 生成推荐内容…
               </p>
-              <p className="text-[11px] text-slate-400">
-                请耐心等待几秒钟。
-              </p>
+              <p className="text-[11px] text-slate-400">请耐心等待几秒钟。</p>
             </div>
           </div>
         )}
 
-        {/* 模型输出完毕后的确认弹窗：移动端居中弹出 */}
+        {/* 模型输出完毕后的确认弹窗 */}
         {showAiConfirm && urlTag && (
           <div className="fixed inset-0 z-40 flex items-center justify-center bg-black/40 px-4">
             <div className="w-full max-w-sm rounded-2xl bg-white p-5 shadow-xl">

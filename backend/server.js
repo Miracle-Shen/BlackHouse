@@ -32,9 +32,6 @@ const client = new Client()
   .setEndpoint(process.env.APPWRITE_ENDPOINT)
   .setProject(process.env.APPWRITE_PROJECT_ID);
 
-/* ========== 全局中间件 ========== */
-// app.use(logger);
-
 app.use(credentials);
 app.use(cors(corsOptions));
 
@@ -42,10 +39,6 @@ app.use(cors(corsOptions));
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 app.use(cookieParser());
-
-// 静态资源（如果需要）
-// const path = require('path');
-// app.use('/', express.static(path.join(__dirname, '/public')));
 
 /* ========== 通用路由 ========== */
 app.get('/', (req, res) => {

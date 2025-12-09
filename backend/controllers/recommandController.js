@@ -2,19 +2,20 @@ const { recommandPostByTags } = require("../lib/fileAPI");
 
 
 const handleRecommand = async (req, res) => {
-  console.log("Received /recommand request",req.query);
-  try {
-    const { tags } = req.query;
+  console.log("Received /recommand request", req.query);
 
-    // 兼容几种情况：string / array / undefined
+  try {
+    // 同时兼容 tags / tag / tags[]
+    let raw = req.query.tags ?? req.query.tag ?? req.query["tags[]"];
+
     let tagList = [];
 
-    if (Array.isArray(tags)) {
-      // ?tags[]=a&tags[]=b
-      tagList = tags;
-    } else if (typeof tags === "string") {
-      // ?tags=a,b 或 ?tags=a
-      tagList = tags
+    if (Array.isArray(raw)) {
+      // 多个：?tags[]=a&tags[]=b
+      tagList = raw;
+    } else if (typeof raw === "string") {
+      // 单个：?tags[]=AI 或 ?tags=AI,情绪
+      tagList = raw
         .split(",")
         .map((t) => t.trim())
         .filter(Boolean);
@@ -34,7 +35,7 @@ const handleRecommand = async (req, res) => {
 
     return res.status(200).json({
       ok: true,
-      data: posts, //  res.data?.posts || res.data || []
+      data: posts,
     });
   } catch (err) {
     console.error("[GET /recommand] error:", err);
@@ -44,5 +45,6 @@ const handleRecommand = async (req, res) => {
     });
   }
 };
+
 
 module.exports = { handleRecommand };
