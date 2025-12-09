@@ -11,6 +11,17 @@ export type AuthContextType = {
   setAuth: React.Dispatch<React.SetStateAction<AuthData | null>>;
 };
 
+export type GridPostListProps = {
+  posts: Array<{
+    $id: string;
+    title?: string;
+    imageUrl?: string;
+    thumbnailUrl?: string;
+  }>;
+  showUser?: boolean;
+  showStats?: boolean;
+};
+
 // ============================================================
 //RESPONSE TYPES
 // ============================================================

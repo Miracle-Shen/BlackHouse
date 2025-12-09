@@ -1,14 +1,6 @@
 import { Link } from "react-router-dom";
+import type { GridPostListProps } from "@/types"; 
 
-type GridPostListProps = {
-  posts: Array<{
-    $id: string;
-    title?: string;
-    imageUrl?: string;
-  }>;
-  showUser?: boolean;
-  showStats?: boolean;
-};
 
 const GridPostList = ({ posts }: GridPostListProps) => {
   return (
@@ -19,7 +11,7 @@ const GridPostList = ({ posts }: GridPostListProps) => {
             <div key={post.$id} className="relative">
               <Link to={`/posts/${post.$id}`} className="block rounded-[24px] border border-dark-4 overflow-hidden cursor-pointer">
                 <img
-                  src={post.imageUrl || "/icons/default-image.svg"}
+                  src={post.thumbnailUrl ||post.imageUrl || "/icons/default-image.svg"}
                   alt="post"
                   className="w-full object-cover"
                 />

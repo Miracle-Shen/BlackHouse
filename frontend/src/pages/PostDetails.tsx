@@ -6,28 +6,44 @@ import {
 } from "@/lib/react-query/queries";
 import { multiFormatDateString } from "@/lib/utils";
 import { Loader } from "lucide-react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useGlobalModal } from "@/context/ModalProvider";
 import useAuth from "../hooks/useAuth";
+import axios from "@/api/axios";
+import GridPostList from "@/components/common/GridPostList";
+
+type Post = {
+  $id: string;
+  $createdAt: string;
+  title: string;
+  caption: string;
+  imageUrl?: string;
+  imageId?: string;
+  tags?: string[];
+  creator?: {
+    $id: string;
+    userName?: string;
+    avatarUrl?: string;
+  } | string;
+};
+
 const PostDetails = () => {
   const navigate = useNavigate();
-  const { id } = useParams();
-
-const { auth } = useAuth();
+  const { id } = useParams<{ id: string }>();
+  const { auth } = useAuth();
   const userId = auth?.$id || "";
-
   const { data: post, isLoading } = useGetPostById(id);
   const { mutate: deletePost, isPending: isDelete } = useDeletePost();
   const [activeTag, setActiveTag] = useState<string | null>(null);
   const { showConfirm } = useGlobalModal();
 
-  const creatID = post?.creator
-    ? typeof post.creator === "object" &&
-      post.creator !== null &&
-      "$id" in post.creator
+  const [relatedPosts, setRelatedPosts] = useState<Post[]>([]);
+  const [isLoadingRelated, setIsLoadingRelated] = useState(false);
+
+  const creatorId =
+    typeof post?.creator === "object" && post?.creator !== null
       ? (post.creator as any).$id
-      : (post.creator as any)
-    : "";
+      : (post?.creator as string) || "";
 
   const handleTagClick = (tag: string) => {
     setActiveTag(tag);
@@ -39,12 +55,40 @@ const { auth } = useAuth();
       confirmText: "去发布",
       onCancel: () => {},
       onConfirm: () => {
-        navigate(`/edit?tag=${tag}`);
+        navigate(`/edit?tag=${encodeURIComponent(tag)}`);
       },
     });
   };
 
+  // 拉取推荐数据
+  useEffect(() => {
+    const fetchRelatedPosts = async () => {
+      if (!post?.tags || post.tags.length === 0) return;
+
+      try {
+        setIsLoadingRelated(true);
+        const res = await axios.get("/recommand", {
+          params: { tags: post.tags },
+        });
+        if(res.data.ok !== true) {
+          console.error("获取推荐帖子失败：", res.data);
+          return;
+        }
+        // 根据你的后端返回结构调整
+        setRelatedPosts(res.data?.data  || []);
+      } catch (error) {
+        console.error("获取推荐帖子失败：", error);
+      } finally {
+        setIsLoadingRelated(false);
+      }
+    };
+
+    fetchRelatedPosts();
+  }, [post?.tags]);
+
   const handleDeletePost = () => {
+    if (!id) return;
+
     showConfirm({
       title: "确定删除该帖子吗？",
       description: "删除后将无法恢复，请谨慎操作。",
@@ -76,14 +120,14 @@ const { auth } = useAuth();
         {/* 顶部操作栏：返回 + 编辑 / 删除 */}
         <header className="flex items-center justify-between gap-3">
           <button
-            onClick={() => navigate('/')}
+            onClick={() => navigate("/")}
             className="inline-flex items-center gap-1 rounded-full border border-transparent px-2 py-1 text-xs text-slate-500 hover:border-slate-200 hover:bg-white hover:text-slate-700"
           >
             <img src={"/icons/back.svg"} alt="back" width={18} height={18} />
             <span>返回</span>
           </button>
 
-          {userId === creatID && (
+          {userId === creatorId && (
             <div className="flex items-center gap-1.5 sm:gap-2">
               <Button
                 onClick={() => navigate(`/edit/${post.$id}`)}
@@ -159,7 +203,7 @@ const { auth } = useAuth();
                 {post.title}
               </h1>
               <div className="rounded-2xl bg-slate-50/80 px-3 py-3 sm:px-4 sm:py-4">
-                <p className="text-sm leading-relaxed text-slate-800 whitespace-pre-wrap">
+                <p className="whitespace-pre-wrap text-sm leading-relaxed text-slate-800">
                   {post.caption}
                 </p>
               </div>
@@ -210,10 +254,20 @@ const { auth } = useAuth();
               根据你当前浏览内容推荐
             </span>
           </div>
-          {/* 这里放你的推荐列表组件，比如： */}
-          {/* <GridPostList posts={relatedPosts} /> */}
-          <div className="mt-3 rounded-2xl border border-dashed border-slate-200 bg-slate-50/70 px-4 py-6 text-center text-[12px] text-slate-400">
-            推荐列表区域预留，你可以在这里渲染相关帖子卡片。
+
+          <div className="mt-3 rounded-2xl border border-dashed border-slate-200 bg-slate-50/70 px-4 py-6">
+            {isLoadingRelated ? (
+              <div className="flex flex-col items-center gap-2 text-center text-[12px] text-slate-400">
+                <Loader className="h-4 w-4 animate-spin" />
+                <span>正在为你加载推荐内容...</span>
+              </div>
+            ) : relatedPosts.length > 0 ? (
+              <GridPostList posts={relatedPosts} />
+            ) : (
+              <p className="text-center text-[12px] text-slate-400">
+                暂时没有推荐内容，试试浏览其他帖子吧。
+              </p>
+            )}
           </div>
         </section>
       </div>

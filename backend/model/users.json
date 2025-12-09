@@ -1,5 +1,12 @@
 [
   {
+    "id": "69375c28002d79ee507a",
+    "username": "waterdogLovesMiracle",
+    "userId": "65b1d689-41f5-43dc-9084-ef3287d881f3",
+    "password": "$2b$10$VH5jbBDg0Gzzga7FYbDha.suSyRSjyHcTtbXbyRtHUPpXTC2m/o9m",
+    "refreshToken": ""
+  },
+  {
     "id": "693585d600133f5ca422",
     "username": "redpanda",
     "userId": "1a4d4a2f-3c6d-4269-8ab9-38b72a622e63",

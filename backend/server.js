@@ -90,23 +90,12 @@ app.use('/register', require('./routes/register')); // 注册
 app.use('/logout', require('./routes/logout'));     // 注销
 app.use('/auth', require('./routes/auth'));         // 登录认证
 app.use('/refresh', require('./routes/refresh'));   // 刷新 token
-
+app.use('/recommand', require('./routes/recommand')); // 推荐内容
 // 下面的路由统一走 JWT 保护
 app.use(verifyJWT);
 app.use('/user', require('./routes/user'));         // 用户个人信息接口，单一功能
 app.use('/profile', require('./routes/profile')); // 用户资料 //合并查表
 
-/* ========== 404 处理（可选） ========== */
-// app.all('*', (req, res) => {
-//   res.status(404);
-//   if (req.accepts('html')) {
-//     res.sendFile(path.join(__dirname, 'views', '404.html'));
-//   } else if (req.accepts('json')) {
-//     res.json({ error: '404 Not Found' });
-//   } else {
-//     res.type('txt').send('404 Not Found');
-//   }
-// });
 
 /* ========== 自定义错误中间件（可选） ========== */
 // app.use(errorHandler);

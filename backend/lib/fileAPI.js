@@ -23,6 +23,43 @@ const getPostsByUserId = async (userId) => {
     }
 }
 
+const recommandPostByTags = async (tags = [], limit = 4) => {
+  if (!Array.isArray(tags) || tags.length === 0) return [];
+
+  const searchPosts = async (tags) => {
+    try {
+      const result = await databases.listDocuments(
+        process.env.DATABASE_ID,
+        "post",
+       [
+        Query.contains("tags", tags)
+      ]
+      );
+
+      return result?.documents || [];
+    } catch (err) {
+      console.error("searchPosts error:", err);
+      return [];
+    }
+  };
+
+  let allResults = [];
+
+  const results = await Promise.all(tags.map((tag) => searchPosts(tag)));
+
+  results.forEach((docs) => {
+    allResults.push(...docs);
+  });
+
+  const uniqueMap = new Map();
+  allResults.forEach((doc) => uniqueMap.set(doc.$id, doc));
+
+  const uniquePosts = Array.from(uniqueMap.values());
+
+  uniquePosts.sort((a, b) => new Date(b.$createdAt) - new Date(a.$createdAt));
+
+  return uniquePosts.slice(0, limit);
+};
 
 const getPostById = async (postId) => {
   if (!postId) {
@@ -158,4 +195,4 @@ async function fetchInterestById(userId) {
   }
 }
 
-module.exports = { getPostById, updatePostById, addTagToPost, getPostsByUserId,addUserInterest, fetchInterestById };
+module.exports = { getPostById, updatePostById, addTagToPost, getPostsByUserId,addUserInterest, fetchInterestById, recommandPostByTags };
