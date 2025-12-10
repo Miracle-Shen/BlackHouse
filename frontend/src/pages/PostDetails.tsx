@@ -224,7 +224,7 @@ const PostDetails = () => {
                     })}
                   </ul>
                   <p className="mt-1 text-[11px] text-slate-400">
-                    点击标签，可以用相同话题快速发一条新内容。
+                    点击标签，可以体验AI智能创作，快速发布相同话题。
                   </p>
                 </div>
               )}
