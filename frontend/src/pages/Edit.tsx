@@ -108,7 +108,7 @@ const EditPage = () => {
       });
 
       // es = new EventSource(`/chat?${query.toString()}`);
-      es = new EventSource(`/chat?${query.toString()}`);
+      es = new EventSource(`https://blackhouse-04o3.onrender.com/chat?${query.toString()}`);
 
       // 第一次建立连接时，启动打字机
       es.onopen = () => {
