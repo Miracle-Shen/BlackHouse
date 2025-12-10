@@ -3,7 +3,7 @@ import react from '@vitejs/plugin-react';
 import path from 'path';
 import checker from 'vite-plugin-checker';
 import { visualizer } from "rollup-plugin-visualizer";
-import { fa } from 'zod/v4/locales';
+
 export default defineConfig({
     plugins: [
         react(), checker({ typescript: true }),
@@ -55,5 +55,14 @@ export default defineConfig({
             },
         },
 
+    },
+    server: {
+        proxy: {
+        "/chat": {
+            target: "https://blackhouse-04o3.onrender.com/",
+            changeOrigin: true,
+            ws: false, 
+        },
+        },
     },
 });

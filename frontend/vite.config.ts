@@ -19,13 +19,13 @@ export default defineConfig({
     },
   },
   server: {
-  proxy: {
-    "/chat": {
-      target: "https://blackhouse-04o3.onrender.com/",
-      changeOrigin: true,
-      ws: false, 
+    proxy: {
+      "/chat": {
+        target: "https://blackhouse-04o3.onrender.com/",
+        changeOrigin: true,
+        ws: false, 
+      },
     },
   },
-},
 
 });
