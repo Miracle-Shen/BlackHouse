@@ -7,8 +7,6 @@ const USER_REGEX = /^[A-z][A-z0-9-_]{3,23}$/;
 const PWD_REGEX = /^\S{8,24}$/;
 const REGISTER_URL = "/register";
 
-/** === 轻量级图标组件（替代 Font Awesome） === */
-
 const CheckIcon = ({ className = "" }: { className?: string }) => (
   <svg
     aria-hidden="true"

@@ -57,7 +57,6 @@ const UserPage = () => {
   }, [id, axiosPrivate, navigate, setAuth]);
 
   if (loading) {
-    // 这里可以复用你 Mine 里那个 skeleton
     return (
       <div className="min-h-screen bg-gradient-to-b from-slate-50 to-slate-100 flex items-center justify-center px-4">
         <div className="w-full max-w-sm rounded-2xl bg-white/90 px-4 py-5 shadow-sm text-center">
@@ -73,16 +72,7 @@ const UserPage = () => {
     );
   }
 
-  // // 如果没有用户，直接渲染一个占位（或者 return null）
-  // console.log("UserPage user:", user);
-  // if (!user) {
-  //   return (
-  //     <div className="w-full max-w-2xl mx-auto py-10 text-center text-sm text-slate-500">
-  //       正在处理用户状态out...
-  //     </div>
-  //   );
-  //   // 也可以直接：return null
-  // }
+
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-slate-50 to-slate-100">

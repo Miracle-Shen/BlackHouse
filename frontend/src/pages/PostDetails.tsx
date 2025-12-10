@@ -11,21 +11,8 @@ import { useGlobalModal } from "@/context/ModalProvider";
 import useAuth from "../hooks/useAuth";
 import axios from "@/api/axios";
 import GridPostList from "@/components/common/GridPostList";
+import type { INewPost } from "@/types";
 
-type Post = {
-  $id: string;
-  $createdAt: string;
-  title: string;
-  caption: string;
-  imageUrl?: string;
-  imageId?: string;
-  tags?: string[];
-  creator?: {
-    $id: string;
-    userName?: string;
-    avatarUrl?: string;
-  } | string;
-};
 
 const PostDetails = () => {
   const navigate = useNavigate();
@@ -37,7 +24,7 @@ const PostDetails = () => {
   const [activeTag, setActiveTag] = useState<string | null>(null);
   const { showConfirm } = useGlobalModal();
 
-  const [relatedPosts, setRelatedPosts] = useState<Post[]>([]);
+  const [relatedPosts, setRelatedPosts] = useState<INewPost[]>([]);
   const [isLoadingRelated, setIsLoadingRelated] = useState(false);
 
   const creatorId =

@@ -14,7 +14,7 @@ const EditPage = () => {
 
   const { data, isLoading } = useGetPostById(id || "");
   const { auth } = useAuth();
-
+  
   // ===== 获取 post 的逻辑 =====
   let post: INewPost | undefined;
   let isLoad = false;
@@ -33,6 +33,10 @@ const EditPage = () => {
   }
 
   const creatorId = auth?.$id || "";
+  const draftKey = `draft_${creatorId || "guest"}_${id ?? "new"}${
+    urlTag ? `_${urlTag}` : ""
+  }`;
+  const [autoSavedAt, setAutoSavedAt] = useState<number | null>(null);
 
   // ===== AI 相关状态 =====
   const [aiLoading, setAiLoading] = useState(false);
@@ -104,7 +108,7 @@ const EditPage = () => {
       });
 
       // es = new EventSource(`/chat?${query.toString()}`);
-      es = new EventSource(`http://localhost:3500/chat?${query.toString()}`);
+      es = new EventSource(`/chat?${query.toString()}`);
 
       // 第一次建立连接时，启动打字机
       es.onopen = () => {
@@ -219,6 +223,11 @@ const EditPage = () => {
                     ? `当前话题 #${urlTag}，试着用一段文字记录你的想法吧。`
                     : "简单几步，分享你的图片和文字。"}
                 </p>
+                {autoSavedAt && (
+                  <p className="mt-1 text-[10px] text-slate-400">
+                    草稿已于 {new Date(autoSavedAt).toLocaleTimeString()} 自动保存
+                  </p>
+                )}
               </div>
             </div>
 
@@ -229,6 +238,8 @@ const EditPage = () => {
               creatorId={creatorId}
               aiCaption={aiCaptionForForm}
               tags={urlTag ? [urlTag] : post?.tags}
+              draftKey={draftKey}
+              onAutoSave={(ts) => setAutoSavedAt(ts)} 
             />
           </section>
         </div>

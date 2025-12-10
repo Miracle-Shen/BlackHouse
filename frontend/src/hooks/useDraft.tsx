@@ -1,174 +1,114 @@
-// src/hooks/useAutosaveDraft.ts
-import { useEffect, useMemo, useState } from "react";
-import axios from "@/api/axios";
-import type { INewPost } from "@/types";
+// src/hooks/usePostDraft.ts
+import { useCallback, useEffect, useRef,useState } from "react";
+import type { UseFormReturn } from "react-hook-form";
+import type * as z from "zod";
+import { PostValidation } from "@/types";
+import { useGlobalModal } from "@/context/ModalProvider";
 
-interface UseAutosaveDraftOptions {
-  creatorId: string;
-  post?: INewPost | null; // 服务器返回的原始数据
-  id?: string;            // 编辑时的 postId
-  tag?: string;           // 话题，用来区分“新建草稿”
-  intervalMs?: number;    // 自动保存间隔，默认 30s
-}
+type PostFormValues = z.infer<typeof PostValidation>;
 
-interface UseAutosaveDraftResult {
-  draft: INewPost | null;
-  onFormChange: (values: Partial<INewPost>) => void;
-  onSubmitSuccess: () => void;
-  isOnline: boolean;
-  isDirty: boolean;
-  fromDraft: boolean;   // 是否是从草稿恢复出来的
-}
-
-const loadLocalDraft = (key: string): INewPost | null => {
-  try {
-    const raw = localStorage.getItem(key);
-    if (!raw) return null;
-    return JSON.parse(raw) as INewPost;
-  } catch (e) {
-    console.error("[Draft] load error", e);
-    return null;
-  }
+// 草稿只存这些字段，避免把 file 等大对象塞进 localStorage
+type DraftShape = {
+  title: string;
+  caption: string;
+  tags: string[];
 };
 
-const saveLocalDraft = (key: string, draft: INewPost) => {
-  try {
-    localStorage.setItem(key, JSON.stringify(draft));
-  } catch (e) {
-    console.error("[Draft] save error", e);
-  }
-};
+/**
+ * 封装自动草稿逻辑：
+ * - 进入页面时：如果有草稿 -> 用全局弹窗提示是否恢复
+ * - 每 30s：自动保存当前表单内容到 localStorage
+ * - 提供 clearDraft 方法给提交成功后调用
+ */
+export function usePostDraft(
+  draftKey: string | undefined,
+  form: UseFormReturn<PostFormValues>
+) {
+  const { showConfirm } = useGlobalModal();
 
-const clearLocalDraft = (key: string) => {
-  try {
-    localStorage.removeItem(key);
-  } catch (e) {
-    console.error("[Draft] clear error", e);
-  }
-};
+  // 防止重复弹窗
+  const hasPromptedRef = useRef(false);
+  const [autoSavedAt, setAutoSavedAt] = useState<number | null>(null);
 
-export function useAutosaveDraft(
-  options: UseAutosaveDraftOptions
-): UseAutosaveDraftResult {
-  const { creatorId, post, id, tag, intervalMs = 30000 } = options;
-
-  // 为每个用户 + post / tag 生成唯一 key
-  const draftKey = useMemo(() => {
-    if (!creatorId) return "";
-    if (id) return `draft_post_${creatorId}_${id}`;
-    return `draft_new_${creatorId}_${tag || "default"}`;
-  }, [creatorId, id, tag]);
-
-  const [draft, setDraft] = useState<INewPost | null>(post ?? null);
-  const [isDirty, setIsDirty] = useState(false);
-  const [pendingSync, setPendingSync] = useState(false);
-  const [isOnline, setIsOnline] = useState<boolean>(navigator.onLine);
-  const [fromDraft, setFromDraft] = useState(false);
-
-  // ===== 初始化时，优先从本地草稿恢复 =====
+  // 进入页面时，判断是否有草稿 -> 用全局弹窗提示是否恢复
   useEffect(() => {
-    if (!creatorId || !draftKey) return;
+    if (!draftKey) return;
+    if (typeof window === "undefined") return;
+    if (hasPromptedRef.current) return;
 
-    const localDraft = loadLocalDraft(draftKey);
-
-    if (localDraft) {
-      setDraft(localDraft);
-      setFromDraft(true);
-    } else if (post) {
-      setDraft(post);
-      setFromDraft(false);
-    }
-    // 只在 post / key 变化时触发一次，不要依赖 draft
-  }, [creatorId, draftKey, post?.$id]);
-
-  // ===== 保存到云端草稿的函数 =====
-  const saveDraftToServer = async (data: INewPost) => {
     try {
-      await axios.post("/drafts/save", {
-        key: draftKey,
-        draft: data,
-      });
-      setPendingSync(false);
-    } catch (e) {
-      console.error("[Draft] save to server error", e);
-      setPendingSync(true);
-    }
-  };
+      const raw = localStorage.getItem(draftKey);
+      if (!raw) return; // 没有草稿，直接结束
 
-  // ===== 定时自动保存（本地 + 云端）===== 
+      const draft: DraftShape = JSON.parse(raw);
+      hasPromptedRef.current = true;
+
+      showConfirm({
+        title: "发现未保存的草稿",
+        description: "检测到你上次编辑时留下了一份草稿，是否恢复继续编辑？",
+        confirmText: "恢复草稿",
+        cancelText: "不用恢复",
+        onConfirm: () => {
+          const current = form.getValues();
+          form.reset({
+            ...current,
+            title: draft.title ?? current.title,
+            caption: draft.caption ?? current.caption,
+            tags: draft.tags ?? current.tags,
+          });
+        },
+        onCancel: () => {
+          localStorage.removeItem(draftKey);
+        },
+      });
+    } catch (error) {
+      console.error("[usePostDraft] 恢复草稿失败", error);
+    }
+  }, [draftKey, form, showConfirm]);
+
+  // 每 30s 自动保存草稿
   useEffect(() => {
-    if (!draft || !draftKey) return;
+    if (!draftKey) return;
+    if (typeof window === "undefined") return;
 
     const timer = window.setInterval(() => {
-      if (!isDirty) return;
+      try {
+        const values = form.getValues();
+        const draft: DraftShape = {
+          title: values.title || "",
+          caption: values.caption || "",
+          tags: values.tags || [],
+        };
 
-      // 1. 本地保存
-      saveLocalDraft(draftKey, draft);
+        const isEmpty =
+          !draft.title &&
+          !draft.caption &&
+          (!draft.tags || draft.tags.length === 0);
 
-      // 2. 在线时同步云端
-      if (navigator.onLine) {
-        saveDraftToServer(draft);
-      } else {
-        setPendingSync(true);
+        if (isEmpty) {
+          // 全空就不保留草稿，避免积累垃圾数据
+          localStorage.removeItem(draftKey);
+          return;
+        }
+
+        localStorage.setItem(draftKey, JSON.stringify(draft));
+        setAutoSavedAt(Date.now());
+      } catch (error) {
+        console.error("[usePostDraft] 自动保存草稿失败", error);
       }
-
-      setIsDirty(false);
-    }, intervalMs);
+    }, 30000); // 30 秒
 
     return () => {
       window.clearInterval(timer);
     };
-  }, [draft, isDirty, draftKey, intervalMs]);
+  }, [draftKey, form]);
 
-  // ===== 监听网络变化：上线后自动同步 =====
-  useEffect(() => {
-    const handleOnline = () => {
-      setIsOnline(true);
-      if (pendingSync && draft) {
-        saveDraftToServer(draft);
-      }
-    };
-
-    const handleOffline = () => {
-      setIsOnline(false);
-    };
-
-    window.addEventListener("online", handleOnline);
-    window.addEventListener("offline", handleOffline);
-
-    return () => {
-      window.removeEventListener("online", handleOnline);
-      window.removeEventListener("offline", handleOffline);
-    };
-  }, [draft, pendingSync]);
-
-  // ===== 外部传进来的表单变化回调 =====
-  const onFormChange = (values: Partial<INewPost>) => {
-    setDraft(prev => {
-      const next: INewPost = {
-        ...(prev || ({} as INewPost)),
-        ...values,
-      };
-      return next;
-    });
-    setIsDirty(true);
-  };
-
-  // ===== 表单提交成功后，清理草稿 =====
-  const onSubmitSuccess = () => {
+  // 提交成功后清除草稿
+  const clearDraft = useCallback(() => {
     if (!draftKey) return;
-    clearLocalDraft(draftKey);
-    setPendingSync(false);
-    setIsDirty(false);
-    setFromDraft(false);
-  };
+    if (typeof window === "undefined") return;
+    localStorage.removeItem(draftKey);
+  }, [draftKey]);
 
-  return {
-    draft,
-    onFormChange,
-    onSubmitSuccess,
-    isOnline,
-    isDirty,
-    fromDraft,
-  };
+  return { clearDraft, autoSavedAt };
 }

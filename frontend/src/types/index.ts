@@ -69,11 +69,11 @@ export type IUpdateUser = {
 
 export type INewPost = {
   creator?:string| IUser;
-  $id?: string;
-  title?: string;
-  caption?: string;
-  imageId?: string;
-  imageUrl?: string;
+  $id: string;
+  title: string;
+  caption: string;
+  imageId: string;
+  imageUrl: string;
   thumbnailUrl?: string;
   file?: File[];
   tags?: string[];

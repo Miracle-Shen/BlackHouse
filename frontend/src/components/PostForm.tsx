@@ -12,14 +12,13 @@ import {
   FormMessage,
 } from "./ui/Form";
 import { Textarea } from "./ui/Textarea";
-
 import { PostValidation } from "@/types/index";
 import { lazy, Suspense } from "react";
 const FileUploader = lazy(() => import("./common/FileUploader"));
 import { useCreatePost, useUpdatePost } from "@/lib/react-query/queries";
 import type { INewPost, IUpdatePost } from "@/types";
 import { useGlobalModal } from "@/context/ModalProvider";
-
+import {usePostDraft} from '../hooks/useDraft';
 type PostFormProps = {
   post?: INewPost;
   action: "Create" | "Update";
@@ -27,9 +26,10 @@ type PostFormProps = {
   tags?: string[];
   creatorId: string;
   aiCaption?: string;
+  draftKey?: string; onAutoSave?: (timestamp: number) => void;
 };
 
-const PostForm = ({ post, action, creatorId, aiCaption,tags }: PostFormProps) => {
+const PostForm = ({ post, action, creatorId, aiCaption,tags,draftKey,onAutoSave }: PostFormProps) => {
   const { showConfirm } = useGlobalModal();
   const navigate = useNavigate();
 
@@ -45,9 +45,15 @@ const PostForm = ({ post, action, creatorId, aiCaption,tags }: PostFormProps) =>
     },
   });
 
+
+  const { clearDraft, autoSavedAt } = usePostDraft(draftKey, form);
+  useEffect(() => {
+    if (!autoSavedAt) return;   // 初始 null 不触发
+    if (onAutoSave) onAutoSave(autoSavedAt);
+  }, [autoSavedAt, onAutoSave]);
   const captionRef = useRef<HTMLTextAreaElement | null>(null);
   const hasScrolledByAIRef = useRef(false);
-
+  
   useEffect(() => {
     if (typeof aiCaption === "string") {
       form.setValue("caption", aiCaption, {
@@ -85,6 +91,8 @@ const PostForm = ({ post, action, creatorId, aiCaption,tags }: PostFormProps) =>
         if (!updatedPost) {
           return;
         }
+        clearDraft();// 提交成功后清除草稿
+
         showConfirm({
           title: "帖子更新成功！",
           description: "你的帖子已成功更新。",
@@ -98,6 +106,9 @@ const PostForm = ({ post, action, creatorId, aiCaption,tags }: PostFormProps) =>
 
       const newPostData: INewPost = {
         ...value,
+        $id: "", //占位
+        imageId: "",
+        imageUrl: "",
         creator: creatorId,
         tags: value.tags || [],
       };
@@ -105,6 +116,7 @@ const PostForm = ({ post, action, creatorId, aiCaption,tags }: PostFormProps) =>
       if (!newPost) {
         return;
       }
+      clearDraft();//
       showConfirm({
         title: "帖子创建成功！",
         description: "你的帖子已成功创建。",

@@ -134,22 +134,20 @@ export async function searchPosts(searchTerm: string) {
 
 export async function getInfinitePosts({
   pageParam,
-}: {
-  pageParam?: string | null;
-}) {
+  }: {
+    pageParam?: string | null;
+  }) {
   // 1. 组装 Appwrite 查询条件
   const queries: string[] = [
     Query.orderDesc("$updatedAt"),
-    Query.limit(9),
+    Query.limit(8),
   ];
 
-  // 有游标才加 cursorAfter
   if (pageParam) {
     queries.push(Query.cursorAfter(pageParam));
   }
 
   try {
-    // 2. 向 Appwrite 拉一页数据
     const postList = await databases.listDocuments(
       appwriteConfig.databaseId,
       appwriteConfig.postCollectionId,
@@ -158,7 +156,6 @@ export async function getInfinitePosts({
 
     const posts = postList.documents ?? [];
 
-    // 3. 给每个 post 补充用户信息，并映射成 INewPost
     const postsWithUserDetails: INewPost[] = await Promise.all(
       posts.map(async (post: any) => {
         try {
@@ -201,7 +198,6 @@ export async function getInfinitePosts({
     };
   } catch (error) {
     console.error("getInfinitePosts error:", error);
-    // 抛出去，让 react-query 能走 onError / error 状态
     throw error;
   }
 }
