@@ -1,8 +1,8 @@
 import { multiFormatDateString } from "@/lib/utils";
 import { Link } from "react-router-dom";
 import type { INewPost, IUser } from "@/types";
-
-const PostCard = ({ post }: { post: INewPost }) => {
+import React from "react";
+const PostCard = React.memo(({ post }: { post: INewPost }) => {
   const creator = post.creator as IUser | undefined;
   const avatarUrl = creator?.thumbnailUrl ||creator?.avatarUrl || "./icons/profile-placeholder.svg";
   const userName = creator?.userName || "加载中...";
@@ -11,7 +11,7 @@ const PostCard = ({ post }: { post: INewPost }) => {
     <article className="w-full max-w-screen-sm">
       <Link
         to={`/posts/${post.$id}`}
-        className="group block rounded-3xl bg-white/90 p-3 shadow-sm ring-1 ring-slate-100 transition hover:-translate-y-0.5 hover:bg-white hover:shadow-md sm:p-4"
+        className="group block rounded-3xl bg-white/90 p-3 shadow-sm ring-1 ring-slate-100 transition "//太貴了 hover:-translate-y-0.5 hover:bg-white hover:shadow-md sm:p-4
       >
         {/* 图片 */}
         <div className="relative mb-3 overflow-hidden rounded-2xl bg-slate-100">
@@ -22,15 +22,13 @@ const PostCard = ({ post }: { post: INewPost }) => {
           />
         </div>
 
-        {/* 文本内容 */}
         <div className="space-y-2">
-          {/* 标题 */}
           <h2 className="line-clamp-2 text-sm font-semibold text-slate-900 sm:text-base">
             {post.title || "标题加载中..."}
           </h2>
 
-          {/* 简短摘要（可选，如果你以后想开） */}
-          {/* {post.caption && (
+          {/* 简短摘要（可选） */}
+          {/* {post.caption && (hover
             <p className="line-clamp-2 text-xs text-slate-500 sm:text-sm">
               {post.caption}
             </p>
@@ -62,7 +60,7 @@ const PostCard = ({ post }: { post: INewPost }) => {
             </div>
           </div>
 
-          {/* 标签（如果你之后想启用） */}
+          {/* 标签（如果之后想启用） */}
           {/* {post?.tags && post.tags.length > 0 && (
             <ul className="mt-2 flex flex-wrap gap-1.5">
               {post.tags.map((tag: string, index: number) => (
@@ -79,6 +77,6 @@ const PostCard = ({ post }: { post: INewPost }) => {
       </Link>
     </article>
   );
-};
+});
 
 export default PostCard;
