@@ -23,7 +23,7 @@ const PostCard = React.memo(({ post }: { post: INewPost }) => {
         </div>
 
         <div className="space-y-2">
-          <h2 className="line-clamp-2 text-sm font-semibold text-slate-900 sm:text-base">
+          <h2 className="line-clamp-1 text-sm font-semibold text-slate-900 sm:text-base">
             {post.title || "标题加载中..."}
           </h2>
 

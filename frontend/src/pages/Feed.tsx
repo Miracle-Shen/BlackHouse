@@ -4,7 +4,7 @@ import { VirtuosoGrid } from "react-virtuoso";
 import PostCard from "@/components/PostCard";
 import PullToRefresh from "@/components/common/PullToRefresh";
 import { useGetPosts } from "@/lib/react-query/queries";
-
+  
 const GridList = forwardRef<HTMLDivElement, React.HTMLAttributes<HTMLDivElement>>(
   ({ style, children, ...rest }, ref) => (
     <div
@@ -64,13 +64,21 @@ const FeedPage = () => {
   }, [postsData]);
 
   const handleEndReached = useCallback(() => {
-    
-    if (hasNextPage && !isFetchingNextPage) 
-      
-      fetchNextPage();
+    if (hasNextPage && !isFetchingNextPage){
+      console.log("now fetch next page");
+       fetchNextPage();
+    } 
   }, [hasNextPage, isFetchingNextPage, fetchNextPage]);
 
   const showSkeleton = isLoading && posts.length === 0;
+
+  const gridData = useMemo(() => {
+    if(!posts || posts.length === 0) return posts;
+    if(!hasNextPage && posts.length % 2 === 1){
+      return [...posts, {}];
+    }
+    return posts;
+  }, [posts, hasNextPage]);
 
   return (
     <div className="bg-white min-h-screen">
@@ -86,7 +94,7 @@ const FeedPage = () => {
           <div className="px-3 pb-20">
             <VirtuosoGrid
               useWindowScroll
-              data={posts}
+              data={gridData}
               endReached={handleEndReached}
               overscan={5}
               computeItemKey={(_, post: any) =>
@@ -95,16 +103,15 @@ const FeedPage = () => {
               components={{
                 List: GridList,
                 Item: ({ children }) => <div>{children}</div>,
-                Footer: () =>
-                  hasNextPage ? (
-                    <div className="py-4 text-center text-xs text-slate-400">
-                      {isFetchingNextPage ? "加载中..." : "上拉加载更多"}
-                    </div>
-                  ) : posts.length > 0 ? (
-                    <div className="py-4 text-center text-xs text-slate-400">
-                      没有更多了
-                    </div>
-                  ) : null,
+                Footer: () => (
+                  <div className="py-4 text-center text-xs text-slate-400 min-h-[32px]">
+                    {hasNextPage
+                      ? (isFetchingNextPage ? "加载中..." : "上拉加载更多")
+                      : posts.length > 0
+                        ? "没有更多了"
+                        : ""}
+                  </div>
+                ),
               }}
               itemContent={(_, post: any) => <PostCard post={post} />}
             />
