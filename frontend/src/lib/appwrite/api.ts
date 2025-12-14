@@ -141,6 +141,7 @@ export async function getInfinitePosts({
   const queries: string[] = [
     Query.orderDesc("$updatedAt"),
     Query.limit(8),
+    Query.equal("isPublished", true),
   ];
 
   if (pageParam) {

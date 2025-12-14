@@ -118,10 +118,11 @@ const PostForm = ({ post, action, creatorId, aiCaption,tags,draftKey,onAutoSave 
       if (!newPost) {
         return;
       }
+      const content = newPost.isPublished ? "成功创建。" : "已保存为草稿。";
       clearDraft();//
       showConfirm({
         title: "帖子创建成功！",
-        description: "你的帖子已成功创建。",
+        description: `你的帖子已${content}`,
         confirmText: "去查看",
         onConfirm: () => {
           navigate(`/posts/${newPost.$id}`);

@@ -59,9 +59,10 @@ const FeedPage = () => {
     isFetchingNextPage,
   } = useGetPosts();
 
-  const posts = useMemo(() => {
-    return postsData?.pages.flatMap((page: any) => page.documents) ?? [];
-  }, [postsData]);
+const posts = useMemo(() => {
+  const all = postsData?.pages.flatMap((page: any) => page.documents) ?? [];
+  return all.filter((p: any) => p?.isPublished !== false);
+}, [postsData]);
 
   const handleEndReached = useCallback(() => {
     if (hasNextPage && !isFetchingNextPage){
@@ -73,11 +74,10 @@ const FeedPage = () => {
   const showSkeleton = isLoading && posts.length === 0;
 
   const gridData = useMemo(() => {
-    if(!posts || posts.length === 0) return posts;
-    if(!hasNextPage && posts.length % 2 === 1){
-      return [...posts, {}];
-    }
-    return posts;
+    if (posts.length === 0) return [];
+
+    const needPad = !hasNextPage && posts.length % 2 === 1;
+    return needPad ? [...posts, { __placeholder: true }] : posts;
   }, [posts, hasNextPage]);
 
   return (
