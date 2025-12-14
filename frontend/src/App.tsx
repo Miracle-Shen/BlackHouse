@@ -2,7 +2,7 @@
 import { Routes, Route } from 'react-router-dom';
 import { lazy, Suspense } from 'react';
 import Layout from './components/Layout';
-
+import PersistLogin from './components/common/PersistLogin';
 import FeedPage from './pages/Feed';
 const EditPage = lazy(() => import('./pages/Edit'));
 const Login = lazy(() => import('./pages/Login'));
@@ -22,28 +22,30 @@ function App() {
         </div>
       }
     >
-    <Routes>
-      {/* 登录和注册页面不使用布局 */}
-      <Route path="/login" element={<Login />} />
-      <Route path="/register" element={<Register />} />
-          {/* 其他页面使用布局 */}
-          <Route path="/" element={<Layout />}>
-          <Route index element={<FeedPage />} />
-          <Route path="/mine" element={<Mine />} />
-          <Route path="/user/:id" element={<UserPage />} />
+    <PersistLogin>
+      <Routes>
+        {/* 登录和注册页面不使用布局 */}
+        <Route path="/login" element={<Login />} />
+        <Route path="/register" element={<Register />} />
+            {/* 其他页面使用布局 */}
+            <Route path="/" element={<Layout />}>
+            <Route index element={<FeedPage />} />
+            <Route path="/mine" element={<Mine />} />
+            <Route path="/user/:id" element={<UserPage />} />
 
-          </Route>
-          <Route
-              path="/edit/:id?/tag=?"
-              element={
-                <ProtectedRoute>
-                  <EditPage />
-                </ProtectedRoute>
-              }
-            />
-            <Route path="/posts/:id" element={<PostDetails />} />
+            </Route>
+            <Route
+                path="/edit/:id?/tag=?"
+                element={
+                  <ProtectedRoute>
+                    <EditPage />
+                  </ProtectedRoute>
+                }
+              />
+              <Route path="/posts/:id" element={<PostDetails />} />
 
-    </Routes>
+      </Routes>
+    </PersistLogin>
     </Suspense>
   );
 }

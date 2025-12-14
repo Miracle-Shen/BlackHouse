@@ -17,21 +17,14 @@ type UserProps = {
 const Profile = ({ users, interests,setUsers,isOwner }: UserProps) => {
   const navigate = useNavigate();
   const [isShow, setIsShow] = useState(false);
-  const { setAuth } = useAuth();  
+  const { logout } = useAuth();  
   const {showConfirm} = useGlobalModal();
-  const logout = async () => {
-    try {
-      await axios.post("/logout", {}, { withCredentials: true });
-    } catch (err) {
-      console.error("Logout error:", err);
-    } finally {
-      setAuth(null);
-      localStorage.removeItem("auth");
-      navigate("/login", { replace: true });
-    }
-  };
 
-      
+
+  const handleLogout = () => {
+    logout();
+    navigate("/", { replace: true });
+  }
 
   useEffect(() => {
     if (!users) {
@@ -84,7 +77,7 @@ const Profile = ({ users, interests,setUsers,isOwner }: UserProps) => {
               )}
             </div>
 
-             {/* 🌈 兴趣圈：异步加载 + 异步拉数据 */}
+             {/* 兴趣圈：异步加载 + 异步拉数据 */}
             <div>
               <InterestCloud interests={interests} />
             </div>
@@ -126,7 +119,7 @@ const Profile = ({ users, interests,setUsers,isOwner }: UserProps) => {
             <div className="w-full flex justify-center">
               <button
                 className="inline-flex h-9 items-center justify-center rounded-full bg-red-500 px-6 text-sm font-medium text-white shadow-sm hover:bg-red-600"
-                onClick={logout}
+                onClick={handleLogout}
               >
                 退出登录
               </button>

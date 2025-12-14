@@ -3,29 +3,25 @@ import { useLocation, useNavigate } from "react-router-dom";
 import useAuth from "../hooks/useAuth";
 
 const Mine = () => {
-  const { auth } = useAuth();
+  const { status,auth } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
 
  useEffect(() => {
-  // 只有一种情况可以“等一下”：Context 还没挂上（一般很少）
-  if (auth === undefined) return;
+  if (status === "loading") return;
 
-  // 没登录（null 或者没有 $id）→ 去登录
-  if (!auth || !auth.$id) {
-    navigate("/login", {
-      state: { from: location.pathname },
-      replace: true,
-    });
+  if (!auth.accessToken) {
+    navigate("/login", { state: { from: location.pathname }, replace: true });
     return;
   }
 
-  // 已登录 → 跳到 user/:id
-  navigate(`/user/${auth.$id}`, { replace: true });
-}, [auth, navigate, location.pathname]);
+  const id = auth.$id || auth.userId;
+  if (id) navigate(`/user/${id}`, { replace: true });
+}, [status, auth.accessToken, auth.$id, auth.userId]);
 
 
-  // 过渡态：给个轻量 loading
+
+  // 过渡态：轻量 loading
   return (
     <div className="min-h-screen bg-gradient-to-b from-slate-50 to-slate-100 flex items-center justify-center px-4">
       <div className="w-full max-w-sm rounded-2xl bg-white/90 px-4 py-5 shadow-sm text-center">

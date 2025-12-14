@@ -1,5 +1,5 @@
 import { useRef, useState, useEffect, useContext } from "react";
-import {AuthContext} from "../context/AuthProvider";
+import { AuthContext } from "../context/AuthProvider";
 import { Link, useNavigate } from "react-router-dom";
 import axios from "../api/axios";
 import type { ILoginResponse } from "../types/index";
@@ -7,7 +7,7 @@ import type { ILoginResponse } from "../types/index";
 const LOGIN_URL = "/auth";
 
 const Login = () => {
-  const { setAuth } = useContext(AuthContext) as { setAuth: (auth: any) => void };
+  const { setAuth, setStatus } = useContext(AuthContext) as any;
 
   const userRef = useRef<HTMLInputElement | null>(null);
   const errRef = useRef<HTMLParagraphElement | null>(null);
@@ -33,6 +33,7 @@ const Login = () => {
 
     try {
       setIsSubmitting(true);
+
       const response = await axios.post<ILoginResponse>(
         LOGIN_URL,
         JSON.stringify({ user, pwd }),
@@ -43,8 +44,18 @@ const Login = () => {
       );
 
       const { accessToken, userId, $id } = response.data;
-      setAuth({ $id, userId, accessToken });
-      localStorage.setItem("user", JSON.stringify({ userId, $id, accessToken }));
+
+      // 写入内存 auth
+      setAuth((prev: any) => ({
+        ...(prev ?? {}),
+        $id: $id ?? prev?.$id,
+        userId: userId ?? prev?.userId,
+        accessToken,
+      }));
+
+      // 标记已登录
+      setStatus("authed");
+
       setUser("");
       setPwd("");
       navigate("/Mine", { replace: true });
@@ -67,7 +78,6 @@ const Login = () => {
   return (
     <div className="min-h-screen bg-gradient-to-b from-slate-50 to-slate-100 flex items-center justify-center px-4">
       <div className="w-full max-w-md rounded-2xl bg-white p-6 shadow-sm ring-1 ring-slate-100 sm:p-7">
-        {/* 错误提示条 */}
         <p
           ref={errRef}
           className={
@@ -80,7 +90,6 @@ const Login = () => {
           {errMsg}
         </p>
 
-        {/* 标题 */}
         <div className="mb-5 text-center">
           <h1 className="text-xl font-semibold text-slate-900 sm:text-2xl">
             欢迎回来
@@ -90,13 +99,9 @@ const Login = () => {
           </p>
         </div>
 
-        {/* 表单 */}
         <form onSubmit={handleSubmit} className="space-y-4">
           <div className="space-y-1">
-            <label
-              htmlFor="username"
-              className="text-xs font-medium text-slate-600 sm:text-sm"
-            >
+            <label htmlFor="username" className="text-xs font-medium text-slate-600 sm:text-sm">
               用户名
             </label>
             <input
@@ -113,10 +118,7 @@ const Login = () => {
           </div>
 
           <div className="space-y-1">
-            <label
-              htmlFor="password"
-              className="text-xs font-medium text-slate-600 sm:text-sm"
-            >
+            <label htmlFor="password" className="text-xs font-medium text-slate-600 sm:text-sm">
               密码
             </label>
             <input
@@ -140,7 +142,6 @@ const Login = () => {
           </button>
         </form>
 
-        {/* 底部切换注册 */}
         <p className="mt-4 text-center text-xs text-slate-500 sm:text-sm">
           还没有账号？
           <Link

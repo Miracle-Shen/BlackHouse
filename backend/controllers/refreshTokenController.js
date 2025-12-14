@@ -23,7 +23,7 @@ const handleRefreshToken =  (req, res) => {
     const foundUser = usersDB.users.find(person => person.refreshToken === refreshToken);
     if (!foundUser) {
         console.log("No matching user found for refreshToken");
-        return res.status(403).json({ 'message': 'foundUser Forbidden' }); //禁止访问
+        return res.status(401).json({ 'message': 'foundUser Forbidden' }); //禁止访问
     }
 
     // console.log("Found user:", foundUser);

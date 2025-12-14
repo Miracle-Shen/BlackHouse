@@ -1,14 +1,19 @@
 
 // types/auth.ts
-export type AuthData = {
-  $id: string;
-  userId: string;
-  accessToken: string;   // 如果你现在就想这么用，先保留
+export type AuthState = {
+  $id?: string;
+  userId?: string;
+  accessToken: string | null;
 };
-
+export type AuthStatus = "loading" | "authed" | "guest";
 export type AuthContextType = {
-  auth: AuthData | null;
-  setAuth: React.Dispatch<React.SetStateAction<AuthData | null>>;
+  auth: AuthState;
+  setAuth: React.Dispatch<React.SetStateAction<AuthState>>;
+  status: AuthStatus;
+  setStatus: React.Dispatch<React.SetStateAction<AuthStatus>>;
+  persist: boolean;
+  setPersist: React.Dispatch<React.SetStateAction<boolean>>;
+  logout: () => void;
 };
 
 export type GridPostListProps = {

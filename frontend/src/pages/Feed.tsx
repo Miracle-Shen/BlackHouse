@@ -96,9 +96,9 @@ const FeedPage = () => {
               useWindowScroll
               data={gridData}
               endReached={handleEndReached}
-              overscan={5}
+              overscan={10}
               computeItemKey={(_, post: any) =>
-                post?.$id ?? post?.id ?? post?._id ?? `${_}`
+                post?.$id ?? `${_}`
               }
               components={{
                 List: GridList,
