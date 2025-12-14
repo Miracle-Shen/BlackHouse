@@ -172,6 +172,7 @@ export async function getInfinitePosts({
             file: [], // 适配 INewPost
             tags: post.tags,
             $createdAt: post.$createdAt,
+            isPublished: post.isPublished ?? false,
           } as INewPost;
         } catch (error) {
           // 拉用户失败就退回原始 creator
@@ -186,6 +187,7 @@ export async function getInfinitePosts({
             file: [],
             tags: post.tags,
             $createdAt: post.$createdAt,
+            isPublished: post.isPublished ?? false,
           } as INewPost;
         }
       })
@@ -442,7 +444,8 @@ export async function getRecentPosts(): Promise<INewPost[]> {
             imageId: post.imageId,
             file: [], // 适配 INewPost 的 file 字段
             tags: post.tags,
-            $createdAt: post.$createdAt
+            $createdAt: post.$createdAt,
+            isPublished: post.isPublished ?? false,
           } as INewPost;
         } catch (error) {
           return {
@@ -455,7 +458,8 @@ export async function getRecentPosts(): Promise<INewPost[]> {
             imageId: post.imageId,
             file: [],
             tags: post.tags,
-            $createdAt: post.$createdAt
+            $createdAt: post.$createdAt,
+            isPublished: post.isPublished ?? false,
           } as INewPost;
         }
       })

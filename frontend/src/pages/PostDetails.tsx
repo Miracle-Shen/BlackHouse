@@ -63,7 +63,6 @@ const PostDetails = () => {
           console.error("获取推荐帖子失败：", res.data);
           return;
         }
-        // 根据你的后端返回结构调整
         setRelatedPosts(res.data?.data  || []);
       } catch (error) {
         console.error("获取推荐帖子失败：", error);

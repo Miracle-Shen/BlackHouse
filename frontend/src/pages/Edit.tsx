@@ -21,6 +21,7 @@ const EditPage = () => {
 
   if (id) {
     post = {
+      isPublished: data ? data.isPublished : false,
       $id: data ? data.$id : "",
       title: data?.title,
       creator: data?.creator,

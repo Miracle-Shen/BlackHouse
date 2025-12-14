@@ -19,6 +19,7 @@ export type AuthContextType = {
 export type GridPostListProps = {
   posts: Array<{
     $id: string;
+    isPublished:boolean;
     title?: string;
     imageUrl?: string;
     thumbnailUrl?: string;
@@ -80,6 +81,7 @@ export type INewPost = {
   imageId: string;
   imageUrl: string;
   thumbnailUrl?: string;
+  isPublished:boolean;
   file?: File[];
   tags?: string[];
   $createdAt?: string;
@@ -92,6 +94,7 @@ export type IUpdatePost = {
   caption?: string;
   imageId?: string;
   imageUrl?: string;
+  isPublished:boolean;
   thumbnailUrl?: string;
   file: File[];
   tags?: string[];
@@ -142,6 +145,7 @@ export const PostValidation = z.object({
   tags: z.array(z.string()).optional(),
   title: z.string().min(1, { message: "标题不能为空" }),
   $id: z.string().optional(),
+  isPublished: z.boolean().optional(),
 });
 
 export const UpdatePostValidation = PostValidation.refine(

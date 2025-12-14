@@ -24,6 +24,7 @@ type PostFormProps = {
   action: "Create" | "Update";
   userId?: string;
   tags?: string[];
+  isPublished?: boolean;
   creatorId: string;
   aiCaption?: string;
   draftKey?: string; onAutoSave?: (timestamp: number) => void;
@@ -32,7 +33,6 @@ type PostFormProps = {
 const PostForm = ({ post, action, creatorId, aiCaption,tags,draftKey,onAutoSave }: PostFormProps) => {
   const { showConfirm } = useGlobalModal();
   const navigate = useNavigate();
-
 
   const form = useForm<z.infer<typeof PostValidation>>({
     resolver: zodResolver(PostValidation),
@@ -86,6 +86,7 @@ const PostForm = ({ post, action, creatorId, aiCaption,tags,draftKey,onAutoSave 
           imageId: post.imageId,
           imageUrl: post.imageUrl,
           tags: value.tags || [],
+          isPublished: value.isPublished ?? post.isPublished ?? true,
         };
         const updatedPost = await updatePost(updateData);
         if (!updatedPost) {
@@ -111,6 +112,7 @@ const PostForm = ({ post, action, creatorId, aiCaption,tags,draftKey,onAutoSave 
         imageUrl: "",
         creator: creatorId,
         tags: value.tags || [],
+        isPublished: value.isPublished ?? true,
       };
       const newPost = await createPost(newPostData);
       if (!newPost) {
@@ -248,14 +250,22 @@ const PostForm = ({ post, action, creatorId, aiCaption,tags,draftKey,onAutoSave 
         <div className="mt-2 flex flex-col-reverse gap-3 sm:flex-row sm:justify-end">
           <button
             type="button"
-            onClick={() => navigate(-1)}
+            onClick={form.handleSubmit(async (value) => {
+              await handleSubmit({ ...value, isPublished: false } as any);
+              //navigate(-1); // 保存后停留页面
+            })}
             className="h-9 w-full rounded-full border border-slate-200 text-sm text-slate-700 hover:bg-slate-50 sm:w-28"
           >
-            取消
+            存草稿
           </button>
+
+          {/* 提交：发布 */}
           <button
-            type="submit"
+            type="button"
             disabled={isSubmitting}
+            onClick={form.handleSubmit((value) =>
+              handleSubmit({ ...value, isPublished: true } as any)
+            )}
             className="relative h-9 w-full rounded-full bg-blue-500 text-sm font-medium text-white shadow-sm transition disabled:cursor-not-allowed disabled:opacity-70 hover:bg-blue-600 sm:w-28"
           >
             <span className={isSubmitting ? "opacity-0" : "opacity-100"}>
@@ -268,6 +278,7 @@ const PostForm = ({ post, action, creatorId, aiCaption,tags,draftKey,onAutoSave 
             )}
           </button>
         </div>
+
       </form>
     </Form>
     </>

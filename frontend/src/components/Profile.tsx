@@ -3,7 +3,6 @@ import { useState, useEffect} from "react";
 import { useGetUserPosts } from "@/lib/react-query/queries";
 import GridPostList from "./common/GridPostList";
 import UpdateAvatarModal from "./common/UpdateAvatarModal";
-import axios from "@/api/axios";
 import useAuth from "../hooks/useAuth";
 import InterestCloud from "./InterestCloud";
 import { useGlobalModal } from "@/context/ModalProvider";
@@ -52,7 +51,13 @@ const Profile = ({ users, interests,setUsers,isOwner }: UserProps) => {
   }
   
   const { data: userPosts } = useGetUserPosts(users.$id);
-  const posts = userPosts?.documents || [];
+  const posts = (userPosts?.documents || []).map((doc: any) => ({
+    $id: doc.$id,
+    title: doc.title,
+    imageUrl: doc.imageUrl,
+    thumbnailUrl: doc.thumbnailUrl,
+    isPublished: doc.isPublished ?? false,
+  }));
 
   return (
     <>
