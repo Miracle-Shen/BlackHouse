@@ -1,10 +1,10 @@
-import React, { useMemo, useState,useCallback, forwardRef } from "react";
+import React, { useMemo, useState,useCallback, forwardRef, use } from "react";
 import { VirtuosoGrid } from "react-virtuoso";
 
 import PostCard from "@/components/PostCard";
 import PullToRefresh from "@/components/common/PullToRefresh";
-import { useGetPosts } from "@/lib/react-query/queries";
-  
+//import { useGetPosts } from "@/lib/react-query/queries";
+import {useGetPostsLite} from "@/hooks/useGetPosts";
 const GridList = forwardRef<HTMLDivElement, React.HTMLAttributes<HTMLDivElement>>(
   ({ style, children, ...rest }, ref) => (
     <div
@@ -51,20 +51,23 @@ const FeedSkeletonOverlay = ({ show }: { show: boolean }) => (
 
 const FeedPage = () => {
   const {
-    data: postsData,
+    data: pages,
     isLoading,
     refetch,
     fetchNextPage,
     hasNextPage,
     isFetchingNextPage,
-  } = useGetPosts();
-console.log("postsData:", postsData);
-const posts = useMemo(() => {
+  } = useGetPostsLite();
+//console.log("postsData:", postsData);
+/* const posts = useMemo(() => {
   // const all = postsData?.pages.flatMap((page: any) => page.documents) ?? [];
   const all = postsData?.pages.flatMap((page: any) => page?.data?.items ?? []) ?? [];
   return all.filter((p: any) => p?.isPublished !== false);
-}, [postsData]);
-
+}, [postsData]); */
+  const posts = useMemo(
+  () => pages.flatMap(p => p.items),
+  [pages]
+);
   const handleEndReached = useCallback(() => {
     if (hasNextPage && !isFetchingNextPage){
       console.log("FeedPage: load more posts"); 

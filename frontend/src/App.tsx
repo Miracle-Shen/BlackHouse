@@ -1,10 +1,12 @@
 import { Routes, Route } from "react-router-dom";
 import { lazy, Suspense } from "react";
 import Layout from "./components/Layout";
-import PersistLogin from "./components/common/PersistLogin";
 import FeedPage from "./pages/Feed";
 import { AuthProvider } from "./context/AuthProvider";
 import { ModalProvider } from "./context/ModalProvider";
+const PersistLogin = lazy(
+  () => import("./components/common/PersistLogin")
+);
 
 const EditPage = lazy(() => import("./pages/Edit"));
 const Login = lazy(() => import("./pages/Login"));
