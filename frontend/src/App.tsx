@@ -4,9 +4,7 @@ import Layout from "./components/Layout";
 import PersistLogin from "./components/common/PersistLogin";
 import FeedPage from "./pages/Feed";
 import { AuthProvider } from "./context/AuthProvider";
-
-const ModalProvider = lazy(() => import("./context/ModalProvider").then(m => ({ default: m.ModalProvider })));
-
+import { ModalProvider } from "./context/ModalProvider";
 
 const EditPage = lazy(() => import("./pages/Edit"));
 const Login = lazy(() => import("./pages/Login"));
