@@ -76,7 +76,7 @@ async function callAgent(client, query, thread_id) {
       name: "read_database",
       description:
         "Read the bound post of this conversation. No arguments. Always uses the current post_id.",
-      schema: z.object({}), // ❗无参数
+      schema: z.object({}), //无参数
     }
   );
 

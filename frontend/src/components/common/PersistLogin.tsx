@@ -22,7 +22,6 @@ export default function PersistLogin({ children }: { children: React.ReactNode }
 
     async function bootstrap() {
       setStatus("loading");      // 启动时先标记 loading
-
       if (!persist) {  // 不持久化：不做 refresh
         setStatus("guest");
         return;

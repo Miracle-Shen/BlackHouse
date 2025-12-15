@@ -7,7 +7,7 @@ import type { ILoginResponse } from "../types/index";
 const LOGIN_URL = "/auth";
 
 const Login = () => {
-  const { setAuth, setStatus } = useContext(AuthContext) as any;
+  const { setAuth, setStatus, setPersist } = useContext(AuthContext) as any;
 
   const userRef = useRef<HTMLInputElement | null>(null);
   const errRef = useRef<HTMLParagraphElement | null>(null);
@@ -55,7 +55,7 @@ const Login = () => {
 
       // 标记已登录
       setStatus("authed");
-
+      setPersist(true);
       setUser("");
       setPwd("");
       navigate("/Mine", { replace: true });

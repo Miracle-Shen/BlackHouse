@@ -2,10 +2,10 @@
 import { useCallback, useEffect, useRef,useState } from "react";
 import type { UseFormReturn } from "react-hook-form";
 import type * as z from "zod";
-import { PostValidation } from "@/types";
+import { makePostValidation } from "@/types";
 import { useGlobalModal } from "@/context/ModalProvider";
 
-type PostFormValues = z.infer<typeof PostValidation>;
+type PostFormValues = z.infer<ReturnType<typeof makePostValidation>>;
 
 // 草稿只存这些字段，避免把 file 等大对象塞进 localStorage
 type DraftShape = {

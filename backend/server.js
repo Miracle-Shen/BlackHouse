@@ -7,7 +7,6 @@ process.on('unhandledRejection', (reason, promise) => {
 });
 
 require('dotenv').config({ path: '../.env' });
-
 const express = require('express');
 const app = express();
 const cors = require('cors');
@@ -15,13 +14,10 @@ const corsOptions = require('./config/corsOptions');
 const credentials = require('./middleware/credentials');
 const verifyJWT = require('./middleware/verifyJWT');
 const cookieParser = require('cookie-parser');
-
-// Appwrite
 const { Client } = require('appwrite');
 const { callAgent } = require('./agent/agent');
 const { getAllUsers } = require('./lib/userAPI');
 
-// 端口：统一用一个
 const PORT = process.env.PORT || 3500;
 
 /* ========== Appwrite Client ========== */
@@ -31,8 +27,6 @@ const client = new Client()
 
 app.use(credentials);
 app.use(cors(corsOptions));
-
-// 解析 body
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 app.use(cookieParser());

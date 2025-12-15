@@ -66,7 +66,6 @@ const posts = useMemo(() => {
 
   const handleEndReached = useCallback(() => {
     if (hasNextPage && !isFetchingNextPage){
-      console.log("now fetch next page");
        fetchNextPage();
     } 
   }, [hasNextPage, isFetchingNextPage, fetchNextPage]);
@@ -79,47 +78,50 @@ const posts = useMemo(() => {
     const needPad = !hasNextPage && posts.length % 2 === 1;
     return needPad ? [...posts, { __placeholder: true }] : posts;
   }, [posts, hasNextPage]);
-
+  const scrollRef = React.useRef<HTMLDivElement | null>(null);
   return (
     <div className="bg-white min-h-screen">
       <h1 className="text-center py-4 text-lg font-semibold text-slate-800">
         动态
       </h1>
 
-      <PullToRefresh onRefresh={refetch}>
-        <div
-          className="relative mx-auto max-w-4xl"
-          style={showSkeleton ? { minHeight: "70vh" } : undefined}
-        >
-          <div className="px-3 pb-20">
-            <VirtuosoGrid
-              useWindowScroll
-              data={gridData}
-              endReached={handleEndReached}
-              overscan={10}
-              computeItemKey={(_, post: any) =>
-                post?.$id ?? `${_}`
-              }
-              components={{
-                List: GridList,
-                Item: ({ children }) => <div>{children}</div>,
-                Footer: () => (
-                  <div className="py-4 text-center text-xs text-slate-400 min-h-[32px]">
-                    {hasNextPage
-                      ? (isFetchingNextPage ? "加载中..." : "上拉加载更多")
-                      : posts.length > 0
-                        ? "没有更多了"
-                        : ""}
-                  </div>
-                ),
-              }}
-              itemContent={(_, post: any) => <PostCard post={post} />}
-            />
-          </div>
+      <div ref = {scrollRef} className="h-[calc(100vh-56px)] overflow-auto overscroll-contain">
+        <PullToRefresh onRefresh={refetch} scrollRef={scrollRef}>
+          <div
+            className="relative mx-auto max-w-4xl"
+            style={showSkeleton ? { minHeight: "70vh" } : undefined}
+          >
+            <div className="px-3 pb-20 ">
+              <VirtuosoGrid
+                //useWindowScroll  //这意味这将滚动事件交给浏览器的原生的滚动系统。
+                customScrollParent={scrollRef.current ?? undefined}
+                data={gridData}
+                endReached={handleEndReached}
+                overscan={10}
+                computeItemKey={(_, post: any) =>
+                  post?.$id ?? `${_}`
+                }
+                components={{
+                  List: GridList,
+                  Item: ({ children }) => <div>{children}</div>,
+                  Footer: () => (
+                    <div className="py-4 text-center text-xs text-slate-400 min-h-[32px]">
+                      {hasNextPage
+                        ? (isFetchingNextPage ? "加载中..." : "上拉加载更多")
+                        : posts.length > 0
+                          ? "没有更多了"
+                          : ""}
+                    </div>
+                  ),
+                }}
+                itemContent={(_, post: any) => <PostCard post={post} />}
+              />
+            </div>
 
-          <FeedSkeletonOverlay show={showSkeleton} />
-        </div>
-      </PullToRefresh>
+            <FeedSkeletonOverlay show={showSkeleton} />
+          </div>
+        </PullToRefresh>
+      </div>
     </div>
   );
 };

@@ -16,7 +16,7 @@ export default function ProtectedRoute({ children }: { children: React.ReactNode
   useEffect(() => {
     // 等 PersistLogin 把状态定下来
     if (status === "loading") return;
-
+    console.log("ProtectedRoute status", status, "isAuthed", isAuthed);
     if (!isAuthed && !openedRef.current) {
       openedRef.current = true;
 

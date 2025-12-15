@@ -1,0 +1,61 @@
+[
+  { "id": "t001", "name": "穿搭", "aliases": ["穿衣搭配", "日常穿搭"], "hot": 980 },
+  { "id": "t002", "name": "美妆", "aliases": ["化妆", "妆容"], "hot": 920 },
+  { "id": "t003", "name": "护肤", "aliases": ["皮肤护理"], "hot": 870 },
+  { "id": "t004", "name": "健身", "aliases": ["运动健身"], "hot": 860 },
+  { "id": "t005", "name": "减脂", "aliases": ["减肥"], "hot": 830 },
+
+  { "id": "t006", "name": "旅行", "aliases": ["旅游", "出游"], "hot": 900 },
+  { "id": "t007", "name": "探店", "aliases": ["美食探店"], "hot": 880 },
+  { "id": "t008", "name": "美食", "aliases": ["吃饭", "美味"], "hot": 940 },
+  { "id": "t009", "name": "甜品", "aliases": ["蛋糕", "甜点"], "hot": 720 },
+  { "id": "t010", "name": "咖啡", "aliases": ["手冲咖啡"], "hot": 700 },
+
+  { "id": "t011", "name": "摄影", "aliases": ["拍照"], "hot": 810 },
+  { "id": "t012", "name": "修图", "aliases": ["图片处理"], "hot": 680 },
+  { "id": "t013", "name": "vlog", "aliases": ["视频记录"], "hot": 760 },
+  { "id": "t014", "name": "剪辑", "aliases": ["视频剪辑"], "hot": 730 },
+  { "id": "t015", "name": "数码", "aliases": ["数码产品"], "hot": 850 },
+
+  { "id": "t016", "name": "手机", "aliases": ["智能手机"], "hot": 890 },
+  { "id": "t017", "name": "电脑", "aliases": ["笔记本"], "hot": 820 },
+  { "id": "t018", "name": "效率工具", "aliases": ["生产力工具"], "hot": 640 },
+  { "id": "t019", "name": "软件推荐", "aliases": ["应用推荐"], "hot": 670 },
+  { "id": "t020", "name": "学习方法", "aliases": ["学习技巧"], "hot": 780 },
+
+  { "id": "t021", "name": "读书", "aliases": ["阅读"], "hot": 740 },
+  { "id": "t022", "name": "写作", "aliases": ["文字创作"], "hot": 690 },
+  { "id": "t023", "name": "职场", "aliases": ["工作"], "hot": 830 },
+  { "id": "t024", "name": "面试", "aliases": ["求职"], "hot": 790 },
+  { "id": "t025", "name": "副业", "aliases": ["兼职"], "hot": 800 },
+
+  { "id": "t026", "name": "理财", "aliases": ["个人理财"], "hot": 860 },
+  { "id": "t027", "name": "投资", "aliases": ["资产配置"], "hot": 840 },
+  { "id": "t028", "name": "情绪管理", "aliases": ["情绪调节"], "hot": 620 },
+  { "id": "t029", "name": "心理成长", "aliases": ["自我成长"], "hot": 700 },
+  { "id": "t030", "name": "生活记录", "aliases": ["日常分享"], "hot": 760 },
+
+  { "id": "t031", "name": "居家生活", "aliases": ["居家"], "hot": 680 },
+  { "id": "t032", "name": "收纳整理", "aliases": ["整理技巧"], "hot": 650 },
+  { "id": "t033", "name": "家居好物", "aliases": ["家居推荐"], "hot": 720 },
+  { "id": "t034", "name": "极简生活", "aliases": ["断舍离"], "hot": 610 },
+  { "id": "t035", "name": "亲子", "aliases": ["育儿"], "hot": 790 },
+
+  { "id": "t036", "name": "宠物", "aliases": ["养宠"], "hot": 820 },
+  { "id": "t037", "name": "猫咪", "aliases": ["养猫"], "hot": 880 },
+  { "id": "t038", "name": "狗狗", "aliases": ["养狗"], "hot": 860 },
+  { "id": "t039", "name": "手工", "aliases": ["手作"], "hot": 640 },
+  { "id": "t040", "name": "绘画", "aliases": ["画画"], "hot": 710 },
+
+  { "id": "t041", "name": "设计", "aliases": ["视觉设计"], "hot": 770 },
+  { "id": "t042", "name": "插画", "aliases": ["插图"], "hot": 690 },
+  { "id": "t043", "name": "音乐", "aliases": ["听歌"], "hot": 850 },
+  { "id": "t044", "name": "电影", "aliases": ["影视"], "hot": 900 },
+  { "id": "t045", "name": "电视剧", "aliases": ["追剧"], "hot": 880 },
+
+  { "id": "t046", "name": "游戏", "aliases": ["电子游戏"], "hot": 920 },
+  { "id": "t047", "name": "独立游戏", "aliases": ["小众游戏"], "hot": 660 },
+  { "id": "t048", "name": "二次元", "aliases": ["动漫"], "hot": 870 },
+  { "id": "t049", "name": "潮流", "aliases": ["时尚潮流"], "hot": 810 },
+  { "id": "t050", "name": "好物推荐", "aliases": ["种草"], "hot": 890 }
+]

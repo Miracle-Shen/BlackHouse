@@ -1,5 +1,5 @@
 import * as z from "zod";
-import { useEffect, useRef } from "react";
+import { useEffect, useMemo, useRef } from "react";
 import { useForm } from "react-hook-form";
 import { useNavigate } from "react-router-dom";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -12,7 +12,7 @@ import {
   FormMessage,
 } from "./ui/Form";
 import { Textarea } from "./ui/Textarea";
-import { PostValidation } from "@/types/index";
+import { makePostValidation } from "@/types/index";
 import { lazy, Suspense } from "react";
 const FileUploader = lazy(() => import("./common/FileUploader"));
 import { useCreatePost, useUpdatePost } from "@/lib/react-query/queries";
@@ -33,9 +33,16 @@ type PostFormProps = {
 const PostForm = ({ post, action, creatorId, aiCaption,tags,draftKey,onAutoSave }: PostFormProps) => {
   const { showConfirm } = useGlobalModal();
   const navigate = useNavigate();
-
-  const form = useForm<z.infer<typeof PostValidation>>({
-    resolver: zodResolver(PostValidation),
+  const schema = useMemo(
+    () =>
+      makePostValidation({
+        action,
+        hasExistingImage: !!post?.imageUrl,
+      }),
+    [action, post?.imageUrl]
+  );
+  const form = useForm<z.infer<ReturnType<typeof makePostValidation>>>({
+    resolver: zodResolver(schema),
     defaultValues: {
       caption: post?.caption || "",
       title: post?.title || "",
@@ -77,7 +84,7 @@ const PostForm = ({ post, action, creatorId, aiCaption,tags,draftKey,onAutoSave 
   const { mutateAsync: createPost, isPending: isLoadingCreate } = useCreatePost();
   const { mutateAsync: updatePost, isPending: isLoadingUpdate } = useUpdatePost();
 
-  const handleSubmit = async (value: z.infer<typeof PostValidation>) => {
+  const handleSubmit = async (value: z.infer<ReturnType<typeof makePostValidation>>) => {
     try {
       if (post && action === "Update") {
         const updateData: IUpdatePost = {
@@ -86,6 +93,7 @@ const PostForm = ({ post, action, creatorId, aiCaption,tags,draftKey,onAutoSave 
           imageId: post.imageId,
           imageUrl: post.imageUrl,
           tags: value.tags || [],
+          file: value.file || [],
           isPublished: value.isPublished ?? post.isPublished ?? true,
         };
         const updatedPost = await updatePost(updateData);

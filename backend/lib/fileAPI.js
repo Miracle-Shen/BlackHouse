@@ -86,7 +86,7 @@ const getPostById = async (postId) => {
   }
 };
 
-// ✅ “先读再加 tag 再写回”的核心逻辑
+// “先读再加 tag 再写回”的核心逻辑
 const addTagToPost = async (postId, tag) => {
   if (!postId) {
     throw new Error("addTagToPost: postId is required");
@@ -112,6 +112,37 @@ const addTagToPost = async (postId, tag) => {
   return updatedPost;
 };
 
+
+const replaceTagsOnPost = async (postId, tagNames) => {
+  if (!postId) throw new Error("replaceTagsOnPost: postId is required");
+  if (!Array.isArray(tagNames)) throw new Error("replaceTagsOnPost: tagNames must be array");
+
+  // 规范化：去空、去重、保序
+  const uniq = Array.from(new Set(tagNames.map(s => String(s || "").trim()))).filter(Boolean);
+
+  // 读一次
+  const post = await getPostById(postId);
+  const oldTags = Array.isArray(post.tags) ? post.tags : [];
+
+  // 幂等：完全相同（集合相同）则不写
+  const same =
+    oldTags.length === uniq.length && oldTags.every(t => uniq.includes(t)) && uniq.every(t => oldTags.includes(t));
+  if (same) return post;
+
+  // 简易乐观锁：写前再确认一次 $updatedAt 没变（避免用户刚编辑、或重复任务交错写）
+  const before = post.$updatedAt;
+  const latest = await getPostById(postId);
+  if (latest.$updatedAt !== before) {
+    const e = new Error("CONFLICT: post changed before tagging write");
+    e.code = "CONFLICT";
+    e.meta = { postId, beforeUpdatedAt: before, latestUpdatedAt: latest.$updatedAt };
+    throw e;
+  }
+
+  // replace 写入
+  const updatedPost = await updatePostById(postId, { tags: uniq });
+  return updatedPost;
+};
 const addUserInterest = async (userId,data) => {
   if (!data || !userId || typeof data !== "object") {
     throw new Error("updatePostById: updateData must be a non-empty object");
@@ -195,4 +226,4 @@ async function fetchInterestById(userId) {
   }
 }
 
-module.exports = { getPostById, updatePostById, addTagToPost, getPostsByUserId,addUserInterest, fetchInterestById, recommandPostByTags };
+module.exports = { getPostById, updatePostById, addTagToPost, getPostsByUserId,addUserInterest, fetchInterestById, recommandPostByTags,replaceTagsOnPost };
