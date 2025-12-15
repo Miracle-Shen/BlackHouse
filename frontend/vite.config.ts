@@ -18,14 +18,5 @@ export default defineConfig({
       '@': path.resolve(__dirname, './src'), // 将 @ 映射到 src 目录
     },
   },
-  server: {
-    proxy: {
-      "/chat": {
-        target: "https://blackhouse-04o3.onrender.com/",
-        changeOrigin: true,
-        ws: false, 
-      },
-    },
-  },
 
 });

@@ -24,9 +24,31 @@ const handleFeed = async (req, res) => {
 
     // 4) 组装 Map，服务端完成 join
     const userMap = new Map(users.map(u => [u.id, u]));
+    const toCreatorSummary = (postCreatorId) => {
+   const u = userMap.get(postCreatorId);
 
+  // user 存在：优先 thumbnailUrl，没有就用 avatarUrl
+  if (u) {
+    const avatar = u.thumbnailUrl ?? u.avatarUrl ?? null;
+
+    return {
+      id: u.id ?? postCreatorId,
+      userName: u.userName ?? u.name ?? u.username ?? "Unknown",
+      avatarUrl: avatar,        // ✅ 统一对外只暴露 avatarUrl
+      thumbnailUrl: avatar,     // ✅ 若你前端仍用 thumbnailUrl，也给同值避免改动
+      };
+    }
+
+    // user 不存在：降级
+    return {
+        id: postCreatorId,
+        userName: "Unknown",
+        avatarUrl: null,
+        thumbnailUrl: null,
+      };
+    };
     const items = posts.map(post => ({
-      id: post.$id,
+      $id: post.$id,
       title: post.title,
       caption: post.caption,
       thumbnailUrl: post.thumbnailUrl,
@@ -36,12 +58,7 @@ const handleFeed = async (req, res) => {
       createdAt: post.$createdAt,
       updatedAt: post.$updatedAt,
       isPublished: !!post.isPublished,
-      creator: userMap.get(post.creator) || {
-        id: post.creator,
-        name: "Unknown",
-        avatarUrl: null,
-        thumbnailUrl: null,
-      },
+      creator: toCreatorSummary(post.creator),
     }));
 
     // 5) nextCursor：通常用“这一页最后一条”的游标

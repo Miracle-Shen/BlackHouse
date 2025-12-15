@@ -16,55 +16,51 @@ import {
   updateUser,
   getRecentPosts,
   //getInfinitePosts,
-  searchPosts,
+  //searchPosts,
   deletePost,
 } from "@/lib/appwrite/api";
 import type{ INewPost, IUpdatePost, IUpdateUser } from "@/types";
+import axios from "@/api/axios";
 
 // ============================================================
 // POST QUERIES
 // ============================================================
+const fetchFeed = async ({ pageParam = undefined }) => {
+  const res = await axios.get("/feed", {
+    params: {
+      limit: 8,
+      ...(pageParam ? { cursor: pageParam } : {}),
+    },
+  });
+
+  return res.data;
+};
 
 export const useGetPosts = () => {
   return useInfiniteQuery({
     queryKey: [QUERY_KEYS.GET_INFINITE_POSTS],
     // queryFn: getInfinitePosts as any,
-    queryFn: ({ pageParam }) =>
-    fetch(`/feed?limit=8${pageParam ? `&cursor=${pageParam}` : ""}`).then(r => r.json()),
+    queryFn: fetchFeed,
     initialPageParam: undefined, 
-    getNextPageParam: (lastPage: any) => {
-      // If there's no data, there are no more pages.
-      if (lastPage && lastPage.documents.length === 0) {
-        return null;
-      }
+    getNextPageParam: (lastPage: any) =>
+      lastPage?.data?.nextCursor ?? undefined,
 
-      // Use the $id of the last document as the cursor.
-      const lastId = lastPage.documents[lastPage.documents.length - 1].$id;
-      return lastId;
+    //  减少首屏抖动 & 重复请求
+    staleTime: 30_000,            // 30s 内认为数据新鲜
+    gcTime: 5 * 60_000,           // 5min 缓存（TanStack Query v5）
+    refetchOnWindowFocus: false,  // 切回页面不闪
+    refetchOnReconnect: true,     // 断网恢复可刷新（可按需求改）
+
+    //  网络抖动友好：只重试少量次，并跳过 4xx
+    retry: (failureCount, error: any) => {
+      const status = error?.response?.status;
+      if (status && status >= 400 && status < 500) return false;
+      return failureCount < 2;
     },
   });
 };
 
-export const useSearchPosts = (searchTerm: string) => {
-  return useQuery({
-    queryKey: [QUERY_KEYS.SEARCH_POSTS, searchTerm],
-    queryFn: () => searchPosts(searchTerm),
-    enabled: !!searchTerm,
-  });
-};
 
-// export const useGetRecentPosts = () => {
-//   return useQuery<(Models.Document & { creator:INewPost })[]>({ 
-//     queryKey: [QUERY_KEYS.GET_RECENT_POSTS],
-//     queryFn: async () => {
-//       const data = await getRecentPosts();
-//       if (!data) {
-//         return [];
-//       }
-//       return data as (Models.Document & { creator:INewPost })[];
-//     },
-//   });
-// };
 export const useGetRecentPosts = () => {
   return useQuery<INewPost[]>({ // 修正返回类型为 INewPost[]
     queryKey: [QUERY_KEYS.GET_RECENT_POSTS],

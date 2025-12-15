@@ -60,7 +60,8 @@ const FeedPage = () => {
   } = useGetPosts();
 
 const posts = useMemo(() => {
-  const all = postsData?.pages.flatMap((page: any) => page.documents) ?? [];
+  // const all = postsData?.pages.flatMap((page: any) => page.documents) ?? [];
+  const all = postsData?.pages.flatMap((page: any) => page?.data?.items ?? []) ?? [];
   return all.filter((p: any) => p?.isPublished !== false);
 }, [postsData]);
 
@@ -99,7 +100,7 @@ const posts = useMemo(() => {
                 endReached={handleEndReached}
                 overscan={10}
                 computeItemKey={(_, post: any) =>
-                  post?.$id ?? `${_}`
+                  post?.$id ?? post?.id?? `${_}`
                 }
                 components={{
                   List: GridList,

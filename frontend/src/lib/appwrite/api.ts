@@ -116,94 +116,94 @@ export async function deleteFile(fileId: string) {
 }
 
 // ============================== GET POSTS
-export async function searchPosts(searchTerm: string) {
-  try {
-    const posts = await databases.listDocuments(
-      appwriteConfig.databaseId,
-      appwriteConfig.postCollectionId,
-      [Query.search("caption", searchTerm)]
-    );
+// export async function searchPosts(searchTerm: string) {
+//   try {
+//     const posts = await databases.listDocuments(
+//       appwriteConfig.databaseId,
+//       appwriteConfig.postCollectionId,
+//       [Query.search("caption", searchTerm)]
+//     );
 
-    if (!posts) throw Error;
+//     if (!posts) throw Error;
 
-    return posts;
-  } catch (error) {
-    console.log(error);
-  }
-}
+//     return posts;
+//   } catch (error) {
+//     console.log(error);
+//   }
+// }
 
-export async function getInfinitePosts({
-  pageParam,
-  }: {
-    pageParam?: string | null;
-  }) {
-  // 1. 组装 Appwrite 查询条件
-  const queries: string[] = [
-    Query.orderDesc("$updatedAt"),
-    Query.limit(8),
-    Query.equal("isPublished", true),
-  ];
+// export async function getInfinitePosts({
+//   pageParam,
+//   }: {
+//     pageParam?: string | null;
+//   }) {
+//   // 1. 组装 Appwrite 查询条件
+//   const queries: string[] = [
+//     Query.orderDesc("$updatedAt"),
+//     Query.limit(8),
+//     Query.equal("isPublished", true),
+//   ];
 
-  if (pageParam) {
-    queries.push(Query.cursorAfter(pageParam));
-  }
+//   if (pageParam) {
+//     queries.push(Query.cursorAfter(pageParam));
+//   }
 
-  try {
-    const postList = await databases.listDocuments(
-      appwriteConfig.databaseId,
-      appwriteConfig.postCollectionId,
-      queries
-    );
+//   try {
+//     const postList = await databases.listDocuments(
+//       appwriteConfig.databaseId,
+//       appwriteConfig.postCollectionId,
+//       queries
+//     );
 
-    const posts = postList.documents ?? [];
+//     const posts = postList.documents ?? [];
 
-    const postsWithUserDetails: INewPost[] = await Promise.all(
-      posts.map(async (post: any) => {
-        try {
-          const user = await getUserById(post.creator);
+//     const postsWithUserDetails: INewPost[] = await Promise.all(
+//       posts.map(async (post: any) => {
+//         try {
+//           const user = await getUserById(post.creator);
 
-          return {
-            $id: post.$id,
-            creator: user || post.creator,
-            thumbnailUrl: post.thumbnailUrl,
-            title: post.title,
-            caption: post.caption,
-            imageUrl: post.imageUrl,
-            imageId: post.imageId,
-            file: [], // 适配 INewPost
-            tags: post.tags,
-            $createdAt: post.$createdAt,
-            isPublished: post.isPublished ?? false,
-          } as INewPost;
-        } catch (error) {
-          // 拉用户失败就退回原始 creator
-          return {
-            $id: post.$id,
-            creator: post.creator,
-            thumbnailUrl: post.thumbnailUrl,
-            title: post.title,
-            caption: post.caption,
-            imageUrl: post.imageUrl,
-            imageId: post.imageId,
-            file: [],
-            tags: post.tags,
-            $createdAt: post.$createdAt,
-            isPublished: post.isPublished ?? false,
-          } as INewPost;
-        }
-      })
-    );
+//           return {
+//             $id: post.$id,
+//             creator: user || post.creator,
+//             thumbnailUrl: post.thumbnailUrl,
+//             title: post.title,
+//             caption: post.caption,
+//             imageUrl: post.imageUrl,
+//             imageId: post.imageId,
+//             file: [], // 适配 INewPost
+//             tags: post.tags,
+//             $createdAt: post.$createdAt,
+//             isPublished: post.isPublished ?? false,
+//           } as INewPost;
+//         } catch (error) {
+//           // 拉用户失败就退回原始 creator
+//           return {
+//             $id: post.$id,
+//             creator: post.creator,
+//             thumbnailUrl: post.thumbnailUrl,
+//             title: post.title,
+//             caption: post.caption,
+//             imageUrl: post.imageUrl,
+//             imageId: post.imageId,
+//             file: [],
+//             tags: post.tags,
+//             $createdAt: post.$createdAt,
+//             isPublished: post.isPublished ?? false,
+//           } as INewPost;
+//         }
+//       })
+//     );
 
   
-    return {
-      ...postList,
-      documents: postsWithUserDetails,
-    };
-  } catch (error) {
-    console.error("getInfinitePosts error:", error);
-    throw error;
-  }
-}
+//     return {
+//       ...postList,
+//       documents: postsWithUserDetails,
+//     };
+//   } catch (error) {
+//     console.error("getInfinitePosts error:", error);
+//     throw error;
+//   }
+// }
 
 // ============================== GET POST BY ID
 export async function getPostById(postId?: string) {
