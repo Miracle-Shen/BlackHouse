@@ -18,15 +18,15 @@ const handleRefreshToken =  (req, res) => {
     const cookie = req.cookies;
     if (!cookie?.jwt) return res.status(401);
     const refreshToken = cookie.jwt;
-    console.log("Received refreshToken:", refreshToken);
+    // console.log("Received refreshToken:", refreshToken);
 
     const foundUser = usersDB.users.find(person => person.refreshToken === refreshToken);
     if (!foundUser) {
         console.log("No matching user found for refreshToken");
-        return res.status(403).json({ 'message': 'foundUser Forbidden' }); //禁止访问
+        return res.status(401).json({ 'message': 'foundUser Forbidden' }); //禁止访问
     }
 
-    console.log("Found user:", foundUser);
+    // console.log("Found user:", foundUser);
 
     //密码验证
     JWT.verify(

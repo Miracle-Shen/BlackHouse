@@ -1,21 +1,13 @@
+import { createRoot } from "react-dom/client";
+import { BrowserRouter } from "react-router-dom";
+import "./index.css";
+import App from "./App";
+import { QueryProvider } from "./lib/react-query/QueryProvider";
 
-import { createRoot } from 'react-dom/client'
-import { BrowserRouter } from 'react-router-dom'
-import './index.css';
-import App from './App'
-import { AuthProvider } from './context/AuthProvider';
-import {  QueryProvider } from './lib/react-query/QueryProvider';
-// import {disableReactDevTools} from '@fvilers/disable-react-devtools';
-// if(process.env.NODE_ENV === 'production') disableReactDevTools();
-
-createRoot(document.getElementById('root')!).render(
-
-    <BrowserRouter>
-      <AuthProvider>
-        <QueryProvider>
-          <App />
-        </QueryProvider>
-      </AuthProvider>
-    </BrowserRouter>
-
-)
+createRoot(document.getElementById("root")!).render(
+  <BrowserRouter>
+    <QueryProvider>
+      <App />
+    </QueryProvider>
+  </BrowserRouter>
+);

@@ -1,74 +1,102 @@
+process.on('uncaughtException', (err) => {
+  console.error('💥 Uncaught Exception:', err);
+});
+
+process.on('unhandledRejection', (reason, promise) => {
+  console.error('💥 Unhandled Rejection:', reason);
+});
+
+require('dotenv').config({ path: '../.env' });
 const express = require('express');
-const app = express(); 
+const app = express();
 const cors = require('cors');
 const corsOptions = require('./config/corsOptions');
-const credentials = require( './middleware/credentials');
+const credentials = require('./middleware/credentials');
 const verifyJWT = require('./middleware/verifyJWT');
 const cookieParser = require('cookie-parser');
-// const { logger } = require('./middleware/logEvents');
-// const errorHandler = require('./middleware/errorHandler');
-
-// 设置服务器监听的端口号，默认3500
+const { Client } = require('appwrite');
+const { callAgent } = require('./agent/agent');
+const { getAllUsers } = require('./lib/userAPI');
 const PORT = process.env.PORT || 3500;
 
-// 使用自定义日志记录中间件
-// app.use(logger);
+/* ========== Appwrite Client ========== */
+const client = new Client()
+  .setEndpoint(process.env.APPWRITE_ENDPOINT)
+  .setProject(process.env.APPWRITE_PROJECT_ID);
 
-app.use(credentials)
-// 启用跨域资源共享中间件
+app.use(credentials);
 app.use(cors(corsOptions));
-
-// 内置中间件：解析urlencoded格式的表单数据
 app.use(express.urlencoded({ extended: true }));
-
-// 内置中间件：解析JSON格式的数据
 app.use(express.json());
-
 app.use(cookieParser());
 
-// 提供静态文件服务
-// app.use('/', express.static(path.join(__dirname, '/public')));
+/* ========== 通用路由 ========== */
+app.get('/', (req, res) => {
+  res.send('Miracle Server here');
+});
 
-// 配置路由
-app.use('/register', require('./routes/register')); // 注册路由
-app.use('/logout', require('./routes/logout')); // 注销路由
-app.use('/auth', require('./routes/auth')); // 认证路由
-app.use('/refresh', require('./routes/refresh')); // 刷新令牌路由   
-app.use('/upload', require('./routes/upload')); // 文件上传路由
-app.use(verifyJWT); // JWT验证中间件，保护后续路由
-app.use('/user', require('./routes/user')); // 用户路由  
+/* ========== LangGraph /genTag 接口 ========== */
+// 新建会话
+// curl -X POST -H "Content-Type: application/json" -d '{"message": "this is the postID:69312d0900102939c737"}' http://localhost:3500/genTag
+app.post('/genTag', async (req, res) => {
+  const initialMessage = req.body.message;
+  const threadId = Date.now().toString(); // 简单生成一个 threadId
 
-// 处理所有未匹配的路由
-// app.all('*', (req, res) => {
-//     res.status(404); // 设置状态码为404
-//     if (req.accepts('html')) {
-//         // 如果客户端接受HTML，返回404页面
-//         res.sendFile(path.join(__dirname, 'views', '404.html'));
-//     } else if (req.accepts('json')) {
-//         // 如果客户端接受JSON，返回JSON格式的错误信息
-//         res.json({ "error": "404 Not Found" });
-//     } else {
-//         // 如果客户端接受纯文本，返回文本格式的错误信息
-//         res.type('txt').send("404 Not Found");
-//     }
-// });
+  console.log('initialMessage', initialMessage);
+  try {
+    const response = await callAgent(client, initialMessage, threadId);
+    res.json({ threadId, response });
+  } catch (error) {
+    console.error('Error starting conversation:', error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
 
-// 使用自定义错误处理中间件
-// app.use(errorHandler);
+// 已有会话里继续聊天
+// curl -X POST -H "Content-Type: application/json" -d '{"message": "this is the postID:69312d0900102939c737"}' http://localhost:3500/genTag/123456789
+app.post('/genTag/:threadId', async (req, res) => {
+  const { threadId } = req.params;
+  const { message } = req.body;
 
-// 启动服务器，监听指定端口
-app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
+  try {
+    const response = await callAgent(client, message, threadId);
+    res.json({ response });
+  } catch (error) {
+    console.error('Error in chat:', error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+app.use("/chat",  require("./routes/chat"));
+app.use("/feed",  require("./routes/feed"));
+/* ========== 认证 & 业务路由 ========== */
+app.use('/register', require('./routes/register')); // 注册
+app.use('/logout', require('./routes/logout'));     // 注销
+app.use('/auth', require('./routes/auth'));         // 登录认证
+app.use('/refresh', require('./routes/refresh'));   // 刷新 token
+app.use('/recommand', require('./routes/recommand')); // 推荐内容
+// 下面的路由统一走 JWT 保护
+app.use(verifyJWT);
+app.use('/user', require('./routes/user'));         // 用户个人信息接口，单一功能
+app.use('/profile', require('./routes/profile')); // 用户资料 //合并查表
 
-const { getAllUsers } = require('./lib/userAPI');
+const { registerUserInterestCron } = require("./job/userInterestCron");
 
-// Execute getAllUsers on server start
+/* ========== 启动前的初始化逻辑（ getAllUsers ，callInterestAgent ） ========== */
 (async () => {
-    try {
-        // Clear require cache for users.json to ensure fresh data is loaded
-        delete require.cache[require.resolve('./model/users.json')];
-        await getAllUsers();
-        console.log("Fetched all users successfully on server start.");
-    } catch (error) {
-        console.error("Error fetching users on server start:", error);
-    }
+  try {
+    // 启动前预加载用户数据
+    delete require.cache[require.resolve('./model/users.json')];
+    await getAllUsers();
+
+    // 启动 HTTP 服务
+    app.listen(PORT, () => {
+      console.log(`Server running on port ${PORT}`);
+      // 注册定时任务
+      registerUserInterestCron();
+    });
+  } catch (error) {
+    console.error('Error during server start:', error);
+    process.exit(1);
+  }
 })();
+

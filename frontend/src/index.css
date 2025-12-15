@@ -1,5 +1,3 @@
-@import url('https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700&display=swap');
-
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -14,6 +12,23 @@
 
 
 /* Post Card */
+/* tag 样式：可点击的小圆角标签 */
+.tag-chip {
+  @apply inline-flex items-center justify-center
+    px-3 py-1 rounded-full
+    border border-primary-700
+    text-xs 
+    bg-transparent
+    cursor-pointer
+    transition
+    hover:bg-primary-100 
+    active:scale-95;
+}
+
+/* tag 选中后的状态（点击后） */
+.tag-chip--active {
+  @apply bg-primary border-primary shadow-md;
+}
 .post-card {
   @apply rounded-3xl border p-5 lg:p-7 w-full max-w-screen-sm;
 }
@@ -135,7 +150,7 @@ form {
   }
 
   .post_details-info {
-    @apply bg-white flex flex-col gap-5 lg:gap-7 flex-1 items-start p-8 rounded-[30px];
+    @apply bg-white flex flex-col gap-2 lg:gap-7 flex-1 items-start p-8 rounded-[30px];
   }
 
   .post_details-delete_btn {

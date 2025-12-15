@@ -1,27 +1,14 @@
+// hooks/useAuth.ts
 import { useContext } from "react";
-import AuthContext from "../context/AuthProvider";
+import { AuthContext } from "../context/AuthProvider";
+import type { AuthContextType } from "../types";
 
-export type AuthContextType = {
-    auth: {
-        $id: string;
-        userId: string;
-        accessToken: string;
-    } | null;
-    setAuth: React.Dispatch<
-        React.SetStateAction<{
-            $id: string;
-            userId: string;
-            accessToken: string;
-        } | null>
-    >;
-};
-
-const useAuth = () => {
-  const context = useContext(AuthContext) as AuthContextType; // 指定类型
-  if (!context) {
+const useAuth = (): AuthContextType => {
+  const ctx = useContext(AuthContext);
+  if (!ctx) {
     throw new Error("useAuth must be used within an AuthProvider");
   }
-  return context;
+  return ctx;
 };
 
 export default useAuth;
