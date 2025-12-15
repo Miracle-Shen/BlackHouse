@@ -9,9 +9,9 @@ import axios from "@/api/axios";
 // ============================== GET FILE URL
 export async function createThumbnailFile(
   file: File,
-  maxWidth = 400,
-  maxHeight = 400,
-  quality = 0.7
+  maxWidth  = 240,
+maxHeight = 240,  
+quality   = 0.45,
 ): Promise<File> {
   return new Promise((resolve, reject) => {
     if (!file.type.startsWith("image/")) {

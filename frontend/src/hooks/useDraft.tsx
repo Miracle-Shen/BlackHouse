@@ -22,7 +22,8 @@ type DraftShape = {
  */
 export function usePostDraft(
   draftKey: string | undefined,
-  form: UseFormReturn<PostFormValues>
+  form: UseFormReturn<PostFormValues>,
+  options:boolean
 ) {
   const { showConfirm } = useGlobalModal();
 
@@ -43,6 +44,9 @@ export function usePostDraft(
       const draft: DraftShape = JSON.parse(raw);
       hasPromptedRef.current = true;
 
+      if(!options){ //false 不提示
+        return;
+      }
       showConfirm({
         title: "发现未保存的草稿",
         description: "检测到你上次编辑时留下了一份草稿，是否恢复继续编辑？",

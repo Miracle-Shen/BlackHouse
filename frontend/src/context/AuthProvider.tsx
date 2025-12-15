@@ -21,7 +21,7 @@ function readUserCache(): Pick<AuthState, "$id" | "userId"> | null {
 }
 
 export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
-  // ✅ 启动时从 localStorage 只恢复 id（不恢复 token）
+  // 启动时从 localStorage 只恢复 id（不恢复 token）
   const cached = readUserCache();
 
   const [auth, setAuth] = useState<AuthState>({

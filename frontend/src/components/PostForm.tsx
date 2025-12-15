@@ -53,7 +53,7 @@ const PostForm = ({ post, action, creatorId, aiCaption,tags,draftKey,onAutoSave 
   });
 
 
-  const { clearDraft, autoSavedAt } = usePostDraft(draftKey, form);
+  const { clearDraft, autoSavedAt } = usePostDraft(draftKey, form,action==="Create"?false:true); //创建不提示草稿恢复);
   useEffect(() => {
     if (!autoSavedAt) return;   // 初始 null 不触发
     if (onAutoSave) onAutoSave(autoSavedAt);
@@ -259,13 +259,16 @@ const PostForm = ({ post, action, creatorId, aiCaption,tags,draftKey,onAutoSave 
         <div className="mt-2 flex flex-col-reverse gap-3 sm:flex-row sm:justify-end">
           <button
             type="button"
+            disabled={isSubmitting}
             onClick={form.handleSubmit(async (value) => {
               await handleSubmit({ ...value, isPublished: false } as any);
               //navigate(-1); // 保存后停留页面
             })}
             className="h-9 w-full rounded-full border border-slate-200 text-sm text-slate-700 hover:bg-slate-50 sm:w-28"
           >
+            <span className={isSubmitting ? "opacity-0" : "opacity-100"}>
             存草稿
+            </span>
           </button>
 
           {/* 提交：发布 */}
