@@ -66,7 +66,7 @@ function correctTagOrThrow(inputTag) {
   // 先 alias 映射
   const mapped = aliasToCanonical.get(norm) || norm;
 
-  // 中文校验（如果你强制中文 tag）
+  // 中文校验（强制中文 tag）
   if (!isAllChineseStrict(mapped)) {
     return { ok: false, error: err("VALIDATION_FAILED", "tag must be Chinese only.", { inputTag, normalized: norm, mapped }) };
   }

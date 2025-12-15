@@ -61,6 +61,47 @@ const recommandPostByTags = async (tags = [], limit = 4) => {
   return uniquePosts.slice(0, limit);
 };
 
+const getFeedPosts = async ({ limit = 8, cursor = null } = {}) => {
+  try {
+    // 1) 参数清洗与保护
+    const safeLimit = Number.isFinite(Number(limit)) ? Number(limit) : 8;
+    const finalLimit = Math.min(Math.max(safeLimit, 1), 50); // 1~50 保护
+
+    // 2) 组装 Appwrite 查询
+    // ⚠️ 注意：如果按 $updatedAt 排序但 cursor 用 $id，
+    // 在更新频繁时可能出现分页重复/漏数据（建议后续调整排序/游标策略）
+    const queries = [
+      Query.orderDesc("$updatedAt"),
+      Query.limit(finalLimit),
+      Query.equal("isPublished", true),
+    ];
+
+    if (cursor) {
+      queries.push(Query.cursorAfter(cursor));
+    }
+
+    // 3) 查询 posts 集合
+    const postList = await databases.listDocuments(
+      process.env.DATABASE_ID,
+      "post",
+      queries
+    );
+
+    const documents = postList?.documents ?? [];
+    return {
+      ...postList,
+      documents,
+    };
+  } catch (error) {
+    console.error("============================================[DB/getFeedPosts] error:", {
+      limit,
+      cursor,
+      error,
+    });
+    throw error;
+  }
+};
+
 const getPostById = async (postId) => {
   if (!postId) {
     throw new Error("getPostById: postId is required");
@@ -226,4 +267,4 @@ async function fetchInterestById(userId) {
   }
 }
 
-module.exports = { getPostById, updatePostById, addTagToPost, getPostsByUserId,addUserInterest, fetchInterestById, recommandPostByTags,replaceTagsOnPost };
+module.exports = { getPostById,getFeedPosts, updatePostById, addTagToPost, getPostsByUserId,addUserInterest, fetchInterestById, recommandPostByTags,replaceTagsOnPost };

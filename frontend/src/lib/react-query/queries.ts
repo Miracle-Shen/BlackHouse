@@ -15,7 +15,7 @@ import {
   getUserById,
   updateUser,
   getRecentPosts,
-  getInfinitePosts,
+  //getInfinitePosts,
   searchPosts,
   deletePost,
 } from "@/lib/appwrite/api";
@@ -28,8 +28,10 @@ import type{ INewPost, IUpdatePost, IUpdateUser } from "@/types";
 export const useGetPosts = () => {
   return useInfiniteQuery({
     queryKey: [QUERY_KEYS.GET_INFINITE_POSTS],
-    queryFn: getInfinitePosts as any,
-    initialPageParam: 0, 
+    // queryFn: getInfinitePosts as any,
+    queryFn: ({ pageParam }) =>
+    fetch(`/feed?limit=8${pageParam ? `&cursor=${pageParam}` : ""}`).then(r => r.json()),
+    initialPageParam: undefined, 
     getNextPageParam: (lastPage: any) => {
       // If there's no data, there are no more pages.
       if (lastPage && lastPage.documents.length === 0) {

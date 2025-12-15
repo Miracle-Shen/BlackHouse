@@ -17,7 +17,6 @@ const cookieParser = require('cookie-parser');
 const { Client } = require('appwrite');
 const { callAgent } = require('./agent/agent');
 const { getAllUsers } = require('./lib/userAPI');
-
 const PORT = process.env.PORT || 3500;
 
 /* ========== Appwrite Client ========== */
@@ -68,6 +67,7 @@ app.post('/genTag/:threadId', async (req, res) => {
   }
 });
 app.use("/chat",  require("./routes/chat"));
+app.use("/feed",  require("./routes/feed"));
 /* ========== 认证 & 业务路由 ========== */
 app.use('/register', require('./routes/register')); // 注册
 app.use('/logout', require('./routes/logout'));     // 注销

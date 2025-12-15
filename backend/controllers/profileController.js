@@ -3,7 +3,7 @@ const { fetchUser } = require("../lib/userAPI");
 
 const handleProfile = async (req, res) => {
  const userId = req.query.userId;
-  console.log("userID",userId);
+  // console.log("userID",userId);
   try {
     const [user, interestDoc] = await Promise.all([
       fetchUser(userId),
