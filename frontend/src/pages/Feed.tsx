@@ -1,9 +1,8 @@
-import React, { useMemo, useState,useCallback, forwardRef, use } from "react";
+import React, { useMemo, useState,useCallback, forwardRef } from "react";
 import { VirtuosoGrid } from "react-virtuoso";
 
 import PostCard from "@/components/PostCard";
 import PullToRefresh from "@/components/common/PullToRefresh";
-//import { useGetPosts } from "@/lib/react-query/queries";
 import {useGetPostsLite} from "@/hooks/useGetPosts";
 const GridList = forwardRef<HTMLDivElement, React.HTMLAttributes<HTMLDivElement>>(
   ({ style, children, ...rest }, ref) => (
