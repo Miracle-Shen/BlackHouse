@@ -1,4 +1,4 @@
-import React, { useMemo, useCallback, forwardRef } from "react";
+import React, { useMemo, useState,useCallback, forwardRef } from "react";
 import { VirtuosoGrid } from "react-virtuoso";
 
 import PostCard from "@/components/PostCard";
@@ -58,7 +58,7 @@ const FeedPage = () => {
     hasNextPage,
     isFetchingNextPage,
   } = useGetPosts();
-
+console.log("postsData:", postsData);
 const posts = useMemo(() => {
   // const all = postsData?.pages.flatMap((page: any) => page.documents) ?? [];
   const all = postsData?.pages.flatMap((page: any) => page?.data?.items ?? []) ?? [];
@@ -67,6 +67,7 @@ const posts = useMemo(() => {
 
   const handleEndReached = useCallback(() => {
     if (hasNextPage && !isFetchingNextPage){
+      console.log("FeedPage: load more posts"); 
        fetchNextPage();
     } 
   }, [hasNextPage, isFetchingNextPage, fetchNextPage]);
@@ -80,13 +81,15 @@ const posts = useMemo(() => {
     return needPad ? [...posts, { __placeholder: true }] : posts;
   }, [posts, hasNextPage]);
   const scrollRef = React.useRef<HTMLDivElement | null>(null);
+  //console.log("scrollRef:", scrollRef.current?.clientHeight);
+  const [scrollEl, setScrollEl] = useState<HTMLDivElement | null>(null);
   return (
     <div className="bg-white min-h-screen">
       <h1 className="text-center py-4 text-lg font-semibold text-slate-800">
         动态
       </h1>
 
-      <div ref = {scrollRef} className="h-[calc(100vh-56px)] overflow-auto overscroll-contain">
+      <div ref = {el=>{scrollRef.current = el;setScrollEl(el);}} className="h-[calc(100vh-56px)] overflow-auto overscroll-contain">
         <PullToRefresh onRefresh={refetch} scrollRef={scrollRef}>
           <div
             className="relative mx-auto max-w-4xl"
@@ -95,7 +98,8 @@ const posts = useMemo(() => {
             <div className="px-3 pb-20 ">
               <VirtuosoGrid
                 //useWindowScroll  //这意味这将滚动事件交给浏览器的原生的滚动系统。
-                customScrollParent={scrollRef.current ?? undefined}
+                style={{ height: "100%" }} 
+                customScrollParent={scrollEl ?? undefined}
                 data={gridData}
                 endReached={handleEndReached}
                 overscan={10}
