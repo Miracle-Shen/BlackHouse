@@ -98,8 +98,8 @@ const fetchUsersByIds = async (userIds = []) => {
 
     // 3️ 映射成 UserSummary（给 feed 用）
     return users.map((user) => ({
-      id: user.$id,
-      name: user.name ?? user.username ?? "Unknown",
+      $id: user.$id,
+      userName: user.userName ?? "Unknown",
       avatarUrl: user.avatarUrl ?? user.imageUrl ?? null,
     }));
   } catch (error) {

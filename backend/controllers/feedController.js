@@ -6,7 +6,6 @@ const handleFeed = async (req, res) => {
   const cursor = req.query.cursor || null;
 
   try {
-    // 1) 查 posts（只查 feed 需要的字段更好）
     const postList = await getFeedPosts({ limit, cursor });
 
     const posts = postList?.documents || [];
@@ -23,30 +22,29 @@ const handleFeed = async (req, res) => {
 
 
     // 4) 组装 Map，服务端完成 join
-    const userMap = new Map(users.map(u => [u.id, u]));
+    const userMap = new Map(users.map(u => [u.$id, u]));
     const toCreatorSummary = (postCreatorId) => {
-   const u = userMap.get(postCreatorId);
+      const u = userMap.get(postCreatorId);
+      if (u) {
+        const avatar = u.thumbnailUrl ?? u.avatarUrl ?? null;
 
-  // user 存在：优先 thumbnailUrl，没有就用 avatarUrl
-  if (u) {
-    const avatar = u.thumbnailUrl ?? u.avatarUrl ?? null;
+        return {
+          $id: u.$id ?? postCreatorId,
+          userName: u.userName ?? u.username ?? "Unknown",
+          avatarUrl: avatar,        // 统一对外只暴露 avatarUrl
+          thumbnailUrl: avatar,     // 若前端仍用 thumbnailUrl，也给同值避免改动
+          };
+      }
 
-    return {
-      id: u.id ?? postCreatorId,
-      userName: u.userName ?? u.name ?? u.username ?? "Unknown",
-      avatarUrl: avatar,        // ✅ 统一对外只暴露 avatarUrl
-      thumbnailUrl: avatar,     // ✅ 若你前端仍用 thumbnailUrl，也给同值避免改动
-      };
-    }
-
-    // user 不存在：降级
-    return {
-        id: postCreatorId,
-        userName: "Unknown",
-        avatarUrl: null,
-        thumbnailUrl: null,
-      };
+      // user 不存在：降级
+      return {
+          $id: postCreatorId,
+          userName: "Unknown",
+          avatarUrl: null,
+          thumbnailUrl: null,
+        };
     };
+    console.log("post.creator -> userMap:", posts.map(p => [p.creator, userMap.get(p.creator)]));
     const items = posts.map(post => ({
       $id: post.$id,
       title: post.title,
