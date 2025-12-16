@@ -53,8 +53,8 @@ const handleFeed = async (req, res) => {
       imageUrl: post.imageUrl,
       imageId: post.imageId,
       tags: post.tags,
-      createdAt: post.$createdAt,
-      updatedAt: post.$updatedAt,
+      $createdAt: post.$createdAt,
+      $updatedAt: post.$updatedAt,
       isPublished: !!post.isPublished,
       creator: toCreatorSummary(post.creator),
     }));

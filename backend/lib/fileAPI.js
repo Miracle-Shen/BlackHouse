@@ -71,7 +71,7 @@ const getFeedPosts = async ({ limit = 8, cursor = null } = {}) => {
     // ⚠️ 注意：如果按 $updatedAt 排序但 cursor 用 $id，
     // 在更新频繁时可能出现分页重复/漏数据（建议后续调整排序/游标策略）
     const queries = [
-      Query.orderDesc("$updatedAt"),
+      Query.orderDesc("$createdAt"),
       Query.limit(finalLimit),
       Query.equal("isPublished", true),
     ];
