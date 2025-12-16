@@ -30,12 +30,12 @@ const handleLogin = async (req, res) => {
         const accessToken = JWT.sign(
             {"username": foundUser.username},
             process.env.ACCESS_TOKEN_SECRET,
-            {expiresIn:'30s'}
+            {expiresIn:'120s'}
         );
         const refreshToken = JWT.sign(
             {"username": foundUser.username},
             process.env.REFRESH_TOKEN_SECRET,
-            {expiresIn:'10000s'}
+            {expiresIn:'36000s'}
         );
         //保存刷新令牌
         const otherUsers = usersDB.users.filter(person => person.username !== foundUser.username);
